@@ -1,0 +1,9 @@
+.c-header {
+  background-color: palette(gray, light);
+  padding: ($space-1 * 4) 0;
+
+  .logo {
+    font-size: $font-size-huge;
+    font-weight: bold;
+  }
+}

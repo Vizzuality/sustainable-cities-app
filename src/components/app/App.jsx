@@ -4,9 +4,12 @@ export default class App extends React.Component {
 
   render() {
     return (
-      <div className="l-app">
+      <div>
+        {this.props.header}
         <main role="main" className="l-main">
-          {this.props.main}
+          <div className="main-content l-app-wrapper">
+            {this.props.main}
+          </div>
         </main>
         {this.props.footer}
       </div>
@@ -16,5 +19,6 @@ export default class App extends React.Component {
 
 App.propTypes = {
   main: React.PropTypes.element,
-  footer: React.PropTypes.element
+  footer: React.PropTypes.element,
+  header: React.PropTypes.element
 };

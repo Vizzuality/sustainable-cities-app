@@ -1,0 +1,33 @@
+$_btn-primary-bg-color: palette(black);
+
+.c-btn {
+  display: inline-block;
+  border-radius: 2px;
+  padding: ($space-1 * 2) ($space-1 * 4);
+  font-size: $font-size-default;
+  text-transform: uppercase;
+  border: none;
+  font-weight: bold;
+  transition: all $animation-time linear;
+
+  &:disabled {
+    pointer-events: none;
+    opacity: .5;
+  }
+
+  // Types
+  &.-primary {
+    background-color: $_btn-primary-bg-color;
+    color: palette(white);
+
+    &:hover {
+      background-color: lighten($_btn-primary-bg-color, 20%);
+    }
+  }
+
+  // Position
+  &.-centered {
+    display: block;
+    margin: 0 auto;
+  }
+}

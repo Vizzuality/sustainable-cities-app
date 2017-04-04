@@ -16,7 +16,8 @@ $palettes: (
   ),
   gray: (
     primary: #AAAAAA,
-    light: #CCCCCC
+    light: #CCCCCC,
+    lighter: #EFEFEF
   ),
   yellow: (
     primary: #FFB400
@@ -24,10 +25,10 @@ $palettes: (
 );
 
 // Font families
-$font-size-default: 'Open Sans', sans-serif;
+$font-family-default: 'Open Sans', sans-serif;
 
 $fonts: (
-  primary: $font-size-default
+  primary: $font-family-default
 );
 
 // Fonts sizes
