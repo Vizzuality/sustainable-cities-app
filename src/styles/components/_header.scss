@@ -1,9 +1,10 @@
 .c-header {
-  background-color: palette(gray, light);
+  background-color: $color-primary;
   padding: ($space-1 * 4) 0;
 
   .logo {
     font-size: $font-size-huge;
     font-weight: bold;
+    color: palette(white);
   }
 }

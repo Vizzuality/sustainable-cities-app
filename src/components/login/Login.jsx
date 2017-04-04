@@ -16,6 +16,7 @@ export default class Login extends React.Component {
 
   onSubmit(evt) {
     evt.preventDefault();
+    console.log('Login');
     // TODO: login with api
   }
 

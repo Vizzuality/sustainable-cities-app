@@ -22,4 +22,5 @@ input[type="password"] {
 .form-error {
   display: block;
   margin-top: $space-1;
+  color: palette(states, error);
 }

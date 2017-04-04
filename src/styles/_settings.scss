@@ -1,7 +1,7 @@
 // Max widths
 $app-width: 1280px;
 
-// Colors
+// Palette
 $palettes: (
   blue: (
     primary: #0F6487,
@@ -12,17 +12,26 @@ $palettes: (
     dark: #FAFAFA
   ),
   black: (
-    primary: #4A4A4A
+    primary: #000000
   ),
   gray: (
     primary: #AAAAAA,
     light: #CCCCCC,
-    lighter: #EFEFEF
+    lighter: #EFEFEF,
+    dark: #4A4A4A
   ),
   yellow: (
     primary: #FFB400
+  ),
+  states: (
+    error: red,
+    success: green
   )
 );
+
+// Brand colors
+$color-primary: #4A4A4A;
+$color-secondary: #0F6487;
 
 // Font families
 $font-family-default: 'Open Sans', sans-serif;
