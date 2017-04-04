@@ -8,7 +8,7 @@ const required = {
 
 const email = {
   rule: value => validator.isEmail(value),
-  hint: value => <span className="form-error -email">{value} isnt an Email.</span>
+  hint: () => <span className="form-error -email">Email not valid</span>
 };
 
 export { required, email };
