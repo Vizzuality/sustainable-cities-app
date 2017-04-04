@@ -4,10 +4,9 @@ import Validation from 'react-validation';
 function withWrapper(Component) {
   return class extends React.Component {
     render() {
-      const { children, ...props} = this.props;
       return (
         <div className="form-control">
-          <Component {...props}>{children}</Component>
+          <Component {...this.props} />
         </div>
       );
     }
