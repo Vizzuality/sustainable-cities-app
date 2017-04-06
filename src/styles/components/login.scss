@@ -1,5 +1,14 @@
 .c-login {
+
   .login-title {
+    margin-bottom: $space-1 * 3;
+  }
+
+  .login-error {
+    display: block;
+    width: 100%;
+    text-align: center;
+    color: palette(states, error);
     margin-bottom: $space-1 * 3;
   }
 }

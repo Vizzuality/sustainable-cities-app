@@ -1,1 +1,1 @@
-export default {};
+export { loginReducer as login } from './login';
