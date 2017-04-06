@@ -1,32 +1,35 @@
+// NOTE: APi doc -> https://sc-api-documentation.herokuapp.com/index.html#registration
+
 import { isLogged } from 'utils/auth';
-import { post } from 'utils/request';
+import { post, get } from 'utils/request';
+import { replace } from 'react-router-redux';
 
 /* Constants */
 const SET_LOGGED = 'SET_LOGGED';
-const SET_USER = 'SET_USER';
+const SET_USER_DATA = 'SET_USER_DATA';
 const SET_LOADING = 'SET_LOADING';
 const SET_ERROR = 'SET_ERROR';
 
 /* Initial state */
 const initialState = {
+  data: null,
   logged: isLogged(),
-  user: null,
   loading: false,
   error: null
 };
 
 /* Reducer */
-function loginReducer(state = initialState, action) {
+function userReducer(state = initialState, action) {
   switch (action.type) {
     case SET_LOGGED:
       return {
         ...state,
         logged: action.payload
       };
-    case SET_USER:
+    case SET_USER_DATA:
       return {
         ...state,
-        user: action.payload
+        data: action.payload
       };
     case SET_LOADING:
       return {
@@ -51,10 +54,10 @@ function setLogged(logged) {
   };
 }
 
-function setUser(user) {
+function setUserData(data) {
   return {
-    type: SET_USER,
-    payload: user
+    type: SET_USER_DATA,
+    payload: data
   };
 }
 
@@ -73,8 +76,18 @@ function setError(error) {
 }
 
 /* Redux-thunk async actions */
+function getUserData() {
+  return (dispatch) => {
+    get({
+      url: `${config.API_URL}/users/current-user`,
+      onSuccess({ data }) {
+        dispatch(setUserData(data.attributes));
+      }
+    });
+  };
+}
 
-function login({ email, password, onSuccess, onError }) {
+function login({ email, password }) {
   return (dispatch) => {
     dispatch(setError(null));
     dispatch(setLoading(true));
@@ -85,15 +98,14 @@ function login({ email, password, onSuccess, onError }) {
       },
       onSuccess({ token }) {
         localStorage.token = token;
-        dispatch(setUser(email));
         dispatch(setLogged(true));
         dispatch(setLoading(false));
-        typeof onSuccess === 'function' && onSuccess();
+        dispatch(replace('/'));
+        dispatch(getUserData());
       },
       onError(error) {
         dispatch(setLoading(false));
         dispatch(setError(error));
-        typeof onError === 'function' && onError(error);
       }
     });
   };
@@ -103,7 +115,9 @@ function logout() {
   return (dispatch) => {
     delete localStorage.token;
     dispatch(setLogged(false));
+    dispatch(setUserData(null));
+    dispatch(replace('/login'));
   };
 }
 
-export { loginReducer, login, logout };
+export { userReducer, login, logout, getUserData };

@@ -1,6 +1,14 @@
 import React from 'react';
+import { dispatch } from 'main';
+import { getUserData } from 'modules/user';
 
 export default class App extends React.Component {
+
+  componentWillMount() {
+    if (this.props.user.logged && !this.props.user.data) {
+      dispatch(getUserData());
+    }
+  }
 
   render() {
     return (
@@ -18,6 +26,7 @@ export default class App extends React.Component {
 }
 
 App.propTypes = {
+  user: React.PropTypes.object,
   main: React.PropTypes.element,
   footer: React.PropTypes.element,
   header: React.PropTypes.element

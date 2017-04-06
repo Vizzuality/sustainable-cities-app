@@ -1,3 +1,6 @@
+import { dispatch } from 'main';
+import { logout } from 'modules/user';
+
 function post({ url, body, headers, onSuccess, onError }) {
   const request = new XMLHttpRequest();
   request.open('POST', url);
@@ -21,6 +24,10 @@ function post({ url, body, headers, onSuccess, onError }) {
       if (request.status === 200) {
         onSuccess(data);
       } else {
+        if (data.errors[0].status === '401') {
+          // Log out
+          dispatch(logout());
+        }
         onError(data);
       }
     }
@@ -29,9 +36,20 @@ function post({ url, body, headers, onSuccess, onError }) {
   return request;
 }
 
-function get({ url, onSuccess, onError }) {
+function get({ url, headers, onSuccess, onError }) {
   const request = new XMLHttpRequest();
   request.open('GET', url);
+
+  const _headers = { ...headers,
+    'Content-Type': 'application/json',
+    SC_API_KEY: config.SC_API_KEY,
+    Authorization: `Bearer ${localStorage.token}`
+  };
+
+  Object.keys(_headers).forEach((h) => {
+    request.setRequestHeader(h, _headers[h]);
+  });
+
   request.send();
 
   request.onreadystatechange = () => {

@@ -1,8 +1,8 @@
 import { connect } from 'react-redux';
-import Login from './Login';
+import HomePage from './HomePage';
 
 const mapStateToProps = ({ user }) => ({
   user
 });
 
-export default connect(mapStateToProps, null)(Login);
+export default connect(mapStateToProps, null)(HomePage);

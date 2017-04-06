@@ -3,18 +3,18 @@ import { connect } from 'react-redux';
 import { IndexRoute, Router, Route } from 'react-router';
 
 // App
-import App from 'components/app/App';
+import AppContainer from 'components/app/AppContainer';
 // Header
 import Header from 'components/header/Header';
 // Pages
-import HomePage from 'components/pages/HomePage';
+import HomePageContainer from 'components/pages/HomePageContainer';
 import LoginPage from 'components/pages/LoginPage';
 import BusinessModelElementPage from 'components/pages/BusinessModelElementPage.jsx';
 
 const Routes = ({ history }) => (
   <Router history={history}>
-    <Route path="/" component={App}>
-      <IndexRoute components={{ main: HomePage, header: Header }} />
+    <Route path="/" component={AppContainer}>
+      <IndexRoute components={{ main: HomePageContainer, header: Header }} />
       <Route path="login">
         <IndexRoute components={{ main: LoginPage, header: Header }} />
       </Route>

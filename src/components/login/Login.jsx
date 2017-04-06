@@ -2,7 +2,7 @@ import React from 'react';
 import { Input, Button, Form } from 'components/form/Form';
 import { required, email } from 'constants/validation-rules';
 import Spinner from 'components/ui/Spinner';
-import { login } from 'modules/login';
+import { login } from 'modules/user';
 import Validation from 'react-validation';
 import { Autobind } from 'es-decorators';
 import { dispatch } from 'main';
@@ -40,14 +40,14 @@ export default class Login extends React.Component {
     return (
       <section className="c-login">
         <h1 className="login-title h1">Login</h1>
-        {this.props.login.error &&
-          <span className="login-error">{this.props.login.error.errors[0].title}</span>
+        {this.props.user.error &&
+          <span className="login-error">{this.props.user.error.errors[0].title}</span>
         }
         <Form className="login-form" onSubmit={this.onSubmit}>
           <Input type="text" onChange={this.onInputChange} name="email" value="" placeholder="Email" validations={['required', 'email']} />
           <Input type="password" onChange={this.onInputChange} name="password" value="" placeholder="Password" validations={['required']} />
           <Button className="c-btn -primary -centered">Login</Button>
-          <Spinner isLoading={this.props.login.loading} />
+          <Spinner isLoading={this.props.user.loading} />
         </Form>
       </section>
     );
