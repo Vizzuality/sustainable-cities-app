@@ -9,6 +9,7 @@ import Header from 'components/header/Header';
 // Pages
 import HomePage from 'components/pages/HomePage';
 import LoginPage from 'components/pages/LoginPage';
+import BusinessModelElementPage from 'components/pages/BusinessModelElementPage.jsx';
 
 const Routes = ({ history }) => (
   <Router history={history}>
@@ -16,6 +17,9 @@ const Routes = ({ history }) => (
       <IndexRoute components={{ main: HomePage, header: Header }} />
       <Route path="login">
         <IndexRoute components={{ main: LoginPage, header: Header }} />
+      </Route>
+      <Route path="business-model-element">
+        <IndexRoute components={{ main: BusinessModelElementPage, header: Header }} />
       </Route>
     </Route>
   </Router>

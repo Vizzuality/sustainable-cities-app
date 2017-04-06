@@ -1,0 +1,12 @@
+.c-nav {
+
+  .nav-list {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-link {
+    color: palette(white);
+  }
+}

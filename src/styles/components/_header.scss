@@ -2,6 +2,12 @@
   background-color: $color-primary;
   padding: ($space-1 * 4) 0;
 
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
   .logo {
     font-size: $font-size-huge;
     font-weight: bold;
