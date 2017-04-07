@@ -21,7 +21,7 @@ function post({ url, body, headers, onSuccess, onError }) {
   request.onreadystatechange = () => {
     if (request.readyState === 4) {
       const data = JSON.parse(request.responseText);
-      if (request.status === 200) {
+      if ([200, 201].includes(request.status)) {
         onSuccess(data);
       } else {
         if (data.errors[0].status === '401') {

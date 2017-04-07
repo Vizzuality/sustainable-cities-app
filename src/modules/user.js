@@ -120,4 +120,25 @@ function logout() {
   };
 }
 
-export { userReducer, login, logout, getUserData };
+function register({ email, nickname, password, password_confirmation, name }, loginAfterRegister) {
+  return (dispatch) => {
+    post({
+      url: `${config.API_URL}/register`,
+      body: {
+        user: {
+          email,
+          nickname,
+          password,
+          password_confirmation,
+          name
+        }
+      },
+      onSuccess() {
+        // Login user after register
+        loginAfterRegister && dispatch(login({ email, password }));
+      }
+    });
+  };
+}
+
+export { userReducer, login, logout, getUserData, register };

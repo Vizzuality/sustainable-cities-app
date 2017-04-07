@@ -1,13 +1,11 @@
 import { replace } from 'react-router-redux';
+import { publicRoutes } from 'constants/routes';
 
 const authRedirectMiddleware = store => next => (action) => {
-  const loginPath = '/login';
   const { logged } = store.getState().user;
 
-  if (action.type === '@@router/LOCATION_CHANGE' && !logged && action.payload.pathname !== loginPath) {
-    if (window.location.pathname !== loginPath) {
-      store.dispatch(replace(loginPath));
-    }
+  if (action.type === '@@router/LOCATION_CHANGE' && !logged && !publicRoutes.includes(action.payload.pathname)) {
+    store.dispatch(replace('/login'));
   } else {
     next(action);
   }

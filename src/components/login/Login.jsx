@@ -1,13 +1,10 @@
 import React from 'react';
 import { Input, Button, Form } from 'components/form/Form';
-import { required, email } from 'constants/validation-rules';
 import Spinner from 'components/ui/Spinner';
 import { login } from 'modules/user';
-import Validation from 'react-validation';
 import { Autobind } from 'es-decorators';
 import { dispatch } from 'main';
-
-Object.assign(Validation.rules, { required, email });
+import { validation } from 'utils/validation';
 
 export default class Login extends React.Component {
 
@@ -21,12 +18,7 @@ export default class Login extends React.Component {
     evt.preventDefault();
 
     // Login user
-    dispatch(
-      login({
-        email: this.state.email,
-        password: this.state.password
-      })
-    );
+    dispatch(login(this.state));
   }
 
   @Autobind
@@ -38,13 +30,13 @@ export default class Login extends React.Component {
 
   render() {
     return (
-      <section className="c-login">
-        <h1 className="login-title h1">Login</h1>
+      <section className="c-form -login">
+        <h1 className="form-title h1">Login</h1>
         {this.props.user.error &&
           <span className="login-error">{this.props.user.error.errors[0].title}</span>
         }
         <Form className="login-form" onSubmit={this.onSubmit}>
-          <Input type="text" onChange={this.onInputChange} name="email" value="" placeholder="Email" validations={['required', 'email']} />
+          <Input type="email" onChange={this.onInputChange} name="email" value="" placeholder="Email" validations={['required', 'email']} />
           <Input type="password" onChange={this.onInputChange} name="password" value="" placeholder="Password" validations={['required']} />
           <Button className="c-btn -primary -centered">Login</Button>
           <Spinner isLoading={this.props.user.loading} />
@@ -55,5 +47,5 @@ export default class Login extends React.Component {
 }
 
 Login.propTypes = {
-  login: React.PropTypes.object
+  user: React.PropTypes.object
 };
