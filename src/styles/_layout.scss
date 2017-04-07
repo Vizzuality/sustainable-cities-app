@@ -10,6 +10,10 @@
   flex: 1;
 }
 
+.main-content {
+  padding: ($space-1 * 4) 0;
+}
+
 /* Wrappers */
 .l-app-wrapper {
   max-width: $app-width;

@@ -13,7 +13,7 @@ export default function Header(props) {
         <div>
           <Nav links={links} />
           {props.user.logged &&
-            <button type="button" onClick={() => { dispatch(logout()); }}>Logout</button>
+            <button className="c-btn -secondary" type="button" onClick={() => { dispatch(logout()); }}>Logout</button>
           }
         </div>
       </div>
