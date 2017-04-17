@@ -33,7 +33,7 @@ export default class Register extends React.Component {
           <Input name="nickname" type="text" onChange={this.onInputChange} value="" placeholder="Nick name" validations={['required']} />
           <Input name="name" type="text" onChange={this.onInputChange} value="" placeholder="Name" validations={['required']} />
           <Input name="password" type="password" onChange={this.onInputChange} value="" placeholder="Password" validations={['required']} />
-          <Input name="password_confirmation" type="password" onChange={this.onInputChange} value="" placeholder="Password confirmation" validations={['required']} />
+          <Input name="password_confirmation" type="password" onChange={this.onInputChange} value="" placeholder="Password confirmation" validations={['required', 'passwordConfirmation']} />
           <Button className="c-btn -primary -centered">Register</Button>
         </Form>
       </section>
