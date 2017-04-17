@@ -15,6 +15,25 @@
   }
 
   .nav-link {
-    color: palette(white);
+    color: inherit;
+
+    &.-active {
+      font-weight: bold;
+    }
+  }
+
+  &.-stacked {
+
+    .nav-list {
+      display: block;
+    }
+
+    .nav-item {
+      margin-bottom: $space-1;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
   }
 }

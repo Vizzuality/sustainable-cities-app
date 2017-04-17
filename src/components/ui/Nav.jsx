@@ -11,15 +11,13 @@ export default function Nav(props) {
   return (
     <nav className={cNames} role="navigation">
       <ul className="nav-list">
-        {
-          props.links.map((l, i) => {
-            return (
-              <li className="nav-item" key={i}>
-                <Link activeClassName="-active" className="nav-link" to={l.href}>{l.text}</Link>
-              </li>
-            );
-          })
-        }
+        {props.links.map((l, i) => {
+          return (
+            <li className="nav-item" key={i}>
+              <Link activeClassName="-active" className="nav-link" to={l.href}>{l.text}</Link>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
