@@ -10,6 +10,9 @@
 /* Lib */
 @import "lib/foundation";
 
+/* External */
+@import "~react-redux-toastr/src/styles/index";
+
 /* Components */
 @import "components/form";
 @import "components/header";

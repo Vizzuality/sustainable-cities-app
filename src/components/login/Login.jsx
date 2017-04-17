@@ -5,6 +5,8 @@ import { login } from 'modules/user';
 import { Autobind } from 'es-decorators';
 import { dispatch } from 'main';
 import { validation } from 'utils/validation';
+import { toastr } from 'react-redux-toastr';
+import isEqual from 'lodash/isEqual';
 
 export default class Login extends React.Component {
 
@@ -13,10 +15,17 @@ export default class Login extends React.Component {
     this.state = {};
   }
 
+  /* Lifecycle */
+  componentWillReceiveProps(newProps) {
+    if (newProps.user.error && !isEqual(this.props.user.error, newProps.user.error)) {
+      toastr.error(newProps.user.error.errors[0].title);
+    }
+  }
+
+  /* Methods  */
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
-
     // Login user
     dispatch(login(this.state));
   }
@@ -32,9 +41,6 @@ export default class Login extends React.Component {
     return (
       <section className="c-form -login">
         <h1 className="form-title h1">Login</h1>
-        {this.props.user.error &&
-          <span className="login-error">{this.props.user.error.errors[0].title}</span>
-        }
         <Form className="login-form" onSubmit={this.onSubmit}>
           <Input type="email" onChange={this.onInputChange} name="email" value="" placeholder="Email" validations={['required', 'email']} />
           <Input type="password" onChange={this.onInputChange} name="password" value="" placeholder="Password" validations={['required']} />
