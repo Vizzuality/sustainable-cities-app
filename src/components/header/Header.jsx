@@ -11,9 +11,9 @@ export default function Header(props) {
       <div className="header-content l-app-wrapper">
         <Link to="/" className="logo">Sustainable Cities</Link>
         <div>
-          <Nav links={links} />
-          {props.user.logged &&
-            <button className="c-btn -secondary" type="button" onClick={() => { dispatch(logout()); }}>Logout</button>
+          {props.user.logged ?
+            <button className="c-btn -secondary" type="button" onClick={() => { dispatch(logout()); }}>Logout</button> :
+            <Nav links={links} />
           }
         </div>
       </div>
