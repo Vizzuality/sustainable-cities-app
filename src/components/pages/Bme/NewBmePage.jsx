@@ -33,7 +33,7 @@ export default class NewBmePage extends React.Component {
     // Create Bme
     dispatch(createBme({
       data: this.form,
-      onSuccess() {
+      onSuccess: () => {
         toastr.success('Business model element created!');
       }
     }));
