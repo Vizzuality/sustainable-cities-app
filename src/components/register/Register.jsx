@@ -4,11 +4,23 @@ import { Autobind } from 'es-decorators';
 import { Input, Button, Form } from 'components/form/Form';
 import { dispatch } from 'main';
 import { register } from 'modules/user';
+import Spinner from 'components/ui/Spinner';
+import { toastr } from 'react-redux-toastr';
+import isEqual from 'lodash/isEqual';
+import capitalize from 'lodash/capitalize';
 
 export default class Register extends React.Component {
+
   constructor(props) {
     super(props);
     this.state = {};
+  }
+
+  /* Lifecycle */
+  componentWillReceiveProps(newProps) {
+    if (newProps.user.error && !isEqual(this.props.user.error, newProps.user.error)) {
+      toastr.error(capitalize(newProps.user.error.errors[0].title));
+    }
   }
 
   @Autobind
@@ -35,6 +47,7 @@ export default class Register extends React.Component {
           <Input name="password" type="password" onChange={this.onInputChange} value="" placeholder="Password" validations={['required']} />
           <Input name="password_confirmation" type="password" onChange={this.onInputChange} value="" placeholder="Password confirmation" validations={['required', 'passwordConfirmation']} />
           <Button className="c-btn -primary -centered">Register</Button>
+          <Spinner isLoading={this.props.user.loading} />
         </Form>
       </section>
     );
@@ -42,5 +55,5 @@ export default class Register extends React.Component {
 }
 
 Register.propTypes = {
-
+  user: React.PropTypes.object
 };

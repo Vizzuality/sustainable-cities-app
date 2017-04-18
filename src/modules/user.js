@@ -122,6 +122,8 @@ function logout() {
 
 function register({ email, nickname, password, password_confirmation, name }, loginAfterRegister) {
   return (dispatch) => {
+    dispatch(setError(null));
+    dispatch(setLoading(true));
     post({
       url: `${config.API_URL}/register`,
       body: {
@@ -135,7 +137,12 @@ function register({ email, nickname, password, password_confirmation, name }, lo
       },
       onSuccess() {
         // Login user after register
+        dispatch(setLoading(false));
         loginAfterRegister && dispatch(login({ email, password }));
+      },
+      onError(error) {
+        dispatch(setLoading(false));
+        dispatch(setError(error));
       }
     });
   };

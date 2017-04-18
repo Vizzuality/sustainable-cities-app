@@ -7,6 +7,7 @@ import { dispatch } from 'main';
 import { validation } from 'utils/validation';
 import { toastr } from 'react-redux-toastr';
 import isEqual from 'lodash/isEqual';
+import capitalize from 'lodash/capitalize';
 
 export default class Login extends React.Component {
 
@@ -18,7 +19,7 @@ export default class Login extends React.Component {
   /* Lifecycle */
   componentWillReceiveProps(newProps) {
     if (newProps.user.error && !isEqual(this.props.user.error, newProps.user.error)) {
-      toastr.error(newProps.user.error.errors[0].title);
+      toastr.error(capitalize(newProps.user.error.errors[0].title));
     }
   }
 

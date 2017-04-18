@@ -1,5 +1,5 @@
 import React from 'react';
-import Register from 'components/register/Register';
+import Register from 'components/register/RegisterContainer';
 
 export default class RegisterPage extends React.Component {
   render() {
