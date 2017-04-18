@@ -13,7 +13,7 @@ export default class Register extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.form = {};
   }
 
   /* Lifecycle */
@@ -26,14 +26,12 @@ export default class Register extends React.Component {
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
-    dispatch(register(this.state, true));
+    dispatch(register(this.form, true));
   }
 
   @Autobind
   onInputChange(evt) {
-    this.setState({
-      [evt.target.name]: evt.target.value
-    });
+    this.form[evt.target.name] = evt.target.value;
   }
 
   render() {

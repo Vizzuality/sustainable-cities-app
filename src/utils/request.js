@@ -7,7 +7,8 @@ function post({ url, body, headers, onSuccess, onError }) {
 
   const _headers = { ...headers,
     'Content-Type': 'application/json',
-    SC_API_KEY: config.SC_API_KEY
+    SC_API_KEY: config.SC_API_KEY,
+    Authorization: `Bearer ${localStorage.token}`
   };
 
   Object.keys(_headers).forEach((h) => {
@@ -22,13 +23,13 @@ function post({ url, body, headers, onSuccess, onError }) {
     if (request.readyState === 4) {
       const data = JSON.parse(request.responseText);
       if ([200, 201].includes(request.status)) {
-        onSuccess(data);
+        onSuccess && onSuccess(data);
       } else {
         if (data.errors[0].status === '401') {
           // Log out
-          dispatch(logout());
+          // dispatch(logout());
         }
-        onError(data);
+        onError && onError(data);
       }
     }
   };
@@ -56,9 +57,9 @@ function get({ url, headers, onSuccess, onError }) {
     if (request.readyState === 4) {
       const data = JSON.parse(request.responseText);
       if (request.status === 200) {
-        onSuccess(data);
+        onSuccess && onSuccess(data);
       } else {
-        onError(data);
+        onError && onError(data);
       }
     }
   };

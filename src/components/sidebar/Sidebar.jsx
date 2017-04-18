@@ -4,29 +4,29 @@ import Nav from 'components/ui/Nav'
 const links = [
   {
     text: 'Study case',
-    href: 'study-case'
+    href: '/study-cases'
   },
   {
     text: 'Business model element',
-    href: 'business-model-element'
+    href: '/business-model-element'
   },
   {
     text: 'Solution',
-    href: 'solution'
+    href: '/solution'
   },
   {
     text: 'Source',
-    href: 'source'
+    href: '/source'
   },
   {
     text: 'Impact',
-    href: 'impact'
+    href: '/impact'
   },
   {
     text: 'Enabling condition',
-    href: 'enabling-condition'
+    href: '/enabling-condition'
   }
-]
+];
 
 export default function Sidebar() {
   return (
@@ -34,4 +34,4 @@ export default function Sidebar() {
       <Nav links={links} className="-stacked" />
     </aside>
   );
-};
+}

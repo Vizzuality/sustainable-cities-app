@@ -15,6 +15,8 @@ function withWrapper(Component) {
 
 const Form = withWrapper(Validation.components.Form);
 const Input = withWrapper(Validation.components.Input);
-const Button = withWrapper(Validation.components.Button);
+const Textarea = withWrapper(Validation.components.Textarea);
+const Select = withWrapper(Validation.components.Select);
+const Button = Validation.components.Button;
 
-export { Input, Button, Form };
+export { Input, Button, Form, Textarea, Select };

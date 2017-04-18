@@ -87,14 +87,14 @@ function getUserData() {
   };
 }
 
-function login({ email, password }) {
+function login(userData) {
   return (dispatch) => {
     dispatch(setError(null));
     dispatch(setLoading(true));
     post({
       url: `${config.API_URL}/login`,
       body: {
-        auth: { email, password }
+        auth: userData
       },
       onSuccess({ token }) {
         localStorage.token = token;

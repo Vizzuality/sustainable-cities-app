@@ -13,7 +13,7 @@ export default class Login extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.form = {};
   }
 
   /* Lifecycle */
@@ -28,14 +28,12 @@ export default class Login extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
     // Login user
-    dispatch(login(this.state));
+    dispatch(login(this.form));
   }
 
   @Autobind
   onInputChange(evt) {
-    this.setState({
-      [evt.target.name]: evt.target.value
-    });
+    this.form[evt.target.name] = evt.target.value;
   }
 
   render() {
