@@ -14,7 +14,7 @@ export default class BmePage extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className="c-page">
         <Link className="c-btn -primary" to="/business-model-element/new">New Business Model Element</Link>
         <Table
           items={this.props.bmes.list}
