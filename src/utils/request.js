@@ -7,8 +7,7 @@ function post({ url, body, headers, onSuccess, onError }) {
 
   const _headers = { ...headers,
     'Content-Type': 'application/json',
-    SC_API_KEY: config.SC_API_KEY,
-    Authorization: `Bearer ${localStorage.token}`
+    SC_API_KEY: config.SC_API_KEY
   };
 
   Object.keys(_headers).forEach((h) => {

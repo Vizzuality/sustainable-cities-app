@@ -63,6 +63,9 @@ function createBme({ data, onSuccess }) {
     post({
       url: `${config.API_URL}/business-model-elements`,
       body: data,
+      headers: {
+        Authorization: `Bearer ${localStorage.token}`
+      },
       onSuccess() {
         dispatch(setBmesLoading(false));
         onSuccess && onSuccess();
