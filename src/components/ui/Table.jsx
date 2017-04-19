@@ -1,5 +1,6 @@
 import React from 'react';
 import isEqual from 'lodash/isEqual';
+import Icon from 'components/ui/Icon';
 
 export default class Table extends React.Component {
 
@@ -26,7 +27,7 @@ export default class Table extends React.Component {
   }
 
   /* Methods */
-  sortableBy(field) {
+  sort(field) {
     this.setState({
       sort: {
         field,
@@ -41,7 +42,11 @@ export default class Table extends React.Component {
       <tr>
         {this.props.fields.map((field, i) => {
           return (
-            <th key={i}>{this.props.sortableBy.includes(field) ? <button className="table-btn" onClick={() => this.sortableBy(field)} >{field}</button> : field}</th>
+            <th key={i}>{this.props.sortableBy.includes(field) ?
+              <button className="table-btn" onClick={() => this.sort(field)} >
+                <Icon className="table-btn-icon -small" name={this.state.sort.direction === 1 ? 'icon-arrow-up-2' : 'icon-arrow-down-2'} />{field}
+              </button> : field}
+            </th>
           );
         })}
       </tr>
