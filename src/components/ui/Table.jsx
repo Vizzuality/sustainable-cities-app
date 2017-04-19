@@ -1,6 +1,8 @@
 import React from 'react';
 import isEqual from 'lodash/isEqual';
 import Icon from 'components/ui/Icon';
+import BtnGroup from 'components/ui/BtnGroup';
+import { Link } from 'react-router';
 
 export default class Table extends React.Component {
 
@@ -49,6 +51,7 @@ export default class Table extends React.Component {
             </th>
           );
         })}
+        <th>Edit / Delete</th>
       </tr>
     );
   }
@@ -58,11 +61,21 @@ export default class Table extends React.Component {
 
     if (sort.field) {
       // Sort items
-      items.sort((prev, next) => (prev.attributes[sort.field].toString() < next.attributes[sort.field].toString() ? sort.direction : (sort.direction * -1)));
+      items.sort((prev, next) => (prev.attributes[sort.field].toString().toLowerCase() < next.attributes[sort.field].toString().toLowerCase() ? sort.direction : (sort.direction * -1)));
     }
 
     return items.map((item, index) => {
-      return <tr key={index}>{this.props.fields.map((field, i) => <td key={i}>{item.attributes[field]}</td>)}</tr>;
+      return (
+        <tr key={index}>
+          {this.props.fields.map((field, i) => <td key={i}>{item.attributes[field]}</td>)}
+          <td>
+            <BtnGroup className="-left">
+              <Link to={`${this.props.editUrl}/${item.id}`} className="table-btn">Edit</Link>
+              <button className="table-btn" onClick={() => this.props.onDelete && this.props.onDelete(item)}>Delete</button>
+            </BtnGroup>
+          </td>
+        </tr>
+      );
     });
   }
 
@@ -84,5 +97,7 @@ Table.propTypes = {
   items: React.PropTypes.array,
   fields: React.PropTypes.array,
   sortableBy: React.PropTypes.array,
-  defaultSort: React.PropTypes.string
+  defaultSort: React.PropTypes.string,
+  editUrl: React.PropTypes.string,
+  onDelete: React.PropTypes.func
 };

@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { getBmes } from 'modules/bmes';
+import { getBmes, deleteBme } from 'modules/bmes';
 import { dispatch } from 'main';
 import Spinner from 'components/ui/Spinner';
 import Table from 'components/ui/Table';
+import { toastr } from 'react-redux-toastr';
 
 export default class BmePage extends React.Component {
 
@@ -21,6 +22,8 @@ export default class BmePage extends React.Component {
           fields={['name', 'description']}
           defaultSort="name"
           sortableBy={['name']}
+          editUrl="/business-model-element/edit"
+          onDelete={item => dispatch(deleteBme({ id: item.id, onSuccess: () => toastr.success('The business model elemen has been removed') }))}
         />
         <Spinner isLoading={this.props.bmes.loading} />
       </div>
