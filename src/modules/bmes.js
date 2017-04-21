@@ -1,16 +1,27 @@
 import { get, post, _delete, patch } from 'utils/request';
-import findIndex from 'lodash/findIndex';
+import {
+  DEFAULT_PAGINATION_SIZE,
+  DEFAULT_PAGINATION_NUMBER,
+  DEFAULT_SORT_FIELD
+} from 'constants/bmes';
 
+/* Constants */
 const SET_BMES = 'SET_BMES';
 const SET_BMES_LOADING = 'SET_BMES_LOADING';
+const SET_BMES_FILTERS = 'SET_BMES_FILTERS';
 const SET_BMES_DETAIL = 'SET_BMES_DETAIL';
-const REMOVE_BEM = 'REMOVE_BEM';
+
 
 /* Initial state */
 const initialState = {
   loading: false,
   list: [],
-  detailId: null
+  detailId: null,
+  filters: {},
+  pagination: {
+    pageSize: DEFAULT_PAGINATION_SIZE,
+    pageNumber: DEFAULT_PAGINATION_NUMBER
+  }
 };
 
 /* Reducer */
@@ -21,20 +32,15 @@ function bmesReducer(state = initialState, action) {
         ...state,
         list: action.payload
       };
-    case REMOVE_BEM: {
-      const index = findIndex(state.list, item => item.id === action.payload);
-      const list = state.list.slice(0);
-      list.splice(index, 1);
-
-      return {
-        ...state,
-        list
-      };
-    }
     case SET_BMES_LOADING:
       return {
         ...state,
         loading: action.payload
+      };
+    case SET_BMES_FILTERS:
+      return {
+        ...state,
+        ...action.payload
       };
     case SET_BMES_DETAIL:
       return {
@@ -54,17 +60,20 @@ function setBmes(categories) {
   };
 }
 
-function removeBem(id) {
-  return {
-    type: REMOVE_BEM,
-    payload: id
-  };
-}
-
 function setBmesLoading(loading) {
   return {
     type: SET_BMES_LOADING,
     payload: loading
+  };
+}
+
+function setFilters(field, value) {
+  const filter = {};
+  filter[field] = value;
+
+  return {
+    type: SET_BMES_FILTERS,
+    payload: filter
   };
 }
 
@@ -76,13 +85,18 @@ function setBmesDetail(id) {
 }
 
 /* Redux-thunk async actions */
-function getBmes(id) {
+function getBmes(paramsConfig = {}) {
   return (dispatch) => {
+    let { pageSize, pageNumber, sort, id } = paramsConfig;
+    id = id ? `/${id}` : '';
+    pageSize = pageSize || DEFAULT_PAGINATION_SIZE;
+    pageNumber = pageNumber || DEFAULT_PAGINATION_NUMBER;
+    sort = sort || DEFAULT_SORT_FIELD;
+
     dispatch(setBmesLoading(true));
-    let url = `${config.API_URL}/business-model-elements`;
-    if (id) {
-      url += `/${id}`;
-    }
+    const url = `${config.API_URL}/business-model-elements${id}?
+      page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}`;
+
     get({
       url,
       onSuccess({ data }) {
@@ -129,7 +143,6 @@ function updateBme({ id, data, onSuccess }) {
         'bme': data
       },
       onSuccess() {
-        dispatch(removeBem(id));
         dispatch(setBmesLoading(false));
         onSuccess && onSuccess(id);
       }
@@ -143,7 +156,6 @@ function deleteBme({ id, onSuccess }) {
     _delete({
       url: `${config.API_URL}/business-model-elements/${id}`,
       onSuccess() {
-        dispatch(removeBem(id));
         dispatch(setBmesLoading(false));
         onSuccess && onSuccess(id);
       }
@@ -151,4 +163,4 @@ function deleteBme({ id, onSuccess }) {
   };
 }
 
-export { bmesReducer, getBmes, createBme, deleteBme, setBmesDetail, updateBme };
+export { bmesReducer, getBmes, createBme, deleteBme, setBmesDetail, updateBme, setFilters };
