@@ -13,19 +13,28 @@ export default class Table extends React.Component {
     this.state = {
       sortDirection: 1
     };
+
+    // initializes maxPagination value
+    this.maxPagination = Math.ceil(this.props.itemCount / this.props.pagination.pageSize);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // updates maxPagination just if it's necessary
+    if (this.props.itemCount !== nextProps.itemCount ||
+      this.props.pagination.pageSize !== nextProps.pagination.pageSize) {
+      this.maxPagination = Math.ceil(nextProps.itemCount / nextProps.pagination.pageSize);
+    }
   }
 
   onChangePageNumber(pageNumber) {
-    // const limitPagination = Math.ceil(this.props.items.length / this.props.pagination.pageSize);
     let nextPage = pageNumber;
 
     if (pageNumber < DEFAULT_PAGINATION_NUMBER) {
       nextPage = DEFAULT_PAGINATION_NUMBER;
     }
 
-    // TO-DO: change to maxPagination value
-    if (pageNumber > 10) {
-      nextPage = 10;
+    if (pageNumber > this.maxPagination) {
+      nextPage = this.maxPagination;
     }
 
     this.props.onUpdateFilters('pagination', { ...this.props.pagination, pageNumber: nextPage });
@@ -77,8 +86,6 @@ export default class Table extends React.Component {
   }
 
   render() {
-    // TO-DO: remove default value of maxPagination variable
-    const maxPagination = 10 || Math.ceil(this.props.items.length / this.props.pagination.pageSize);
     const { pageNumber } = this.props.pagination;
 
     return (
@@ -94,8 +101,8 @@ export default class Table extends React.Component {
         <ul className="c-pagination-list">
           <li disabled={DEFAULT_PAGINATION_NUMBER === pageNumber} className="pagination-item" onClick={() => this.onChangePageNumber(DEFAULT_PAGINATION_NUMBER)}>&#60;&#60;</li>
           <li disabled={DEFAULT_PAGINATION_NUMBER === pageNumber} className="pagination-item" onClick={() => this.onChangePageNumber(pageNumber - 1)}>&#60;</li>
-          <li disabled={maxPagination === pageNumber} className="pagination-item" onClick={() => this.onChangePageNumber(pageNumber + 1)}>&#62;</li>
-          <li disabled={maxPagination === pageNumber} className="pagination-item" onClick={() => this.onChangePageNumber(maxPagination)}>&#62;&#62;</li>
+          <li disabled={this.maxPagination === pageNumber} className="pagination-item" onClick={() => this.onChangePageNumber(pageNumber + 1)}>&#62;</li>
+          <li disabled={this.maxPagination === pageNumber} className="pagination-item" onClick={() => this.onChangePageNumber(this.maxPagination)}>&#62;&#62;</li>
         </ul>
       </div>
     );
@@ -104,6 +111,7 @@ export default class Table extends React.Component {
 
 Table.propTypes = {
   items: React.PropTypes.array,
+  itemCount: React.PropTypes.number,
   fields: React.PropTypes.array,
   sortableBy: React.PropTypes.array,
   editUrl: React.PropTypes.string,

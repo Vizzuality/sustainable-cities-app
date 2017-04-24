@@ -16,6 +16,7 @@ const SET_BMES_DETAIL = 'SET_BMES_DETAIL';
 const initialState = {
   loading: false,
   list: [],
+  itemCount: null,
   detailId: null,
   filters: {},
   pagination: {
@@ -30,7 +31,8 @@ function bmesReducer(state = initialState, action) {
     case SET_BMES:
       return {
         ...state,
-        list: action.payload
+        list: action.payload.list,
+        itemCount: action.payload.itemCount
       };
     case SET_BMES_LOADING:
       return {
@@ -56,7 +58,10 @@ function bmesReducer(state = initialState, action) {
 function setBmes(categories) {
   return {
     type: SET_BMES,
-    payload: categories
+    payload: {
+      list: categories.list,
+      itemCount: categories.itemCount
+    }
   };
 }
 
@@ -94,12 +99,11 @@ function getBmes(paramsConfig = {}) {
     sort = sort || DEFAULT_SORT_FIELD;
 
     dispatch(setBmesLoading(true));
-    const url = `${config.API_URL}/business-model-elements${id}?
-      page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}`;
+    const url = `${config.API_URL}/business-model-elements${id}?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}`;
 
     get({
       url,
-      onSuccess({ data }) {
+      onSuccess({ data, meta }) {
         // Parse data to json api format
         if (!Array.isArray(data)) {
           data = [data];
@@ -111,7 +115,7 @@ function getBmes(paramsConfig = {}) {
         });
 
         dispatch(setBmesLoading(false));
-        dispatch(setBmes(parsedData));
+        dispatch(setBmes({ list: parsedData, itemCount: meta.total_items }));
       }
     });
   };

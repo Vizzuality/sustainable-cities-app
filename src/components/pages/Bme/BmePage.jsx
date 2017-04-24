@@ -35,6 +35,7 @@ class BmePage extends React.Component {
         <Link className="c-btn -primary" to="/business-model-element/new">New Business Model Element</Link>
         <Table
           items={this.props.bmes.list}
+          itemCount={this.props.bmes.itemCount}
           fields={['name', 'description']}
           defaultSort="name"
           sortableBy={['name']}
