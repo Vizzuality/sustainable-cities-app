@@ -1,14 +1,16 @@
-import { get, post, _delete } from 'utils/request';
+import { get, post, _delete, patch } from 'utils/request';
 import findIndex from 'lodash/findIndex';
 
 const SET_BMES = 'SET_BMES';
 const SET_BMES_LOADING = 'SET_BMES_LOADING';
+const SET_BMES_DETAIL = 'SET_BMES_DETAIL';
 const REMOVE_BEM = 'REMOVE_BEM';
 
 /* Initial state */
 const initialState = {
   loading: false,
-  list: []
+  list: [],
+  detailId: null
 };
 
 /* Reducer */
@@ -29,12 +31,16 @@ function bmesReducer(state = initialState, action) {
         list
       };
     }
-    case SET_BMES_LOADING: {
+    case SET_BMES_LOADING:
       return {
         ...state,
         loading: action.payload
       };
-    }
+    case SET_BMES_DETAIL:
+      return {
+        ...state,
+        detailId: action.payload
+      };
     default:
       return state;
   }
@@ -62,15 +68,36 @@ function setBmesLoading(loading) {
   };
 }
 
+function setBmesDetail(id) {
+  return {
+    type: SET_BMES_DETAIL,
+    payload: id
+  };
+}
+
 /* Redux-thunk async actions */
-function getBmes() {
+function getBmes(id) {
   return (dispatch) => {
     dispatch(setBmesLoading(true));
+    let url = `${config.API_URL}/business-model-elements`;
+    if (id) {
+      url += `/${id}`;
+    }
     get({
-      url: `${config.API_URL}/business-model-elements`,
+      url,
       onSuccess({ data }) {
+        // Parse data to json api format
+        if (!Array.isArray(data)) {
+          data = [data];
+        }
+
+        const parsedData = data.map((item) => {
+          const { attributes, ...props } = item;
+          return { ...attributes, ...props };
+        });
+
         dispatch(setBmesLoading(false));
-        dispatch(setBmes(data));
+        dispatch(setBmes(parsedData));
       }
     });
   };
@@ -93,6 +120,23 @@ function createBme({ data, onSuccess }) {
   };
 }
 
+function updateBme({ id, data, onSuccess }) {
+  return (dispatch) => {
+    dispatch(setBmesLoading(true));
+    patch({
+      url: `${config.API_URL}/business-model-elements/${id}`,
+      body: {
+        'bme': data
+      },
+      onSuccess() {
+        dispatch(removeBem(id));
+        dispatch(setBmesLoading(false));
+        onSuccess && onSuccess(id);
+      }
+    });
+  };
+}
+
 function deleteBme({ id, onSuccess }) {
   return (dispatch) => {
     dispatch(setBmesLoading(true));
@@ -107,4 +151,4 @@ function deleteBme({ id, onSuccess }) {
   };
 }
 
-export { bmesReducer, getBmes, createBme, deleteBme };
+export { bmesReducer, getBmes, createBme, deleteBme, setBmesDetail, updateBme };

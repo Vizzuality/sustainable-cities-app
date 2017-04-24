@@ -61,13 +61,13 @@ export default class Table extends React.Component {
 
     if (sort.field) {
       // Sort items
-      items.sort((prev, next) => (prev.attributes[sort.field].toString().toLowerCase() < next.attributes[sort.field].toString().toLowerCase() ? sort.direction : (sort.direction * -1)));
+      items.sort((prev, next) => (prev[sort.field].toString().toLowerCase() < next[sort.field].toString().toLowerCase() ? sort.direction : (sort.direction * -1)));
     }
 
     return items.map((item, index) => {
       return (
         <tr key={index}>
-          {this.props.fields.map((field, i) => <td key={i}>{item.attributes[field]}</td>)}
+          {this.props.fields.map((field, i) => <td key={i}>{item[field]}</td>)}
           <td>
             <BtnGroup className="-left">
               <Link to={`${this.props.editUrl}/${item.id}`} className="table-btn">Edit</Link>

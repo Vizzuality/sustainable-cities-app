@@ -8,8 +8,9 @@ import { validation } from 'utils/validation';
 import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
 import { toastr } from 'react-redux-toastr';
+import { connect } from 'react-redux';
 
-export default class NewBmePage extends React.Component {
+class NewBmePage extends React.Component {
 
   constructor(props) {
     super(props);
@@ -56,5 +57,14 @@ export default class NewBmePage extends React.Component {
 }
 
 NewBmePage.propTypes = {
+  // State
   categories: React.PropTypes.object
 };
+
+// Map state to props
+const mapStateToProps = ({ user, categories }) => ({
+  user,
+  categories
+});
+
+export default connect(mapStateToProps, null)(NewBmePage);

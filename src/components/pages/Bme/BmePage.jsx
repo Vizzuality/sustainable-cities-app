@@ -5,8 +5,9 @@ import { dispatch } from 'main';
 import Spinner from 'components/ui/Spinner';
 import Table from 'components/ui/Table';
 import { toastr } from 'react-redux-toastr';
+import { connect } from 'react-redux';
 
-export default class BmePage extends React.Component {
+class BmePage extends React.Component {
 
   componentWillMount() {
     // Fetch Bems
@@ -32,5 +33,13 @@ export default class BmePage extends React.Component {
 }
 
 BmePage.propTypes = {
+  // State
   bmes: React.PropTypes.object
 };
+
+// Map state to props
+const mapStateToProps = ({ bmes }) => ({
+  bmes
+});
+
+export default connect(mapStateToProps, null)(BmePage);
