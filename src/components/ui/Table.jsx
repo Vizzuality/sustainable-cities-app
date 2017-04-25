@@ -1,7 +1,7 @@
 import React from 'react';
-import isEqual from 'lodash/isEqual';
 import Icon from 'components/ui/Icon';
 import BtnGroup from 'components/ui/BtnGroup';
+import { DEFAULT_PAGINATION_NUMBER } from 'constants/bmes';
 import { Link } from 'react-router';
 
 export default class Table extends React.Component {
@@ -11,31 +11,42 @@ export default class Table extends React.Component {
 
     /* Initial state */
     this.state = {
-      items: props.items,
-      sort: {
-        field: props.defaultSort,
-        direction: -1
-      }
+      sortDirection: 1
     };
+
+    // initializes maxPagination value
+    this.maxPagination = Math.ceil(this.props.itemCount / this.props.pagination.pageSize);
   }
 
-  /* Lifecycle */
-  componentWillReceiveProps(newProps) {
-    if (!isEqual(this.state.items, newProps.items)) {
-      this.setState({
-        items: newProps.items
-      });
+  componentWillReceiveProps(nextProps) {
+    // updates maxPagination just if it's necessary
+    if (this.props.itemCount !== nextProps.itemCount ||
+      this.props.pagination.pageSize !== nextProps.pagination.pageSize) {
+      this.maxPagination = Math.ceil(nextProps.itemCount / nextProps.pagination.pageSize);
     }
   }
 
-  /* Methods */
-  sort(field) {
+  onChangePageNumber(pageNumber) {
+    let nextPage = pageNumber;
+
+    if (pageNumber < DEFAULT_PAGINATION_NUMBER) {
+      nextPage = DEFAULT_PAGINATION_NUMBER;
+    }
+
+    if (pageNumber > this.maxPagination) {
+      nextPage = this.maxPagination;
+    }
+
+    this.props.onUpdateFilters('pagination', { ...this.props.pagination, pageNumber: nextPage });
+  }
+
+  onSort(field) {
+    const sortDirection = -(this.state.sortDirection);
     this.setState({
-      sort: {
-        field,
-        direction: this.state.sort.direction * -1
-      }
+      sortDirection
     });
+
+    this.props.onUpdateFilters('sort', sortDirection === 1 ? field : `-${field}`);
   }
 
   /* Partial renders */
@@ -45,8 +56,8 @@ export default class Table extends React.Component {
         {this.props.fields.map((field, i) => {
           return (
             <th key={i}>{this.props.sortableBy.includes(field) ?
-              <button className="table-btn" onClick={() => this.sort(field)} >
-                <Icon className="table-btn-icon -small" name={this.state.sort.direction === 1 ? 'icon-arrow-up-2' : 'icon-arrow-down-2'} />{field}
+              <button className="table-btn" onClick={() => this.onSort(field)} >
+                <Icon className="table-btn-icon -small" name={this.state.sortDirection === 1 ? 'icon-arrow-up-2' : 'icon-arrow-down-2'} />{field}
               </button> : field}
             </th>
           );
@@ -57,12 +68,7 @@ export default class Table extends React.Component {
   }
 
   renderTableContent() {
-    const { items, sort } = this.state;
-
-    if (sort.field) {
-      // Sort items
-      items.sort((prev, next) => (prev[sort.field].toString().toLowerCase() < next[sort.field].toString().toLowerCase() ? sort.direction : (sort.direction * -1)));
-    }
+    const { items } = this.props;
 
     return items.map((item, index) => {
       return (
@@ -80,24 +86,38 @@ export default class Table extends React.Component {
   }
 
   render() {
+    const { pageNumber } = this.props.pagination;
+
     return (
-      <table className="c-table">
-        <thead>
-          {this.renderTableHead()}
-        </thead>
-        <tbody>
-          {this.renderTableContent()}
-        </tbody>
-      </table>
+      <div>
+        <table className="c-table">
+          <thead>
+            {this.renderTableHead()}
+          </thead>
+          <tbody>
+            {this.renderTableContent()}
+          </tbody>
+        </table>
+        <ul className="c-pagination-list">
+          <li disabled={DEFAULT_PAGINATION_NUMBER === pageNumber} className="pagination-item" onClick={() => this.onChangePageNumber(DEFAULT_PAGINATION_NUMBER)}>&#60;&#60;</li>
+          <li disabled={DEFAULT_PAGINATION_NUMBER === pageNumber} className="pagination-item" onClick={() => this.onChangePageNumber(pageNumber - 1)}>&#60;</li>
+          <li disabled={this.maxPagination === pageNumber} className="pagination-item" onClick={() => this.onChangePageNumber(pageNumber + 1)}>&#62;</li>
+          <li disabled={this.maxPagination === pageNumber} className="pagination-item" onClick={() => this.onChangePageNumber(this.maxPagination)}>&#62;&#62;</li>
+        </ul>
+      </div>
     );
   }
 }
 
 Table.propTypes = {
   items: React.PropTypes.array,
+  itemCount: React.PropTypes.number,
   fields: React.PropTypes.array,
   sortableBy: React.PropTypes.array,
-  defaultSort: React.PropTypes.string,
   editUrl: React.PropTypes.string,
-  onDelete: React.PropTypes.func
+  /* Filters */
+  pagination: React.PropTypes.object,
+  /* Callbacks */
+  onDelete: React.PropTypes.func,
+  onUpdateFilters: React.PropTypes.func
 };
