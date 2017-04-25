@@ -7,20 +7,20 @@
 @import "mixins";
 @import "layout";
 
-/* Lib */
-@import "lib/foundation";
-
 /* External */
 @import "~react-redux-toastr/src/styles/index";
 
+/*  Foundation */
+@import 'foundation';
+@include foundation-button;
+@include foundation-table;
+@include foundation-pagination;
+@include foundation-top-bar;
+@include foundation-forms;
+@include foundation-menu;
+@include foundation-typography;
+
 /* Components */
-@import "components/form";
-@import "components/header";
-@import "components/text";
-@import "components/button";
-@import "components/nav";
 @import "components/spinner";
-@import "components/table";
 @import "components/page";
-@import "components/pagination";
 @import "components/icon";

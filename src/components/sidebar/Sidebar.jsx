@@ -31,7 +31,7 @@ const links = [
 export default function Sidebar() {
   return (
     <aside className="c-sidebar">
-      <Nav links={links} className="-stacked" />
+      <Nav links={links} />
     </aside>
   );
 }

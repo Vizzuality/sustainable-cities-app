@@ -2,14 +2,12 @@ import React from 'react';
 import classnames from 'classnames';
 
 export default function BtnGroup({ children, className }) {
-  const cNames = classnames('c-btn-group', {
+  const cNames = classnames('button-group', {
     [className]: !!className
   });
 
   return (
-    <ul className={cNames}>
-      {children.map((btn, i) => <li className="btn-group-item" key={i}>{btn}</li>)}
-    </ul>
+    <div className={cNames}>{children}</div>
   );
 }
 

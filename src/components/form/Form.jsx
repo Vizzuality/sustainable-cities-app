@@ -4,9 +4,11 @@ import Validation from 'react-validation';
 function withWrapper(Component) {
   return class extends React.Component {
     render() {
+      const { label, ...props } = this.props;
       return (
         <div className="form-control">
-          <Component {...this.props} />
+          {label && <label htmlFor={props.name} >{label}</label>}
+          <Component id={props.name} {...props} />
         </div>
       );
     }

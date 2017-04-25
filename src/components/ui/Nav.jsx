@@ -3,18 +3,14 @@ import { Link } from 'react-router';
 import classnames from 'classnames';
 
 export default function Nav(props) {
-  const cNames = classnames(
-    'c-nav',
-    'header-nav',
-    { [props.className]: !!props.className }
-  );
+  const cNames = classnames({ [props.className]: !!props.className });
   return (
     <nav className={cNames} role="navigation">
-      <ul className="nav-list">
+      <ul className="menu">
         {props.links.map((l, i) => {
           return (
-            <li className="nav-item" key={i}>
-              <Link activeClassName="-active" className="nav-link" to={l.href}>{l.text}</Link>
+            <li key={i}>
+              <Link activeClassName="active" to={l.href}>{l.text}</Link>
             </li>
           );
         })}

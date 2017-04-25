@@ -10,20 +10,6 @@
   flex: 1;
 }
 
-.main-content {
-  display: flex;
-  padding: ($space-1 * 4) 0;
-
-  .content-sidebar {
-    width: 33.33%;
-  }
-
-  .content-content {
-    margin: 0 auto;
-    width: 66.66%;
-  }
-}
-
 /* Wrappers */
 .l-app-wrapper {
   max-width: $app-width;

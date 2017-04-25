@@ -39,11 +39,11 @@ export default class Login extends React.Component {
   render() {
     return (
       <section className="c-form -login">
-        <h1 className="form-title h1">Login</h1>
         <Form className="login-form" onSubmit={this.onSubmit}>
+          <h3>Login</h3>
           <Input type="email" onChange={this.onInputChange} name="email" value="" placeholder="Email" validations={['required', 'email']} />
           <Input type="password" onChange={this.onInputChange} name="password" value="" placeholder="Password" validations={['required']} />
-          <Button className="c-btn -primary -centered">Login</Button>
+          <Button className="button">Login</Button>
           <Spinner isLoading={this.props.user.loading} />
         </Form>
       </section>

@@ -18,9 +18,9 @@ export default class App extends React.Component {
         <Header />
         <main role="main" className="l-main">
           <div className="main-content l-app-wrapper">
-            {this.props.sidebar &&
-              <div className="content-sidebar">
-                {this.props.sidebar}
+            {this.props.nav &&
+              <div className="content-header">
+                {this.props.nav}
               </div>
             }
             <div className="content-content">
@@ -39,5 +39,5 @@ App.propTypes = {
   user: React.PropTypes.object,
   main: React.PropTypes.element,
   footer: React.PropTypes.element,
-  sidebar: React.PropTypes.element
+  nav: React.PropTypes.element
 };

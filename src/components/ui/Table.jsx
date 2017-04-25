@@ -3,6 +3,7 @@ import Icon from 'components/ui/Icon';
 import BtnGroup from 'components/ui/BtnGroup';
 import { DEFAULT_PAGINATION_NUMBER } from 'constants/bmes';
 import { Link } from 'react-router';
+import capitalize from 'lodash/capitalize';
 
 export default class Table extends React.Component {
 
@@ -56,9 +57,9 @@ export default class Table extends React.Component {
         {this.props.fields.map((field, i) => {
           return (
             <th key={i}>{this.props.sortableBy.includes(field) ?
-              <button className="table-btn" onClick={() => this.onSort(field)} >
-                <Icon className="table-btn-icon -small" name={this.state.sortDirection === 1 ? 'icon-arrow-up-2' : 'icon-arrow-down-2'} />{field}
-              </button> : field}
+              <a onClick={() => this.onSort(field)} >
+                <Icon className="table-btn-icon -small" name={this.state.sortDirection === 1 ? 'icon-arrow-up-2' : 'icon-arrow-down-2'} />{capitalize(field)}
+              </a> : capitalize(field)}
             </th>
           );
         })}
@@ -75,9 +76,9 @@ export default class Table extends React.Component {
         <tr key={index}>
           {this.props.fields.map((field, i) => <td key={i}>{item[field]}</td>)}
           <td>
-            <BtnGroup className="-left">
-              <Link to={`${this.props.editUrl}/${item.id}`} className="table-btn">Edit</Link>
-              <button className="table-btn" onClick={() => this.props.onDelete && this.props.onDelete(item)}>Delete</button>
+            <BtnGroup>
+              <Link to={`${this.props.editUrl}/${item.id}`} className="tiny button">Edit</Link>
+              <button className="tiny button" onClick={() => this.props.onDelete && this.props.onDelete(item)}>Delete</button>
             </BtnGroup>
           </td>
         </tr>
@@ -85,11 +86,22 @@ export default class Table extends React.Component {
     });
   }
 
-  render() {
+  renderPagination() {
     const { pageNumber } = this.props.pagination;
+    return (
+      <ul className="pagination" role="navigation">
+        <li><a href="#0" className={DEFAULT_PAGINATION_NUMBER === pageNumber ? 'disabled' : null} onClick={() => this.onChangePageNumber(DEFAULT_PAGINATION_NUMBER)}>&#60;&#60; First</a></li>
+        <li><a href="#0" className={DEFAULT_PAGINATION_NUMBER === pageNumber ? 'disabled' : null} onClick={() => this.onChangePageNumber(pageNumber - 1)}>&#60; Prev</a></li>
+        <li><a href="#0" className={this.maxPagination === pageNumber ? 'disabled' : null} onClick={() => this.onChangePageNumber(pageNumber + 1)}>Next &#62;</a></li>
+        <li><a href="#0" className={this.maxPagination === pageNumber ? 'disabled' : null} onClick={() => this.onChangePageNumber(this.maxPagination)}>Last &#62;&#62;</a></li>
+      </ul>
+    );
+  }
 
+  render() {
     return (
       <div>
+        {this.renderPagination()}
         <table className="c-table">
           <thead>
             {this.renderTableHead()}
@@ -98,12 +110,7 @@ export default class Table extends React.Component {
             {this.renderTableContent()}
           </tbody>
         </table>
-        <ul className="c-pagination-list">
-          <li disabled={DEFAULT_PAGINATION_NUMBER === pageNumber} className="pagination-item" onClick={() => this.onChangePageNumber(DEFAULT_PAGINATION_NUMBER)}>&#60;&#60;</li>
-          <li disabled={DEFAULT_PAGINATION_NUMBER === pageNumber} className="pagination-item" onClick={() => this.onChangePageNumber(pageNumber - 1)}>&#60;</li>
-          <li disabled={this.maxPagination === pageNumber} className="pagination-item" onClick={() => this.onChangePageNumber(pageNumber + 1)}>&#62;</li>
-          <li disabled={this.maxPagination === pageNumber} className="pagination-item" onClick={() => this.onChangePageNumber(this.maxPagination)}>&#62;&#62;</li>
-        </ul>
+        {this.renderPagination()}
       </div>
     );
   }

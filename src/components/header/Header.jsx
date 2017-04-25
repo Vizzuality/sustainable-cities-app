@@ -7,12 +7,14 @@ import { logout } from 'modules/user';
 
 export default function Header(props) {
   return (
-    <header className="c-header" role="banner">
-      <div className="header-content l-app-wrapper">
-        <Link to="/" className="logo">Sustainable Cities</Link>
-        <div>
+    <header className="top-bar" role="banner">
+      <div className="l-app-wrapper">
+        <div className="top-bar-left">
+          <Link to="/" className="logo">Sustainable Cities</Link>
+        </div>
+        <div className="top-bar-right">
           {props.user.logged ?
-            <button className="c-btn -secondary" type="button" onClick={() => { dispatch(logout()); }}>Logout</button> :
+            <button className="button" type="button" onClick={() => { dispatch(logout()); }}>Logout</button> :
             <Nav links={links} />
           }
         </div>

@@ -2,7 +2,7 @@ import React from 'react';
 import { dispatch } from 'main';
 import { getCategories } from 'modules/bmes';
 import { createBme } from 'modules/bmes';
-import { Input, Button, Form, Textarea } from 'components/form/Form';
+import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import { validation } from 'utils/validation';
 import { Autobind } from 'es-decorators';
@@ -45,9 +45,12 @@ class NewBmePage extends React.Component {
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
           <BtnGroup>
-            <Link to="/business-model-element" className="c-btn -secondary">Cancel</Link>
-            <Button type="submit" className="c-btn -primary">Save</Button>
+            <Link to="/business-model-element" className="button alert">Cancel</Link>
+            <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
+          <Select name="category" label="Category" validations={['required']} value="">
+            {this.props.bmes.categories.map((category, i) => <option key={i} value={category.id}>{category.name}</option>)}
+          </Select>
           <Input type="text" onChange={this.onInputChange} name="name" value="" placeholder="Business model element title" validations={['required']} />
           <Textarea onChange={this.onInputChange} name="description" value="" placeholder="Description" validations={['required']} />
         </Form>

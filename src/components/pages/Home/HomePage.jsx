@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 function HomePage(props) {
   return (
     <div>
-      <h1>Welcome to Sustainable Cities, <em>{props.user.data ? props.user.data.email : ''}</em></h1>
+      <p>Welcome to Sustainable Cities, <strong>{props.user.data ? props.user.data.email : ''}</strong></p>
     </div>
   );
 }

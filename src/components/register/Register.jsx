@@ -37,14 +37,14 @@ export default class Register extends React.Component {
   render() {
     return (
       <section className="c-form -register">
-        <h1 className="form-title h1">Register</h1>
+        <h3>Register</h3>
         <Form onSubmit={this.onSubmit}>
           <Input name="email" type="Email" onChange={this.onInputChange} value="" placeholder="Email" validations={['required', 'email']} />
           <Input name="nickname" type="text" onChange={this.onInputChange} value="" placeholder="Nick name" validations={['required']} />
           <Input name="name" type="text" onChange={this.onInputChange} value="" placeholder="Name" validations={['required']} />
           <Input name="password" type="password" onChange={this.onInputChange} value="" placeholder="Password" validations={['required']} />
           <Input name="password_confirmation" type="password" onChange={this.onInputChange} value="" placeholder="Password confirmation" validations={['required', 'passwordConfirmation']} />
-          <Button className="c-btn -primary -centered">Register</Button>
+          <Button className="button">Register</Button>
           <Spinner isLoading={this.props.user.loading} />
         </Form>
       </section>

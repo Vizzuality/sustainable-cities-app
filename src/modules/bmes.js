@@ -109,8 +109,12 @@ function getCategories() {
     get({
       url: `${config.API_URL}/business-model-element-categories?page[number]=1&page[size]=999999`,
       onSuccess({ data }) {
+        const parsedData = data.map((item) => {
+          const { attributes, ...props } = item;
+          return { ...attributes, ...props };
+        });
         dispatch(setBmesLoading(false));
-        dispatch(setCategories(data));
+        dispatch(setCategories(parsedData));
       }
     });
   };

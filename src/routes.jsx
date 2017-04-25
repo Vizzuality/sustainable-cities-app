@@ -26,7 +26,7 @@ import { onEnterEditBmePage } from 'modules/url';
 const Routes = ({ history }) => (
   <Router history={history}>
     <Route path="/" component={AppContainer}>
-      <IndexRoute components={{ main: HomePage, sidebar: Sidebar }} />
+      <IndexRoute components={{ main: HomePage, nav: Sidebar }} />
       <Route path="login">
         <IndexRoute components={{ main: LoginPage }} />
       </Route>
@@ -34,12 +34,12 @@ const Routes = ({ history }) => (
         <IndexRoute components={{ main: RegisterPage }} />
       </Route>
       <Route path="study-cases">
-        <IndexRoute components={{ main: StudyCasesPage, sidebar: Sidebar }} />
+        <IndexRoute components={{ main: StudyCasesPage, nav: Sidebar }} />
       </Route>
       <Route path="business-model-element">
-        <IndexRoute components={{ main: BmePage, sidebar: Sidebar }} />
-        <Route path="new" components={{ main: NewBmePage, sidebar: Sidebar }} />
-        <Route path="edit/:id" components={{ main: EditBmePage, sidebar: Sidebar }} onEnter={onEnterEditBmePage} />
+        <IndexRoute components={{ main: BmePage, nav: Sidebar }} />
+        <Route path="new" components={{ main: NewBmePage, nav: Sidebar }} />
+        <Route path="edit/:id" components={{ main: EditBmePage, nav: Sidebar }} onEnter={onEnterEditBmePage} />
       </Route>
     </Route>
   </Router>
