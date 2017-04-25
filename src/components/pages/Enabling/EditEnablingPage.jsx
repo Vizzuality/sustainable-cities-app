@@ -1,26 +1,27 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { dispatch } from 'main';
 import { getBmes } from 'modules/bmes';
-import { createEnabling, getEnablings } from 'modules/enablings';
+import { getEnablings, updateEnabling } from 'modules/enablings';
 import { getCategories } from 'modules/categories';
-import { Input, Button, Form, Textarea, Select, Radio } from 'components/form/Form';
+import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
+import getEnablingDetail from 'selectors/enablingDetail';
 import { validation } from 'utils/validation';
 import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
 import { toastr } from 'react-redux-toastr';
 import { connect } from 'react-redux';
+import isEqual from 'lodash/isEqual';
 
-class NewEnablingPage extends React.Component {
+class EditBmePage extends React.Component {
 
   constructor(props) {
     super(props);
     this.form = {};
-
     this.state = {
-      category_id: null,
       bme_ids: null,
+      category_id: null,
+      /* radio buttons */
       'success-barrier': {
         success: true,
         barrier: false
@@ -30,9 +31,23 @@ class NewEnablingPage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.enablings.categories.length || dispatch(getCategories({ type: 'enablings', tree: false }));
     dispatch(getBmes());
-    dispatch(getEnablings());
+    dispatch(getCategories({ type: 'enablings', tree: false }));
+    if (!this.props.enablingDetail) {
+      dispatch(getEnablings({ id: this.props.enablings.detailId }));
+    }
+  }
+
+  componentDidMount() {
+    if (this.props.enablingDetail) {
+      this.fillFields(this.props);
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!isEqual(this.props.enablingDetail, nextProps.enablingDetail)) {
+      this.fillFields(nextProps);
+    }
   }
 
   /* Methods */
@@ -42,10 +57,10 @@ class NewEnablingPage extends React.Component {
   }
 
   onSelectChange(field, val) {
-    if (!Array.isArray(val)) {
-      val = val.value
-    } else {
+    if (Array.isArray(val)) {
       val = val.map(v => v.value);
+    } else {
+      val = val.value;
     }
 
     this.setState({
@@ -85,16 +100,33 @@ class NewEnablingPage extends React.Component {
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
-    // creates enabling condition
-    dispatch(createEnabling({
+    // Update Enabling
+    dispatch(updateEnabling({
+      id: this.props.enablingDetail.id,
       data: {
         ...this.form,
         ...this.state
       },
-      onSuccess: () => {
-        toastr.success('Enabling condition created!');
+      onSuccess() {
+        toastr.success('Enabling condition edited!');
       }
     }));
+  }
+
+  fillFields({ enablingDetail }) {
+    const categoryId = enablingDetail.relationships.category.data ?
+      enablingDetail.relationships.category.data.id : null;
+    const activeBmes = enablingDetail.relationships.bmes.data.map(bme => bme.id);
+    const factor = enablingDetail.assessment_value;
+
+    this.setState({
+      category_id: categoryId,
+      bme_ids: activeBmes,
+      'success-barrier': {
+        success: factor === 'Success',
+        barrier: factor === 'Barrier'
+      }
+    });
   }
 
   render() {
@@ -102,11 +134,23 @@ class NewEnablingPage extends React.Component {
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
           <BtnGroup>
-            <Link to="/enabling-condition" className="button alert">Cancel</Link>
-            <Button type="submit" className="button success">Save</Button>
+            <Link to="/business-model-element" className="button alert">Cancel</Link>
+            <Button type="submit" className="button success">Edit</Button>
           </BtnGroup>
-          <Input type="text" onChange={this.onInputChange} name="name" value="" label="Enabling condition title" validations={['required']} />
-          <Textarea onChange={this.onInputChange} name="description" value="" label="Description" validations={['required']} />
+          <Input
+            type="text"
+            onChange={this.onInputChange}
+            name="name" value={this.props.enablingDetail ? this.props.enablingDetail.name : ''}
+            label="Enabling condition title"
+            validations={['required']}
+          />
+          <Textarea
+            onChange={this.onInputChange}
+            name="description"
+            value={this.props.enablingDetail ? this.props.enablingDetail.description : ''}
+            label="Description"
+            validations={['required']}
+          />
           <Select
             name="category"
             label="Category"
@@ -147,18 +191,19 @@ class NewEnablingPage extends React.Component {
   }
 }
 
-NewEnablingPage.propTypes = {
-  /* state */
-  bmes: PropTypes.object,
-  categories: PropTypes.object,
-  enablings: PropTypes.object
+EditBmePage.propTypes = {
+  bmes: React.PropTypes.object,
+  categories: React.PropTypes.object,
+  enablings: React.PropTypes.object,
+  enablingDetail: React.PropTypes.object
 };
 
 // Map state to props
-const mapStateToProps = ({ bmes, categories, enablings }) => ({
-  bmes,
-  categories,
-  enablings
+const mapStateToProps = state => ({
+  bmes: state.bmes,
+  categories: state.categories,
+  enablings: state.enablings,
+  enablingDetail: getEnablingDetail(state)
 });
 
-export default connect(mapStateToProps, null)(NewEnablingPage);
+export default connect(mapStateToProps, null)(EditBmePage);

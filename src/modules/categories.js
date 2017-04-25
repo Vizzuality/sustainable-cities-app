@@ -8,6 +8,7 @@ const SET_CATEGORIES_LOADING = 'SET_CATEGORIES_LOADING';
 const initialState = {
   loading: false,
   Bme: [],
+  enablings: [],
   timing: []
 };
 
@@ -52,6 +53,7 @@ function setCategoriesLoading(loading) {
 function getCategories({ type, tree }) {
   const endPoints = {
     bme: 'business-model-element-categories?',
+    enablings: 'enabling-categories?',
     timing: 'timing-categories?'
   };
 

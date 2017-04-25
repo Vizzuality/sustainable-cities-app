@@ -39,7 +39,7 @@ class EnablingPage extends React.Component {
           itemCount={this.props.enablings.itemCount}
           fields={['name', 'category']}
           defaultSort="name"
-          sortableBy={['name']}
+          sortableBy={['name', 'category']}
           editUrl="/enabling-condition/edit"
           pagination={this.props.enablings.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}

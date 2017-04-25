@@ -1,4 +1,4 @@
-import { get, post, _delete } from 'utils/request';
+import { get, post, _delete, patch } from 'utils/request';
 import { deserialize } from 'utils/json-api';
 
 import {
@@ -10,7 +10,7 @@ import {
 const SET_ENABLINGS = 'SET_ENABLINGS';
 const SET_ENABLINGS_LOADING = 'SET_ENABLINGS_LOADING';
 const SET_ENABLINGS_FILTERS = 'SET_ENABLINGS_FILTERS';
-const SET_ENABLINGS_CATEGORIES = 'SET_ENABLINGS_CATEGORIES';
+const SET_ENABLINGS_DETAIL = 'SET_ENABLINGS_DETAIL';
 
 /* Initial state */
 const initialState = {
@@ -46,10 +46,10 @@ function enablingsReducer(state = initialState, action) {
         ...state,
         ...action.payload
       };
-    case SET_ENABLINGS_CATEGORIES:
+    case SET_ENABLINGS_DETAIL:
       return {
         ...state,
-        categories: action.payload
+        detailId: action.payload
       };
     default:
       return state;
@@ -64,17 +64,17 @@ function setEnablings(categories) {
   };
 }
 
-function setCategories(categories) {
-  return {
-    type: SET_ENABLINGS_CATEGORIES,
-    payload: categories
-  };
-}
-
 function setEnablingsLoading(loading) {
   return {
     type: SET_ENABLINGS_LOADING,
     payload: loading
+  };
+}
+
+function setEnablingDetail(id) {
+  return {
+    type: SET_ENABLINGS_DETAIL,
+    payload: id
   };
 }
 
@@ -106,23 +106,13 @@ function getEnablings(paramsConfig = {}) {
     get({
       url,
       onSuccess({ data, meta }) {
+        // Parse data to json api format
+        if (!Array.isArray(data)) {
+          data = [data];
+        }
         const parsedData = deserialize(data);
         dispatch(setEnablingsLoading(false));
         dispatch(setEnablings({ list: parsedData, itemCount: meta.total_items }));
-      }
-    });
-  };
-}
-
-function getCategories() {
-  return (dispatch) => {
-    dispatch(setEnablingsLoading(true));
-    get({
-      url: `${config.API_URL}/enabling-categories?page[number]=1&page[size]=999999`,
-      onSuccess({ data }) {
-        const parsedData = deserialize(data);
-        dispatch(setEnablingsLoading(false));
-        dispatch(setCategories(parsedData));
       }
     });
   };
@@ -146,7 +136,7 @@ function createEnabling({ data, onSuccess }) {
     dispatch(setEnablingsLoading(true));
     post({
       url: `${config.API_URL}/enablings`,
-      body: data,
+      body: { enabling: data },
       headers: {
         Authorization: `Bearer ${localStorage.token}`
       },
@@ -158,4 +148,20 @@ function createEnabling({ data, onSuccess }) {
   };
 }
 
-export { enablingsReducer, getEnablings, deleteEnabling, createEnabling, getCategories, setFilters };
+function updateEnabling({ id, data, onSuccess }) {
+  return (dispatch) => {
+    dispatch(setEnablingsLoading(true));
+    patch({
+      url: `${config.API_URL}/enablings/${id}`,
+      body: {
+        enabling: data
+      },
+      onSuccess() {
+        dispatch(setEnablingsLoading(false));
+        onSuccess && onSuccess(id);
+      }
+    });
+  };
+}
+
+export { enablingsReducer, getEnablings, deleteEnabling, createEnabling, updateEnabling, setFilters, setEnablingDetail };
