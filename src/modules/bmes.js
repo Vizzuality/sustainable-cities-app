@@ -10,7 +10,7 @@ const SET_BMES = 'SET_BMES';
 const SET_BMES_LOADING = 'SET_BMES_LOADING';
 const SET_BMES_FILTERS = 'SET_BMES_FILTERS';
 const SET_BMES_DETAIL = 'SET_BMES_DETAIL';
-
+const SET_BMES_CATEGORIES = 'SET_BMES_CATEGORIES';
 
 /* Initial state */
 const initialState = {
@@ -22,7 +22,8 @@ const initialState = {
   pagination: {
     pageSize: DEFAULT_PAGINATION_SIZE,
     pageNumber: DEFAULT_PAGINATION_NUMBER
-  }
+  },
+  categories: []
 };
 
 /* Reducer */
@@ -48,6 +49,11 @@ function bmesReducer(state = initialState, action) {
       return {
         ...state,
         detailId: action.payload
+      };
+    case SET_BMES_CATEGORIES:
+      return {
+        ...state,
+        categories: action.payload
       };
     default:
       return state;
@@ -89,17 +95,41 @@ function setBmesDetail(id) {
   };
 }
 
+function setCategories(categories) {
+  return {
+    type: SET_BMES_CATEGORIES,
+    payload: categories
+  };
+}
+
 /* Redux-thunk async actions */
+function getCategories() {
+  return (dispatch) => {
+    dispatch(setBmesLoading(true));
+    get({
+      url: `${config.API_URL}/business-model-element-categories?page[number]=1&page[size]=999999`,
+      onSuccess({ data }) {
+        dispatch(setBmesLoading(false));
+        dispatch(setCategories(data));
+      }
+    });
+  };
+}
+
 function getBmes(paramsConfig = {}) {
   return (dispatch) => {
-    let { pageSize, pageNumber, sort, id } = paramsConfig;
-    id = id ? `/${id}` : '';
+    let { pageSize, pageNumber, sort } = paramsConfig;
+    const { id } = paramsConfig;
+
     pageSize = pageSize || DEFAULT_PAGINATION_SIZE;
     pageNumber = pageNumber || DEFAULT_PAGINATION_NUMBER;
     sort = sort || DEFAULT_SORT_FIELD;
 
+    const url = id ?
+      `${config.API_URL}/business-model-elements/${id}` :
+      `${config.API_URL}/business-model-elements?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}`;
+
     dispatch(setBmesLoading(true));
-    const url = `${config.API_URL}/business-model-elements${id}?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}`;
 
     get({
       url,
@@ -144,7 +174,7 @@ function updateBme({ id, data, onSuccess }) {
     patch({
       url: `${config.API_URL}/business-model-elements/${id}`,
       body: {
-        'bme': data
+        bme: data
       },
       onSuccess() {
         dispatch(setBmesLoading(false));
@@ -167,4 +197,4 @@ function deleteBme({ id, onSuccess }) {
   };
 }
 
-export { bmesReducer, getBmes, createBme, deleteBme, setBmesDetail, updateBme, setFilters };
+export { bmesReducer, getBmes, createBme, deleteBme, setBmesDetail, updateBme, getCategories, setFilters };

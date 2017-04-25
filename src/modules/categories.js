@@ -48,7 +48,7 @@ function getCategories() {
   return (dispatch) => {
     dispatch(setCategoriesLoading(true));
     get({
-      url: `${config.API_URL}/categories`,
+      url: `${config.API_URL}/business-model-element-categories?page[number]=1&page[size]=999999`,
       onSuccess({ data }) {
         dispatch(setCategoriesLoading(false));
         dispatch(setCategories(data));

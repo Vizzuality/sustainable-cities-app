@@ -1,6 +1,6 @@
 import React from 'react';
 import { dispatch } from 'main';
-import { getCategories } from 'modules/categories';
+import { getCategories } from 'modules/bmes';
 import { createBme } from 'modules/bmes';
 import { Input, Button, Form, Textarea } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
@@ -19,7 +19,7 @@ class NewBmePage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.categories.list.length || dispatch(getCategories());
+    this.props.bmes.categories.length || dispatch(getCategories());
   }
 
   /* Methods */
@@ -58,13 +58,13 @@ class NewBmePage extends React.Component {
 
 NewBmePage.propTypes = {
   // State
-  categories: React.PropTypes.object
+  bmes: React.PropTypes.object
 };
 
 // Map state to props
-const mapStateToProps = ({ user, categories }) => ({
+const mapStateToProps = ({ user, bmes }) => ({
   user,
-  categories
+  bmes
 });
 
 export default connect(mapStateToProps, null)(NewBmePage);

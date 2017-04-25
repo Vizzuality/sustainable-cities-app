@@ -20,7 +20,7 @@ class EditBmePage extends React.Component {
   /* Lifecycle */
   componentWillMount() {
     if (!this.props.bmesDetail) {
-      dispatch(getBmes(this.props.bmes.detailId));
+      dispatch(getBmes({ id: this.props.bmes.detailId }));
     }
   }
 
