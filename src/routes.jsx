@@ -19,6 +19,9 @@ import EditBmePage from 'components/pages/Bme/EditBmePage';
 //    Study case
 import StudyCasesPage from 'components/pages/StudyCasesPage';
 
+/* Enabling Conditions */
+import EnablingPage from 'components/pages/Enabling/EnablingPage';
+
 // Url hooks
 import { onEnterEditBmePage } from 'modules/url';
 
@@ -40,6 +43,9 @@ const Routes = ({ history }) => (
         <IndexRoute components={{ main: BmePage, nav: Sidebar }} />
         <Route path="new" components={{ main: NewBmePage, nav: Sidebar }} />
         <Route path="edit/:id" components={{ main: EditBmePage, nav: Sidebar }} onEnter={onEnterEditBmePage} />
+      </Route>
+      <Route path="enabling-condition">
+        <IndexRoute components={{ main: EnablingPage, nav: Sidebar }} />
       </Route>
     </Route>
   </Router>

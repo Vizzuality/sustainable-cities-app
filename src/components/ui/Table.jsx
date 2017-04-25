@@ -1,7 +1,7 @@
 import React from 'react';
 import Icon from 'components/ui/Icon';
 import BtnGroup from 'components/ui/BtnGroup';
-import { DEFAULT_PAGINATION_NUMBER } from 'constants/bmes';
+import { DEFAULT_PAGINATION_NUMBER } from 'constants/enablings';
 import { Link } from 'react-router';
 import capitalize from 'lodash/capitalize';
 
@@ -27,8 +27,10 @@ export default class Table extends React.Component {
     }
   }
 
-  onChangePageNumber(pageNumber) {
+  onChangePageNumber(e, pageNumber) {
+    e.preventDefault();
     let nextPage = pageNumber;
+
 
     if (pageNumber < DEFAULT_PAGINATION_NUMBER) {
       nextPage = DEFAULT_PAGINATION_NUMBER;
@@ -90,10 +92,10 @@ export default class Table extends React.Component {
     const { pageNumber } = this.props.pagination;
     return (
       <ul className="pagination" role="navigation">
-        <li><a href="#0" className={DEFAULT_PAGINATION_NUMBER === pageNumber ? 'disabled' : null} onClick={() => this.onChangePageNumber(DEFAULT_PAGINATION_NUMBER)}>&#60;&#60; First</a></li>
-        <li><a href="#0" className={DEFAULT_PAGINATION_NUMBER === pageNumber ? 'disabled' : null} onClick={() => this.onChangePageNumber(pageNumber - 1)}>&#60; Prev</a></li>
-        <li><a href="#0" className={this.maxPagination === pageNumber ? 'disabled' : null} onClick={() => this.onChangePageNumber(pageNumber + 1)}>Next &#62;</a></li>
-        <li><a href="#0" className={this.maxPagination === pageNumber ? 'disabled' : null} onClick={() => this.onChangePageNumber(this.maxPagination)}>Last &#62;&#62;</a></li>
+        <li><a href="#0" className={DEFAULT_PAGINATION_NUMBER === pageNumber ? 'disabled' : null} onClick={e => this.onChangePageNumber(e, DEFAULT_PAGINATION_NUMBER)}>&#60;&#60; First</a></li>
+        <li><a href="#0" className={DEFAULT_PAGINATION_NUMBER === pageNumber ? 'disabled' : null} onClick={e => this.onChangePageNumber(e, pageNumber - 1)}>&#60; Prev</a></li>
+        <li><a href="#0" className={this.maxPagination === pageNumber ? 'disabled' : null} onClick={e => this.onChangePageNumber(e, pageNumber + 1)}>Next &#62;</a></li>
+        <li><a href="#0" className={this.maxPagination === pageNumber ? 'disabled' : null} onClick={e => this.onChangePageNumber(e, this.maxPagination)}>Last &#62;&#62;</a></li>
       </ul>
     );
   }
