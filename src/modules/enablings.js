@@ -1,4 +1,4 @@
-import { get, _delete } from 'utils/request';
+import { get, post, _delete } from 'utils/request';
 import { deserialize } from 'utils/json-api';
 
 import {
@@ -10,6 +10,7 @@ import {
 const SET_ENABLINGS = 'SET_ENABLINGS';
 const SET_ENABLINGS_LOADING = 'SET_ENABLINGS_LOADING';
 const SET_ENABLINGS_FILTERS = 'SET_ENABLINGS_FILTERS';
+const SET_ENABLINGS_CATEGORIES = 'SET_ENABLINGS_CATEGORIES';
 
 /* Initial state */
 const initialState = {
@@ -21,7 +22,8 @@ const initialState = {
   pagination: {
     pageSize: DEFAULT_PAGINATION_SIZE,
     pageNumber: DEFAULT_PAGINATION_NUMBER
-  }
+  },
+  categories: []
 };
 
 /* Reducer */
@@ -44,6 +46,11 @@ function enablingsReducer(state = initialState, action) {
         ...state,
         ...action.payload
       };
+    case SET_ENABLINGS_CATEGORIES:
+      return {
+        ...state,
+        categories: action.payload
+      };
     default:
       return state;
   }
@@ -53,6 +60,13 @@ function enablingsReducer(state = initialState, action) {
 function setEnablings(categories) {
   return {
     type: SET_ENABLINGS,
+    payload: categories
+  };
+}
+
+function setCategories(categories) {
+  return {
+    type: SET_ENABLINGS_CATEGORIES,
     payload: categories
   };
 }
@@ -100,6 +114,20 @@ function getEnablings(paramsConfig = {}) {
   };
 }
 
+function getCategories() {
+  return (dispatch) => {
+    dispatch(setEnablingsLoading(true));
+    get({
+      url: `${config.API_URL}/enabling-categories?page[number]=1&page[size]=999999`,
+      onSuccess({ data }) {
+        const parsedData = deserialize(data);
+        dispatch(setEnablingsLoading(false));
+        dispatch(setCategories(parsedData));
+      }
+    });
+  };
+}
+
 function deleteEnabling({ id, onSuccess }) {
   return (dispatch) => {
     dispatch(setEnablingsLoading(true));
@@ -113,4 +141,21 @@ function deleteEnabling({ id, onSuccess }) {
   };
 }
 
-export { enablingsReducer, getEnablings, deleteEnabling, setFilters };
+function createEnabling({ data, onSuccess }) {
+  return (dispatch) => {
+    dispatch(setEnablingsLoading(true));
+    post({
+      url: `${config.API_URL}/enablings`,
+      body: data,
+      headers: {
+        Authorization: `Bearer ${localStorage.token}`
+      },
+      onSuccess() {
+        dispatch(setEnablingsLoading(false));
+        onSuccess && onSuccess();
+      }
+    });
+  };
+}
+
+export { enablingsReducer, getEnablings, deleteEnabling, createEnabling, getCategories, setFilters };

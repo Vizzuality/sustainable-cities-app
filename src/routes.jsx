@@ -21,6 +21,7 @@ import StudyCasesPage from 'components/pages/StudyCasesPage';
 
 /* Enabling Conditions */
 import EnablingPage from 'components/pages/Enabling/EnablingPage';
+import NewEnablingPage from 'components/pages/Enabling/NewEnablingPage';
 
 // Url hooks
 import { onEnterEditBmePage } from 'modules/url';
@@ -46,6 +47,7 @@ const Routes = ({ history }) => (
       </Route>
       <Route path="enabling-condition">
         <IndexRoute components={{ main: EnablingPage, nav: Sidebar }} />
+        <Route path="new" components={{ main: NewEnablingPage, nav: Sidebar }} />
       </Route>
     </Route>
   </Router>

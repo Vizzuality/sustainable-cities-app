@@ -33,7 +33,7 @@ class EnablingPage extends React.Component {
   render() {
     return (
       <div className="c-page">
-        <Link className="button" to="/business-model-element/new">New Enabling Condition</Link>
+        <Link className="button" to="/enabling-condition/new">New Enabling Condition</Link>
         <Table
           items={this.props.enablings.list}
           itemCount={this.props.enablings.itemCount}
