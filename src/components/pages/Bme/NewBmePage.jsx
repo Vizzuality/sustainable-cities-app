@@ -16,6 +16,10 @@ class NewBmePage extends React.Component {
   constructor(props) {
     super(props);
     this.form = {};
+    this.state = {
+      enablings: [],
+      categories: []
+    };
   }
 
   /* Lifecycle */
@@ -30,12 +34,25 @@ class NewBmePage extends React.Component {
     this.form[evt.target.name] = evt.target.value;
   }
 
+  onSelectChange(field, val) {
+    this.setState({
+      [field]: val.map(v => v.value).join(',')
+    });
+  }
+
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
+
+    const data = {
+      ...this.form,
+      category_ids: this.state.categories.split(','),
+      enablings_ids: this.state.enablings.split(',')
+    };
+
     // Create Bme
     dispatch(createBme({
-      data: this.form,
+      data,
       onSuccess: () => {
         toastr.success('Business model element created!');
       }
@@ -50,12 +67,26 @@ class NewBmePage extends React.Component {
             <Link to="/business-model-element" className="button alert">Cancel</Link>
             <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
-          <Select name="category" label="Category" validations={['required']} value="">
-            {this.props.bmes.categories.map((category, i) => <option key={i} value={category.id}>{category.name}</option>)}
-          </Select>
-          <Select name="enablings" label="Enabling conditions" validations={['required']} value="">
-            {this.props.enablings.list.map((enabling, i) => <option key={i} value={enabling.id}>{enabling.name}</option>)}
-          </Select>
+          <Select
+            multi
+            name="categories"
+            value={this.state.categories}
+            onChange={val => this.onSelectChange('categories', val)}
+            delimiter=","
+            label="Category"
+            validations={['required']}
+            options={this.props.bmes.categories.map(cat => ({ value: cat.id, label: cat.name }))}
+          />
+          <Select
+            multi
+            name="enablings"
+            value={this.state.enablings}
+            onChange={val => this.onSelectChange('enablings', val)}
+            label="Enabling conditions"
+            delimiter=","
+            validations={['required']}
+            options={this.props.enablings.list.map(en => ({ value: en.id, label: en.name }))}
+          />
           <Input type="text" onChange={this.onInputChange} name="name" value="" label="Business model element title" validations={['required']} />
           <Textarea onChange={this.onInputChange} name="description" value="" label="Description" validations={['required']} />
         </Form>
