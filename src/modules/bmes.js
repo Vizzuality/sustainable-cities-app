@@ -4,6 +4,7 @@ import {
   DEFAULT_PAGINATION_NUMBER,
   DEFAULT_SORT_FIELD
 } from 'constants/bmes';
+import { deserialize } from 'utils/json-api';
 
 /* Constants */
 const SET_BMES = 'SET_BMES';
@@ -109,10 +110,7 @@ function getCategories() {
     get({
       url: `${config.API_URL}/business-model-element-categories?page[number]=1&page[size]=999999`,
       onSuccess({ data }) {
-        const parsedData = data.map((item) => {
-          const { attributes, ...props } = item;
-          return { ...attributes, ...props };
-        });
+        const parsedData = deserialize(data);
         dispatch(setBmesLoading(false));
         dispatch(setCategories(parsedData));
       }
@@ -142,12 +140,7 @@ function getBmes(paramsConfig = {}) {
         if (!Array.isArray(data)) {
           data = [data];
         }
-
-        const parsedData = data.map((item) => {
-          const { attributes, ...props } = item;
-          return { ...attributes, ...props };
-        });
-
+        const parsedData = deserialize(data);
         dispatch(setBmesLoading(false));
         dispatch(setBmes({ list: parsedData, itemCount: meta.total_items }));
       }

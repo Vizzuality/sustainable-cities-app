@@ -2,6 +2,7 @@ import React from 'react';
 import { dispatch } from 'main';
 import { getCategories } from 'modules/bmes';
 import { createBme } from 'modules/bmes';
+import { getEnablings } from 'modules/enablings';
 import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import { validation } from 'utils/validation';
@@ -20,6 +21,7 @@ class NewBmePage extends React.Component {
   /* Lifecycle */
   componentWillMount() {
     this.props.bmes.categories.length || dispatch(getCategories());
+    dispatch(getEnablings());
   }
 
   /* Methods */
@@ -51,8 +53,11 @@ class NewBmePage extends React.Component {
           <Select name="category" label="Category" validations={['required']} value="">
             {this.props.bmes.categories.map((category, i) => <option key={i} value={category.id}>{category.name}</option>)}
           </Select>
-          <Input type="text" onChange={this.onInputChange} name="name" value="" placeholder="Business model element title" validations={['required']} />
-          <Textarea onChange={this.onInputChange} name="description" value="" placeholder="Description" validations={['required']} />
+          <Select name="enablings" label="Enabling conditions" validations={['required']} value="">
+            {this.props.enablings.list.map((enabling, i) => <option key={i} value={enabling.id}>{enabling.name}</option>)}
+          </Select>
+          <Input type="text" onChange={this.onInputChange} name="name" value="" label="Business model element title" validations={['required']} />
+          <Textarea onChange={this.onInputChange} name="description" value="" label="Description" validations={['required']} />
         </Form>
       </section>
     );
@@ -61,13 +66,15 @@ class NewBmePage extends React.Component {
 
 NewBmePage.propTypes = {
   // State
-  bmes: React.PropTypes.object
+  bmes: React.PropTypes.object,
+  enablings: React.PropTypes.object
 };
 
 // Map state to props
-const mapStateToProps = ({ user, bmes }) => ({
+const mapStateToProps = ({ user, bmes, enablings }) => ({
   user,
-  bmes
+  bmes,
+  enablings
 });
 
 export default connect(mapStateToProps, null)(NewBmePage);

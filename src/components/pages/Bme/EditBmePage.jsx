@@ -48,8 +48,8 @@ class EditBmePage extends React.Component {
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
           <BtnGroup>
-            <Link to="/business-model-element" className="c-btn -secondary">Cancel</Link>
-            <Button type="submit" className="c-btn -primary">Edit</Button>
+            <Link to="/business-model-element" className="button alert">Cancel</Link>
+            <Button type="submit" className="button success">Edit</Button>
           </BtnGroup>
           <Input
             type="text"

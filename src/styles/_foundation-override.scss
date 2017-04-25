@@ -1,0 +1,18 @@
+// Foundation override
+.form-error {
+  display: block !important;
+}
+
+table {
+  table-layout: fixed;
+}
+
+.menu {
+  .active {
+    font-weight: bold;
+  }
+}
+
+select {
+  max-width: 100%;
+}

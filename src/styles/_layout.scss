@@ -10,6 +10,12 @@
   flex: 1;
 }
 
+.main-content {
+  .content-header {
+    padding-bottom: $space-1 * 4;
+  }
+}
+
 /* Wrappers */
 .l-app-wrapper {
   max-width: $app-width;
