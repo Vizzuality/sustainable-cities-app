@@ -81,7 +81,7 @@ const config = {
       },
       config: {
         API_URL: JSON.stringify(process.env.API_URL),
-        SC_API_KEY: JSON.stringify(process.env.SC_API_KEY)
+        'SC-API-KEY': JSON.stringify(process.env['SC-API-KEY'])
       }
     })
   ]

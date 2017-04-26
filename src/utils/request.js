@@ -7,7 +7,7 @@ function post({ url, body, headers, onSuccess, onError }) {
 
   const _headers = { ...headers,
     'Content-Type': 'application/json',
-    SC_API_KEY: config.SC_API_KEY
+    'SC-API-KEY': config['SC-API-KEY']
   };
 
   Object.keys(_headers).forEach((h) => {
@@ -42,7 +42,7 @@ function get({ url, headers, onSuccess, onError }) {
 
   const _headers = { ...headers,
     'Content-Type': 'application/json',
-    SC_API_KEY: config.SC_API_KEY,
+    'SC-API-KEY': config['SC-API-KEY'],
     Authorization: `Bearer ${localStorage.token}`
   };
 
@@ -72,7 +72,7 @@ function _delete({ url, headers, onSuccess, onError }) {
 
   const _headers = { ...headers,
     'Content-Type': 'application/json',
-    SC_API_KEY: config.SC_API_KEY,
+    'SC-API-KEY': config['SC-API-KEY'],
     Authorization: `Bearer ${localStorage.token}`
   };
 
@@ -102,7 +102,7 @@ function patch({ url, headers, body, onSuccess, onError }) {
 
   const _headers = { ...headers,
     'Content-Type': 'application/json',
-    SC_API_KEY: config.SC_API_KEY,
+    'SC-API-KEY': config['SC-API-KEY'],
     Authorization: `Bearer ${localStorage.token}`
   };
 
