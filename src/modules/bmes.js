@@ -108,7 +108,7 @@ function getCategories() {
   return (dispatch) => {
     dispatch(setBmesLoading(true));
     get({
-      url: `${config.API_URL}/business-model-element-categories?page[number]=1&page[size]=999999`,
+      url: `${config.API_URL}/categories-tree?type=Bme&page[number]=1&page[size]=999999`,
       onSuccess({ data }) {
         const parsedData = deserialize(data);
         dispatch(setBmesLoading(false));

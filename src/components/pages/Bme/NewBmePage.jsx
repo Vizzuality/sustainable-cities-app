@@ -18,7 +18,7 @@ class NewBmePage extends React.Component {
     this.form = {};
     this.state = {
       enablings: [],
-      categories: []
+      categories: {}
     };
   }
 
@@ -46,8 +46,8 @@ class NewBmePage extends React.Component {
 
     const data = {
       ...this.form,
-      category_ids: this.state.categories.split(','),
-      enablings_ids: this.state.enablings.split(',')
+      category_ids: this.state.categories.nephew,
+      enabling_ids: this.state.enablings.split(',')
     };
 
     // Create Bme
@@ -59,7 +59,39 @@ class NewBmePage extends React.Component {
     }));
   }
 
+  onCategoryChange(level, id) {
+    const categories = {
+      ...this.state.categories,
+      [level]: id
+    };
+    if (level === 'parent') {
+      categories.children = null;
+      categories.nephew = [];
+    }
+    if (level === 'children') {
+      categories.nephew = [];
+    }
+    this.setState({ categories });
+  }
+
   render() {
+    const { parent, children } = this.state.categories;
+
+    let childrenOptions = [];
+    let nephewOptions = [];
+    let parentCategory = null;
+    let childrenCategory = null;
+
+    if (parent) {
+      parentCategory = this.props.bmes.categories.find(cat => cat.id === this.state.categories.parent);
+      childrenOptions = parentCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
+
+      if (children) {
+        childrenCategory = parentCategory.children.find(child => child.id === this.state.categories.children);
+        nephewOptions = childrenCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
+      }
+    }
+
     return (
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
@@ -67,16 +99,40 @@ class NewBmePage extends React.Component {
             <Link to="/business-model-element" className="button alert">Cancel</Link>
             <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
-          <Select
-            multi
-            name="categories"
-            value={this.state.categories}
-            onChange={val => this.onSelectChange('categories', val)}
-            delimiter=","
-            label="Category"
-            validations={['required']}
-            options={this.props.bmes.categories.map(cat => ({ value: cat.id, label: cat.name }))}
-          />
+          {/* Name */}
+          <Input type="text" onChange={this.onInputChange} name="name" value="" label="Business model element name" validations={['required']} />
+          {/* Categories */}
+          <div className="row expanded">
+            <div className="small-4 columns">
+              <Select
+                name="categories"
+                value={this.state.categories.parent}
+                onChange={val => this.onCategoryChange('parent', val.value)}
+                label="Category"
+                options={this.props.bmes.categories.map(cat => ({ value: cat.id, label: cat.name }))}
+              />
+            </div>
+            <div className="small-4 columns">
+              <Select
+                name="categories"
+                value={this.state.categories.children}
+                onChange={val => this.onCategoryChange('children', val.value)}
+                label="Sub-category"
+                options={childrenOptions}
+              />
+            </div>
+            <div className="small-4 columns">
+              <Select
+                multi
+                name="categories"
+                value={this.state.categories.nephew}
+                onChange={val => this.onCategoryChange('nephew', val.map(i => i.value))}
+                label="Sub-sub-category"
+                options={nephewOptions}
+              />
+            </div>
+          </div>
+          {/* Enabling conditions */}
           <Select
             multi
             name="enablings"
@@ -87,7 +143,6 @@ class NewBmePage extends React.Component {
             validations={['required']}
             options={this.props.enablings.list.map(en => ({ value: en.id, label: en.name }))}
           />
-          <Input type="text" onChange={this.onInputChange} name="name" value="" label="Business model element title" validations={['required']} />
           <Textarea onChange={this.onInputChange} name="description" value="" label="Description" validations={['required']} />
         </Form>
       </section>
