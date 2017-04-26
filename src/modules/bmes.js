@@ -11,7 +11,6 @@ const SET_BMES = 'SET_BMES';
 const SET_BMES_LOADING = 'SET_BMES_LOADING';
 const SET_BMES_FILTERS = 'SET_BMES_FILTERS';
 const SET_BMES_DETAIL = 'SET_BMES_DETAIL';
-const SET_BMES_CATEGORIES = 'SET_BMES_CATEGORIES';
 
 /* Initial state */
 const initialState = {
@@ -23,8 +22,7 @@ const initialState = {
   pagination: {
     pageSize: DEFAULT_PAGINATION_SIZE,
     pageNumber: DEFAULT_PAGINATION_NUMBER
-  },
-  categories: []
+  }
 };
 
 /* Reducer */
@@ -51,23 +49,18 @@ function bmesReducer(state = initialState, action) {
         ...state,
         detailId: action.payload
       };
-    case SET_BMES_CATEGORIES:
-      return {
-        ...state,
-        categories: action.payload
-      };
     default:
       return state;
   }
 }
 
 /* Action creators */
-function setBmes(categories) {
+function setBmes(data) {
   return {
     type: SET_BMES,
     payload: {
-      list: categories.list,
-      itemCount: categories.itemCount
+      list: data.list,
+      itemCount: data.itemCount
     }
   };
 }
@@ -96,32 +89,10 @@ function setBmesDetail(id) {
   };
 }
 
-function setCategories(categories) {
-  return {
-    type: SET_BMES_CATEGORIES,
-    payload: categories
-  };
-}
-
-/* Redux-thunk async actions */
-function getCategories() {
-  return (dispatch) => {
-    dispatch(setBmesLoading(true));
-    get({
-      url: `${config.API_URL}/categories-tree?type=Bme&page[number]=1&page[size]=999999`,
-      onSuccess({ data }) {
-        const parsedData = deserialize(data);
-        dispatch(setBmesLoading(false));
-        dispatch(setCategories(parsedData));
-      }
-    });
-  };
-}
-
 function getBmes(paramsConfig = {}) {
   return (dispatch) => {
-    let { pageSize, pageNumber, sort, onSuccess } = paramsConfig;
-    const { id } = paramsConfig;
+    let { pageSize, pageNumber, sort } = paramsConfig;
+    const { onSuccess, id } = paramsConfig;
 
     pageSize = pageSize || DEFAULT_PAGINATION_SIZE;
     pageNumber = pageNumber || DEFAULT_PAGINATION_NUMBER;
@@ -195,4 +166,4 @@ function deleteBme({ id, onSuccess }) {
   };
 }
 
-export { bmesReducer, getBmes, createBme, deleteBme, setBmesDetail, updateBme, getCategories, setFilters };
+export { bmesReducer, getBmes, createBme, deleteBme, setBmesDetail, updateBme, setFilters };

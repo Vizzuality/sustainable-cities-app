@@ -1,4 +1,5 @@
 import { get } from 'utils/request';
+import { deserialize } from 'utils/json-api';
 
 const SET_CATEGORIES = 'SET_CATEGORIES';
 const SET_CATEGORIES_LOADING = 'SET_CATEGORIES_LOADING';
@@ -6,7 +7,8 @@ const SET_CATEGORIES_LOADING = 'SET_CATEGORIES_LOADING';
 /* Initial state */
 const initialState = {
   loading: false,
-  list: []
+  Bme: [],
+  timing: []
 };
 
 /* Reducer */
@@ -15,7 +17,7 @@ function categoriesReducer(state = initialState, action) {
     case SET_CATEGORIES:
       return {
         ...state,
-        list: action.payload
+        [action.payload.type]: action.payload.data
       };
     case SET_CATEGORIES_LOADING: {
       return {
@@ -29,10 +31,13 @@ function categoriesReducer(state = initialState, action) {
 }
 
 /* Action creators */
-function setCategories(categories) {
+function setCategories(categories, type) {
   return {
     type: SET_CATEGORIES,
-    payload: categories
+    payload: {
+      data: categories,
+      type
+    }
   };
 }
 
@@ -44,14 +49,21 @@ function setCategoriesLoading(loading) {
 }
 
 /* Redux-thunk async actions */
-function getCategories() {
+function getCategories({ type, tree }) {
+  const endPoints = {
+    bme: 'business-model-element-categories?',
+    timing: 'timing-categories?'
+  };
+
+  const endPoint = tree ? `/categories-tree?type=${type}` : endPoints[type];
+
   return (dispatch) => {
     dispatch(setCategoriesLoading(true));
     get({
-      url: `${config.API_URL}/business-model-element-categories?page[number]=1&page[size]=999999`,
+      url: `${config.API_URL}/${endPoint}&page[number]=1&page[size]=999999`,
       onSuccess({ data }) {
         dispatch(setCategoriesLoading(false));
-        dispatch(setCategories(data));
+        dispatch(setCategories(deserialize(data), type));
       }
     });
   };

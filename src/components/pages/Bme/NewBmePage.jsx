@@ -1,8 +1,8 @@
 import React from 'react';
 import { dispatch } from 'main';
-import { getCategories } from 'modules/bmes';
 import { createBme } from 'modules/bmes';
 import { getEnablings } from 'modules/enablings';
+import { getCategories } from 'modules/categories';
 import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import { validation } from 'utils/validation';
@@ -24,7 +24,8 @@ class NewBmePage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.bmes.categories.length || dispatch(getCategories());
+    this.props.bmeCategories.length || dispatch(getCategories({ type: 'Bme', tree: true }));
+    this.props.timingCategories.length || dispatch(getCategories({ type: 'timing' }));
     this.props.enablings.list.length || dispatch(getEnablings());
   }
 
@@ -77,13 +78,14 @@ class NewBmePage extends React.Component {
   render() {
     const { parent, children } = this.state.categories;
 
+    const parentOptions = this.props.bmeCategories.map(cat => ({ value: cat.id, label: cat.name }));
     let childrenOptions = [];
     let nephewOptions = [];
     let parentCategory = null;
     let childrenCategory = null;
 
     if (parent) {
-      parentCategory = this.props.bmes.categories.find(cat => cat.id === this.state.categories.parent);
+      parentCategory = this.props.bmeCategories.find(cat => cat.id === this.state.categories.parent);
       childrenOptions = parentCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
 
       if (children) {
@@ -109,7 +111,7 @@ class NewBmePage extends React.Component {
                 value={this.state.categories.parent}
                 onChange={val => this.onCategoryChange('parent', val.value)}
                 label="Category"
-                options={this.props.bmes.categories.map(cat => ({ value: cat.id, label: cat.name }))}
+                options={parentOptions}
               />
             </div>
             <div className="small-4 columns">
@@ -152,15 +154,17 @@ class NewBmePage extends React.Component {
 
 NewBmePage.propTypes = {
   // State
-  bmes: React.PropTypes.object,
-  enablings: React.PropTypes.object
+  enablings: React.PropTypes.object,
+  bmeCategories: React.PropTypes.array,
+  timingCategories: React.PropTypes.array
 };
 
 // Map state to props
-const mapStateToProps = ({ user, bmes, enablings }) => ({
+const mapStateToProps = ({ user, enablings, categories }) => ({
   user,
-  bmes,
-  enablings
+  enablings,
+  bmeCategories: categories.Bme,
+  timingCategories: categories.timing
 });
 
 export default connect(mapStateToProps, null)(NewBmePage);
