@@ -125,7 +125,7 @@ function createBme({ data, onSuccess }) {
     dispatch(setBmesLoading(true));
     post({
       url: `${config.API_URL}/business-model-elements`,
-      body: data,
+      body: { bme: data },
       headers: {
         Authorization: `Bearer ${localStorage.token}`
       },

@@ -48,7 +48,7 @@ class NewBmePage extends React.Component {
     const data = {
       ...this.form,
       category_ids: this.state.categories.nephew,
-      enabling_ids: this.state.enablings.split(',')
+      enabling_ids: this.state.enablings
     };
 
     // Create Bme
@@ -58,6 +58,11 @@ class NewBmePage extends React.Component {
         toastr.success('Business model element created!');
       }
     }));
+  }
+
+  onEnablingsChange(enablings) {
+    enablings = enablings.map(e => e.value);
+    this.setState({ enablings });
   }
 
   onCategoryChange(level, id) {
@@ -139,10 +144,9 @@ class NewBmePage extends React.Component {
             multi
             name="enablings"
             value={this.state.enablings}
-            onChange={val => this.onSelectChange('enablings', val)}
+            onChange={val => this.onEnablingsChange(val)}
             label="Enabling conditions"
             delimiter=","
-            validations={['required']}
             options={this.props.enablings.list.map(en => ({ value: en.id, label: en.name }))}
           />
           <Textarea onChange={this.onInputChange} name="description" value="" label="Description" validations={['required']} />
