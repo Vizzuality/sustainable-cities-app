@@ -18,6 +18,7 @@ class NewBmePage extends React.Component {
     this.form = {};
     this.state = {
       enablings: [],
+      timing: [],
       categories: {}
     };
   }
@@ -35,19 +36,13 @@ class NewBmePage extends React.Component {
     this.form[evt.target.name] = evt.target.value;
   }
 
-  onSelectChange(field, val) {
-    this.setState({
-      [field]: val.map(v => v.value).join(',')
-    });
-  }
-
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
 
     const data = {
       ...this.form,
-      category_ids: this.state.categories.nephew,
+      category_ids: [...this.state.categories.nephew, ...this.state.timing],
       enabling_ids: this.state.enablings
     };
 
@@ -60,9 +55,10 @@ class NewBmePage extends React.Component {
     }));
   }
 
-  onEnablingsChange(enablings) {
-    enablings = enablings.map(e => e.value);
-    this.setState({ enablings });
+  onSelectChange(field, val) {
+    this.setState({
+      [field]: val.map(v => v.value)
+    });
   }
 
   onCategoryChange(level, id) {
@@ -144,12 +140,27 @@ class NewBmePage extends React.Component {
             multi
             name="enablings"
             value={this.state.enablings}
-            onChange={val => this.onEnablingsChange(val)}
+            onChange={val => this.onSelectChange('enablings', val)}
             label="Enabling conditions"
             delimiter=","
             options={this.props.enablings.list.map(en => ({ value: en.id, label: en.name }))}
           />
-          <Textarea onChange={this.onInputChange} name="description" value="" label="Description" validations={['required']} />
+          {/* Timing */}
+          <Select
+            multi
+            name="timing"
+            value={this.state.timing}
+            onChange={val => this.onSelectChange('timing', val)}
+            label="Timing"
+            options={this.props.timingCategories.map(en => ({ value: en.id, label: en.name }))}
+          />
+          <Textarea
+            validations={[]}
+            onChange={this.onInputChange}
+            name="description"
+            value=""
+            label="Description"
+          />
         </Form>
       </section>
     );
