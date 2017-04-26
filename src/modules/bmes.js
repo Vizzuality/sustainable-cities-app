@@ -120,7 +120,7 @@ function getCategories() {
 
 function getBmes(paramsConfig = {}) {
   return (dispatch) => {
-    let { pageSize, pageNumber, sort } = paramsConfig;
+    let { pageSize, pageNumber, sort, onSuccess } = paramsConfig;
     const { id } = paramsConfig;
 
     pageSize = pageSize || DEFAULT_PAGINATION_SIZE;
@@ -143,6 +143,7 @@ function getBmes(paramsConfig = {}) {
         const parsedData = deserialize(data);
         dispatch(setBmesLoading(false));
         dispatch(setBmes({ list: parsedData, itemCount: meta.total_items }));
+        onSuccess && onSuccess();
       }
     });
   };

@@ -25,7 +25,7 @@ class NewBmePage extends React.Component {
   /* Lifecycle */
   componentWillMount() {
     this.props.bmes.categories.length || dispatch(getCategories());
-    dispatch(getEnablings());
+    this.props.enablings.list.length || dispatch(getEnablings());
   }
 
   /* Methods */

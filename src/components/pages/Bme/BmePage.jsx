@@ -29,6 +29,24 @@ class BmePage extends React.Component {
     }
   }
 
+  deleteBme(bme) {
+    const { bmes } = this.props;
+
+    dispatch(
+      deleteBme({
+        id: bme.id,
+        onSuccess: () => {
+          dispatch(getBmes({
+            pageSize: bmes.pagination.pageSize,
+            pageNumber: bmes.pagination.pageNumber,
+            sort: bmes.sort,
+            onSuccess: () => toastr.success('The business model elemen has been removed')
+          }));
+        }
+      })
+    );
+  }
+
   render() {
     return (
       <div className="c-page">
@@ -42,7 +60,7 @@ class BmePage extends React.Component {
           editUrl="/business-model-element/edit"
           pagination={this.props.bmes.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
-          onDelete={item => dispatch(deleteBme({ id: item.id, onSuccess: () => toastr.success('The business model elemen has been removed') }))}
+          onDelete={item => this.deleteBme(item)}
         />
         <Spinner isLoading={this.props.bmes.loading} />
       </div>
