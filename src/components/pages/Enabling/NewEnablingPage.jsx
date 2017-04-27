@@ -16,15 +16,11 @@ class NewEnablingPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.form = {};
 
+    this.form = {};
     this.state = {
       category_id: null,
-      bme_ids: null,
-      'success-barrier': {
-        success: true,
-        barrier: false
-      }
+      bme_ids: null
     };
   }
 
@@ -54,28 +50,7 @@ class NewEnablingPage extends React.Component {
   }
 
   @Autobind
-  onSuccessChange(evt) {
-    this.state[evt.target.name] = {
-      success: true,
-      barrier: false
-    };
-
-    this.setState(this.state);
-
-    this.form = {
-      ...this.form,
-      assessment_value: evt.target.value
-    };
-  }
-
-  @Autobind
-  onBarrierChange(evt) {
-    this.state[evt.target.name] = {
-      success: false,
-      barrier: true
-    };
-
-    this.setState(this.state);
+  onRadioChange(evt) {
     this.form = {
       ...this.form,
       assessment_value: evt.target.value
@@ -121,16 +96,15 @@ class NewEnablingPage extends React.Component {
               type="radio"
               value="Success"
               name="success-barrier"
-              onChange={this.onSuccessChange}
-              checked={this.state['success-barrier'].success}
+              onChange={this.onRadioChange}
+              defaultChecked
             /> Success
             <input
               type="radio"
               value="Barrier"
               name="success-barrier"
-              onChange={this.onBarrierChange}
-              checked={this.state['success-barrier'].barrier}
-            />Barrier
+              onChange={this.onRadioChange}
+            /> Barrier
           </div>
           <Select
             name="bme_ids"

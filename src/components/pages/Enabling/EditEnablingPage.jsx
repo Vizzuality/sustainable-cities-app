@@ -22,7 +22,7 @@ class EditBmePage extends React.Component {
       bme_ids: null,
       category_id: null,
       /* radio buttons */
-      'success-barrier': {
+      assessment_value: {
         success: true,
         barrier: false
       }
@@ -69,32 +69,18 @@ class EditBmePage extends React.Component {
   }
 
   @Autobind
-  onSuccessChange(evt) {
+  onRadioChange(evt) {
     this.state[evt.target.name] = {
-      success: true,
-      barrier: false
+      success: evt.target.value === 'Success',
+      barrier: evt.target.value === 'Barrier'
     };
-
-    this.setState(this.state);
 
     this.form = {
       ...this.form,
       assessment_value: evt.target.value
     };
-  }
-
-  @Autobind
-  onBarrierChange(evt) {
-    this.state[evt.target.name] = {
-      success: false,
-      barrier: true
-    };
 
     this.setState(this.state);
-    this.form = {
-      ...this.form,
-      assessment_value: evt.target.value
-    };
   }
 
   @Autobind
@@ -105,7 +91,8 @@ class EditBmePage extends React.Component {
       id: this.props.enablingDetail.id,
       data: {
         ...this.form,
-        ...this.state
+        ...this.state.bme_ids,
+        ...this.state.category_id
       },
       onSuccess() {
         toastr.success('Enabling condition edited!');
@@ -122,7 +109,7 @@ class EditBmePage extends React.Component {
     this.setState({
       category_id: categoryId,
       bme_ids: activeBmes,
-      'success-barrier': {
+      assessment_value: {
         success: factor === 'Success',
         barrier: factor === 'Barrier'
       }
@@ -160,20 +147,20 @@ class EditBmePage extends React.Component {
             options={this.props.categories.enablings.map(cat => ({ value: cat.id, label: cat.name }))}
           />
           <div className="radio-group">
-            <label htmlFor="success-barrier">Success factor/barrier</label>
+            <label htmlFor="assessment_value">Success factor/barrier</label>
             <input
               type="radio"
               value="Success"
-              name="success-barrier"
-              onChange={this.onSuccessChange}
-              checked={this.state['success-barrier'].success}
+              name="assessment_value"
+              onChange={this.onRadioChange}
+              checked={this.state.assessment_value.success}
             /> Success
             <input
               type="radio"
               value="Barrier"
-              name="success-barrier"
-              onChange={this.onBarrierChange}
-              checked={this.state['success-barrier'].barrier}
+              name="assessment_value"
+              onChange={this.onRadioChange}
+              checked={this.state.assessment_value.barrier}
             />Barrier
           </div>
           <Select
