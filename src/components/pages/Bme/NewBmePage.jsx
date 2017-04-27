@@ -61,18 +61,26 @@ class NewBmePage extends React.Component {
     });
   }
 
-  onCategoryChange(level, id) {
+  onCategoryChange(level, val) {
+    if (val) {
+      val = Array.isArray(val) ?
+        val.map(i => i.value) : val.value;
+    }
+
     const categories = {
       ...this.state.categories,
-      [level]: id
+      [level]: val
     };
+
     if (level === 'parent') {
       categories.children = null;
       categories.nephew = [];
     }
+
     if (level === 'children') {
       categories.nephew = [];
     }
+
     this.setState({ categories });
   }
 
@@ -110,7 +118,7 @@ class NewBmePage extends React.Component {
               <Select
                 name="categories"
                 value={this.state.categories.parent}
-                onChange={val => this.onCategoryChange('parent', val.value)}
+                onChange={val => this.onCategoryChange('parent', val)}
                 label="Category"
                 options={parentOptions}
               />
@@ -119,7 +127,7 @@ class NewBmePage extends React.Component {
               <Select
                 name="categories"
                 value={this.state.categories.children}
-                onChange={val => this.onCategoryChange('children', val.value)}
+                onChange={val => this.onCategoryChange('children', val)}
                 label="Sub-category"
                 options={childrenOptions}
               />
@@ -129,7 +137,7 @@ class NewBmePage extends React.Component {
                 multi
                 name="categories"
                 value={this.state.categories.nephew}
-                onChange={val => this.onCategoryChange('nephew', val.map(i => i.value))}
+                onChange={val => this.onCategoryChange('nephew', val)}
                 label="Sub-sub-category"
                 options={nephewOptions}
               />

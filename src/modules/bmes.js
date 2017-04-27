@@ -106,14 +106,19 @@ function getBmes(paramsConfig = {}) {
 
     get({
       url,
-      onSuccess({ data, meta }) {
+      onSuccess({ data, meta, included }) {
         // Parse data to json api format
         if (!Array.isArray(data)) {
           data = [data];
         }
-        const parsedData = deserialize(data);
+
+        let parsedData = deserialize(data);
+        if (included) {
+          parsedData = [({ ...parsedData[0], ...{ included: deserialize(included) } })];
+        }
+
         dispatch(setBmesLoading(false));
-        dispatch(setBmes({ list: parsedData, itemCount: meta.total_items }));
+        dispatch(setBmes({ list: parsedData, itemCount: meta.total_items, included }));
         onSuccess && onSuccess();
       }
     });
