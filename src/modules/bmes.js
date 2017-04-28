@@ -112,10 +112,23 @@ function getBmes(paramsConfig = {}) {
           data = [data];
         }
 
+        console.log(data);
+        console.log(included)
         let parsedData = deserialize(data);
         if (included) {
-          parsedData = parsedData.map((d, i) => ({ ...d, ...{ included: deserialize([included[i]]) } }));
+          // { included: deserialize([included[i]]) }
+          console.log(parsedData, included)
+          parsedData = parsedData.map((d) => {
+            const inc = included.find(incl => incl.id === d.id);
+            console.log(inc);
+            return ({
+              ...d,
+              ...{ included: inc ? inc.map(incl => deserialize([incl])[0]) : [] }
+            });
+          });
         }
+
+        console.log(parsedData)
 
         dispatch(setBmesLoading(false));
         dispatch(setBmes({ list: parsedData, itemCount: meta.total_items, included }));
