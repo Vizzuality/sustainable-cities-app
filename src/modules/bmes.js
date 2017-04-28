@@ -107,7 +107,6 @@ function getBmes(paramsConfig = {}) {
     get({
       url,
       onSuccess({ data, meta, included }) {
-        console.log(data)
         // Parse data to json api format
         if (!Array.isArray(data)) {
           data = [data];
