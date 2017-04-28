@@ -114,7 +114,7 @@ function getBmes(paramsConfig = {}) {
 
         let parsedData = deserialize(data);
         if (included) {
-          parsedData = [({ ...parsedData[0], ...{ included: deserialize(included) } })];
+          parsedData = parsedData.map((d, i) => ({ ...d, ...{ included: deserialize([included[i]]) } }));
         }
 
         dispatch(setBmesLoading(false));
