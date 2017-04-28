@@ -1,0 +1,29 @@
+/* Settings */
+@import "settings";
+@import "functions";
+@import "reset";
+@import "base";
+@import "animations";
+@import "mixins";
+@import "layout";
+
+/* External */
+@import "~react-redux-toastr/src/styles/index";
+@import "~react-select/dist/react-select.css";
+
+/*  Foundation */
+@import 'foundation';
+@include foundation-button;
+@include foundation-table;
+@include foundation-pagination;
+@include foundation-top-bar;
+@include foundation-forms;
+@include foundation-menu;
+@include foundation-typography;
+@include foundation-grid;
+@import "foundation-override";
+
+/* Components */
+@import "components/spinner";
+@import "components/page";
+@import "components/icon";
