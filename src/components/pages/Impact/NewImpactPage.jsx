@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { dispatch } from 'main';
+import { push } from 'react-router-redux';
+
 import { getBmes } from 'modules/bmes';
 import { createImpact } from 'modules/impacts';
 import { getCategories } from 'modules/categories';
@@ -83,6 +85,8 @@ class NewImpactPage extends React.Component {
         ...{ category_id: categoryIds }
       },
       onSuccess: () => {
+        // Redirect to impact list
+        dispatch(push('/impact'));
         toastr.success('Impact created!');
       }
     }));
