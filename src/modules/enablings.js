@@ -1,5 +1,6 @@
 import { get, post, _delete, patch } from 'utils/request';
 import { deserialize } from 'utils/json-api';
+import { getIdRelations } from 'utils/relation';
 
 import {
   DEFAULT_PAGINATION_SIZE,
@@ -33,6 +34,7 @@ function enablingsReducer(state = initialState, action) {
       return {
         ...state,
         list: action.payload.list,
+        included: action.payload.included,
         itemCount: action.payload.itemCount
       };
     case SET_ENABLINGS_LOADING: {
@@ -57,10 +59,20 @@ function enablingsReducer(state = initialState, action) {
 }
 
 /* Action creators */
-function setEnablings(categories) {
+function setEnablings(data) {
   return {
     type: SET_ENABLINGS,
-    payload: categories
+    payload: {
+      list: data.list.map((l) => {
+        return {
+          ...l,
+          ...{ bmes: getIdRelations(l.relationships.bmes.data, data.included) },
+          ...{ category: l.relationships.category.data ? l.relationships.category.data.id : null }
+        };
+      }),
+      included: data.included,
+      itemCount: data.itemCount
+    }
   };
 }
 
@@ -91,7 +103,7 @@ function setFilters(field, value) {
 /* Redux-thunk async actions */
 function getEnablings(paramsConfig = {}) {
   let { pageSize, pageNumber, sort } = paramsConfig;
-  const { id } = paramsConfig;
+  const { id, onSuccess } = paramsConfig;
 
   pageSize = pageSize || DEFAULT_PAGINATION_SIZE;
   pageNumber = pageNumber || DEFAULT_PAGINATION_NUMBER;
@@ -105,14 +117,22 @@ function getEnablings(paramsConfig = {}) {
     dispatch(setEnablingsLoading(true));
     get({
       url,
-      onSuccess({ data, meta }) {
+      onSuccess({ data, included, meta }) {
         // Parse data to json api format
         if (!Array.isArray(data)) {
           data = [data];
         }
+
         const parsedData = deserialize(data);
+        const parsedIncluded = included.map(incl => deserialize([incl])[0]);
+
         dispatch(setEnablingsLoading(false));
-        dispatch(setEnablings({ list: parsedData, itemCount: meta.total_items }));
+        dispatch(setEnablings({
+          list: parsedData,
+          included: parsedIncluded,
+          itemCount: meta.total_items
+        }));
+        onSuccess && onSuccess();
       }
     });
   };

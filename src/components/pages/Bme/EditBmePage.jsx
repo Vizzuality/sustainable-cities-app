@@ -33,6 +33,9 @@ class EditBmePage extends React.Component {
 
     if (!this.props.bmesDetail) {
       dispatch(getBmes({ id: this.props.bmes.detailId }));
+    } else {
+      this.fillFields(this.props);
+      this.setCategories(this.props);
     }
   }
 
@@ -101,7 +104,7 @@ class EditBmePage extends React.Component {
 
   setTimingCategory(bmesDetail) {
     // looks for timing categories
-    const activeTimingCategories = bmesDetail.included.filter(cat => Object.hasOwnProperty.call(cat, 'category_type') && cat.category_type === 'Timing');
+    const activeTimingCategories = bmesDetail.categories.filter(cat => cat.category_type === 'Timing');
 
     // retrieves their ids
     const activeTimingCategoriesIds = activeTimingCategories.map(cat => cat.id);
@@ -120,13 +123,14 @@ class EditBmePage extends React.Component {
   }
 
   setCategories({ bmesDetail, bmeCategories }) {
-    const nephewCategories = bmesDetail.included.filter(cat => Object.hasOwnProperty.call(cat, 'category_type') && cat.category_type === 'Bme');
+    const nephewCategories = bmesDetail.categories.filter(cat => cat.category_type === 'Bme');
 
     if (!nephewCategories.length) return;
 
     const nephewCategoriesIds = nephewCategories.map(cat => cat.id);
 
     const childrenCategoryId = nephewCategories ? nephewCategories[0].relationships.parent.data.id : {};
+
     const parentCategory = childrenCategoryId ? bmeCategories.find((cat) => {
       return cat.children.find(c => c.id === childrenCategoryId);
     }) : {};
