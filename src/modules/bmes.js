@@ -5,6 +5,7 @@ import {
   DEFAULT_SORT_FIELD
 } from 'constants/bmes';
 import { deserialize } from 'utils/json-api';
+import { getIdRelations } from 'utils/relation';
 
 /* Constants */
 const SET_BMES = 'SET_BMES';
@@ -16,6 +17,7 @@ const SET_BMES_DETAIL = 'SET_BMES_DETAIL';
 const initialState = {
   loading: false,
   list: [],
+  included: [],
   itemCount: null,
   detailId: null,
   filters: {},
@@ -32,6 +34,7 @@ function bmesReducer(state = initialState, action) {
       return {
         ...state,
         list: action.payload.list,
+        included: action.payload.included,
         itemCount: action.payload.itemCount
       };
     case SET_BMES_LOADING:
@@ -59,7 +62,14 @@ function setBmes(data) {
   return {
     type: SET_BMES,
     payload: {
-      list: data.list,
+      list: data.list.map((l) => {
+        return {
+          ...l,
+          ...{ categories: getIdRelations(l.relationships.categories.data, data.included) },
+          ...{ enablings: getIdRelations(l.relationships.enablings.data, data.included) }
+        };
+      }),
+      included: data.included,
       itemCount: data.itemCount
     }
   };
@@ -112,26 +122,15 @@ function getBmes(paramsConfig = {}) {
           data = [data];
         }
 
-        console.log(data);
-        console.log(included)
-        let parsedData = deserialize(data);
-        if (included) {
-          // { included: deserialize([included[i]]) }
-          console.log(parsedData, included)
-          parsedData = parsedData.map((d) => {
-            const inc = included.find(incl => incl.id === d.id);
-            console.log(inc);
-            return ({
-              ...d,
-              ...{ included: inc ? inc.map(incl => deserialize([incl])[0]) : [] }
-            });
-          });
-        }
-
-        console.log(parsedData)
+        const parsedData = deserialize(data);
+        const parsedIncluded = included.map(incl => deserialize([incl])[0]);
 
         dispatch(setBmesLoading(false));
-        dispatch(setBmes({ list: parsedData, itemCount: meta.total_items, included }));
+        dispatch(setBmes({
+          list: parsedData,
+          included: parsedIncluded,
+          itemCount: meta.total_items
+        }));
         onSuccess && onSuccess();
       }
     });
