@@ -174,6 +174,16 @@ class EditBmePage extends React.Component {
             <Link to="/business-model-element" className="button alert">Cancel</Link>
             <Button type="submit" className="button success">Edit</Button>
           </BtnGroup>
+          {/* name */}
+          <Input
+            type="text"
+            name="name"
+            label="BME name"
+            placeholder="Business model element title"
+            validations={['required']}
+            onChange={this.onInputChange}
+            value={this.props.bmesDetail ? this.props.bmesDetail.name : ''}
+          />
           {/* categories */}
           <div className="row expanded">
             <div className="small-4 columns">
@@ -183,7 +193,6 @@ class EditBmePage extends React.Component {
                 value={this.state.categories.parent}
                 onChange={val => this.onCategoryChange('parent', val)}
                 label="Category"
-                validations={['required']}
                 options={this.props.bmeCategories.map(cat => ({ value: cat.id, label: cat.name }))}
               />
             </div>
@@ -193,7 +202,6 @@ class EditBmePage extends React.Component {
                 name="categories"
                 value={this.state.categories.children}
                 onChange={val => this.onCategoryChange('children', val)}
-                validations={['required']}
                 label="Sub-category"
                 options={childrenOptions}
               />
@@ -205,30 +213,19 @@ class EditBmePage extends React.Component {
                 name="categories"
                 value={this.state.categories.nephew}
                 onChange={val => this.onCategoryChange('nephew', val)}
-                validations={['required']}
                 label="Sub-sub-category"
                 options={nephewOptions}
               />
             </div>
           </div>
-          {/* name */}
-          <Input
-            type="text"
-            name="name"
-            label="BME name"
-            placeholder="Business model element title"
-            validations={['required']}
-            onChange={this.onInputChange}
-            value={this.props.bmesDetail ? this.props.bmesDetail.name : ''}
-          />
           {/* description */}
           <Textarea
             name="description"
             label="Description"
             placeholder="Description"
-            validations={['required']}
             onChange={this.onInputChange}
-            value={this.props.bmesDetail ? this.props.bmesDetail.description : ''}
+            value={this.props.bmesDetail && this.props.bmesDetail.description ? this.props.bmesDetail.description : ''}
+            validations={[]}
           />
           {/* enabling conditions */}
           <Select

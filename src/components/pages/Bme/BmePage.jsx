@@ -7,7 +7,8 @@ import Table from 'components/ui/Table';
 import { toastr } from 'react-redux-toastr';
 import { connect } from 'react-redux';
 import isEqual from 'lodash/isEqual';
-
+import { toggleModal } from 'modules/modal';
+import Confirm from 'components/confirm/Confirm';
 
 class BmePage extends React.Component {
 
@@ -60,7 +61,7 @@ class BmePage extends React.Component {
           editUrl="/business-model-element/edit"
           pagination={this.props.bmes.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
-          onDelete={item => this.deleteBme(item)}
+          onDelete={item => dispatch(toggleModal(true, <Confirm text={`Business model element "${item.name}" will be deleted. Are you sure?`} onAccept={() => this.deleteBme(item)} />))}
         />
         <Spinner isLoading={this.props.bmes.loading} />
       </div>

@@ -10,6 +10,7 @@ import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
 import { toastr } from 'react-redux-toastr';
 import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
 
 class NewBmePage extends React.Component {
 
@@ -42,14 +43,16 @@ class NewBmePage extends React.Component {
 
     const data = {
       ...this.form,
-      category_ids: [...this.state.categories.nephew, ...this.state.timing],
+      category_ids: this.state.categories.nephew ? [...this.state.categories.nephew, ...this.state.timing] : null,
       enabling_ids: this.state.enablings
     };
 
     // Create Bme
     dispatch(createBme({
       data,
-      onSuccess: () => {
+      onSuccess() {
+        // Redirect to bme list
+        dispatch(push('/business-model-element'));
         toastr.success('Business model element created!');
       }
     }));
