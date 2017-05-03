@@ -61,7 +61,10 @@ class BmePage extends React.Component {
           editUrl="/business-model-element/edit"
           pagination={this.props.bmes.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
-          onDelete={item => dispatch(toggleModal(true, <Confirm text={`Business model element "${item.name}" will be deleted. Are you sure?`} onAccept={() => this.deleteBme(item)} />))}
+          onDelete={(item) => {
+            const confirm = <Confirm text={`Business model element "${item.name}" will be deleted. Are you sure?`} onAccept={() => this.deleteBme(item)} />;
+            dispatch(toggleModal(true, confirm));
+          }}
         />
         <Spinner isLoading={this.props.bmes.loading} />
       </div>

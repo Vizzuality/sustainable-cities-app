@@ -5,7 +5,7 @@ const MODAL_SET_CHILDREN = 'MODAL_SET_CHILDREN';
 /* Initial state */
 const initialState = {
   opened: false,
-  loading: false
+  children: null
 };
 
 /* Reducer */

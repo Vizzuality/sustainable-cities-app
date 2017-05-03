@@ -60,15 +60,16 @@ class EnablingPage extends React.Component {
           editUrl="/enabling-condition/edit"
           pagination={this.props.enablings.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
-          onDelete={item => dispatch(toggleModal(true, <Confirm text={`Enabling condition "${item.name}" will be deleted. Are you sure?`} onAccept={() => this.deleteEnabling(item)} />))}
+          onDelete={(item) => {
+            const confirm = <Confirm text={`Enabling condition "${item.name}" will be deleted. Are you sure?`} onAccept={() => this.deleteEnabling(item)} />;
+            dispatch(toggleModal(true, confirm));
+          }}
         />
         <Spinner isLoading={this.props.enablings.loading} />
       </div>
     );
   }
 }
-
-//this.deleteEnabling(item)
 
 EnablingPage.propTypes = {
   enablings: PropTypes.object
