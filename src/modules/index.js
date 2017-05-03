@@ -1,6 +1,7 @@
 /* App reducers */
 export { userReducer as user } from './user';
 export { bmesReducer as bmes } from './bmes';
+export { solutionsReducer as solutions } from './solutions';
 export { enablingsReducer as enablings } from './enablings';
 export { categoriesReducer as categories } from './categories';
 export { modalReducer as modal } from './modal';

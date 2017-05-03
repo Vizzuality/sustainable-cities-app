@@ -19,13 +19,18 @@ import EditBmePage from 'components/pages/Bme/EditBmePage';
 //    Study case
 import StudyCasesPage from 'components/pages/StudyCasesPage';
 
+/* Solutions */
+import SolutionPage from 'components/pages/Solution/SolutionPage';
+import NewSolutionPage from 'components/pages/Solution/NewSolutionPage';
+import EditSolutionPage from 'components/pages/Solution/EditSolutionPage';
+
 /* Enabling Conditions */
 import EnablingPage from 'components/pages/Enabling/EnablingPage';
 import NewEnablingPage from 'components/pages/Enabling/NewEnablingPage';
 import EditEnablingPage from 'components/pages/Enabling/EditEnablingPage';
 
 // Url hooks
-import { onEnterEditBmePage, onEnterEditEnablingPage } from 'modules/url';
+import { onEnterEditBmePage, onEnterEditEnablingPage, onEnterEditSolutionPage } from 'modules/url';
 
 
 const Routes = ({ history }) => (
@@ -45,6 +50,15 @@ const Routes = ({ history }) => (
         <IndexRoute components={{ main: BmePage, nav: Sidebar }} />
         <Route path="new" components={{ main: NewBmePage, nav: Sidebar }} />
         <Route path="edit/:id" components={{ main: EditBmePage, nav: Sidebar }} onEnter={onEnterEditBmePage} />
+      </Route>
+      <Route path="solution">
+        <IndexRoute components={{ main: SolutionPage, nav: Sidebar }} />
+        <Route path="new" components={{ main: NewSolutionPage, nav: Sidebar }} />
+        <Route
+          path="edit"
+          components={{ main: EditSolutionPage, nav: Sidebar }}
+          onEnter={onEnterEditSolutionPage}
+        />
       </Route>
       <Route path="enabling-condition">
         <IndexRoute components={{ main: EnablingPage, nav: Sidebar }} />

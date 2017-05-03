@@ -9,6 +9,7 @@ const initialState = {
   loading: false,
   Bme: [],
   enablings: [],
+  solution: [],
   timing: []
 };
 
@@ -54,6 +55,7 @@ function getCategories({ type, tree }) {
   const endPoints = {
     bme: 'business-model-element-categories?',
     enablings: 'enabling-categories?',
+    solutions: 'solution-categories?',
     timing: 'timing-categories?'
   };
 
