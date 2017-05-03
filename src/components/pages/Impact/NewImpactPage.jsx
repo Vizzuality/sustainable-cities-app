@@ -58,25 +58,19 @@ class NewImpactPage extends React.Component {
     };
 
     if (level === 'parent') {
-      categories.children = null;
-      categories.nephew = [];
-    }
-
-    if (level === 'children') {
-      categories.nephew = [];
+      categories.children = this.loadFirstChildrenOption(val);
     }
 
     this.setState({ categories });
   }
+
 
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
     let categoryIds = [];
 
-    if (this.state.categories.nephew && this.state.categories.nephew.length) {
-      categoryIds = this.state.categories.nephew;
-    } else if (this.state.categories.children && this.state.categories.children.length) {
+    if (this.state.categories.children && this.state.categories.children.length) {
       categoryIds = this.state.categories.children;
     } else {
       categoryIds = this.state.categories.parent;
@@ -94,35 +88,33 @@ class NewImpactPage extends React.Component {
     }));
   }
 
+  loadFirstChildrenOption(parentId) {
+    const parentCategory = this.props.impactCategories.find(cat => cat.id === parentId);
+    return parentCategory.children ? parentCategory.children[0].id : null;
+  }
+
   render() {
-    const { parent, children } = this.state.categories;
+    const { parent } = this.state.categories;
 
     const parentOptions = this.props.impactCategories.map(cat => ({ value: cat.id, label: cat.name }));
     let childrenOptions = [];
-    let nephewOptions = [];
     let parentCategory = null;
-    let childrenCategory = null;
 
     if (parent) {
       parentCategory = this.props.impactCategories.find(cat => cat.id === this.state.categories.parent);
       childrenOptions = parentCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
-
-      if (children) {
-        childrenCategory = parentCategory.children.find(child => child.id === this.state.categories.children);
-        nephewOptions = childrenCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
-      }
     }
 
     return (
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
           <BtnGroup>
-            <Link to="/enabling-condition" className="button alert">Cancel</Link>
+            <Link to="/impact" className="button alert">Cancel</Link>
             <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
           {/* Categories */}
           <div className="row expanded">
-            <div className="small-4 columns">
+            <div className="small-6 columns">
               <Select
                 name="categories"
                 value={this.state.categories.parent}
@@ -131,23 +123,13 @@ class NewImpactPage extends React.Component {
                 options={parentOptions}
               />
             </div>
-            <div className="small-4 columns">
+            <div className="small-6 columns">
               <Select
                 name="categories"
                 value={this.state.categories.children}
                 onChange={val => this.onCategoryChange('children', val)}
                 label="Sub-category"
                 options={childrenOptions}
-              />
-            </div>
-            <div className="small-4 columns">
-              <Select
-                multi
-                name="categories"
-                value={this.state.categories.nephew}
-                onChange={val => this.onCategoryChange('nephew', val)}
-                label="Sub-sub-category"
-                options={nephewOptions}
               />
             </div>
             <div className="small-12 columns">

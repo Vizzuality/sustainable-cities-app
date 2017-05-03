@@ -5,6 +5,7 @@ import {
   DEFAULT_SORT_FIELD
 } from 'constants/impacts';
 import { deserialize } from 'utils/json-api';
+import { getIdRelations } from 'utils/relation';
 
 /* Constants */
 const SET_IMPACT = 'SET_IMPACT';
@@ -59,7 +60,13 @@ function setImpacts(data) {
   return {
     type: SET_IMPACT,
     payload: {
-      list: data.list,
+      list: data.list.map((l) => {
+        return {
+          ...l,
+          ...{ category: l.relationships.category.data ? l.relationships.category.data.id : null }
+        };
+      }),
+      included: data.included,
       itemCount: data.itemCount
     }
   };
@@ -112,13 +119,17 @@ function getImpacts(paramsConfig = {}) {
           data = [data];
         }
 
-        let parsedData = deserialize(data);
+        const impactData = {
+          list: deserialize(data),
+          itemCount: meta.total_items
+        };
+
         if (included) {
-          parsedData = [({ ...parsedData[0], ...{ included: deserialize(included) } })];
+          impactData.included = included.map(incl => deserialize([incl])[0]);
         }
 
         dispatch(setImpactLoading(false));
-        dispatch(setImpacts({ list: parsedData, itemCount: meta.total_items, included }));
+        dispatch(setImpacts(impactData));
         onSuccess && onSuccess();
       }
     });
