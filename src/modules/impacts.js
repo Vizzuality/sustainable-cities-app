@@ -130,7 +130,7 @@ function createImpact({ data, onSuccess }) {
     dispatch(setImpactLoading(true));
     post({
       url: `${config.API_URL}/impacts`,
-      body: { bme: data },
+      body: { impact: data },
       headers: {
         Authorization: `Bearer ${localStorage.token}`
       },
@@ -148,7 +148,7 @@ function updateImpact({ id, data, onSuccess }) {
     patch({
       url: `${config.API_URL}/impacts/${id}`,
       body: {
-        bme: data
+        impact: data
       },
       onSuccess() {
         dispatch(setImpactLoading(false));

@@ -9,7 +9,7 @@ const initialState = {
   loading: false,
   Bme: [],
   enablings: [],
-  impact: [],
+  Impact: [],
   timing: []
 };
 
@@ -59,7 +59,7 @@ function getCategories({ type, tree }) {
     timing: 'timing-categories?'
   };
 
-  const endPoint = tree ? `/categories-tree?type=${type}` : endPoints[type];
+  const endPoint = tree ? `categories-tree?type=${type}` : endPoints[type];
 
   return (dispatch) => {
     dispatch(setCategoriesLoading(true));

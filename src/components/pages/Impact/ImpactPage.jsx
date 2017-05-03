@@ -48,7 +48,7 @@ class EnablingPage extends React.Component {
   render() {
     let impacts = null;
 
-    if (this.props.impacts.list.length && this.props.impactCategories.length) {
+    if (this.props.impacts.list.length && this.props.impactCategories && this.props.impactCategories.length) {
       impacts = this.setCategory();
     }
 

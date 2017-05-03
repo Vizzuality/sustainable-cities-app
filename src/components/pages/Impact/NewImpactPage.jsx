@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { dispatch } from 'main';
 import { getBmes } from 'modules/bmes';
-import { createEnabling, getEnablings } from 'modules/enablings';
+import { createImpact } from 'modules/impacts';
 import { getCategories } from 'modules/categories';
 import { Input, Button, Form, Textarea, Select, Radio } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
@@ -19,16 +19,13 @@ class NewImpactPage extends React.Component {
 
     this.form = {};
     this.state = {
-      category_id: null,
-      bme_ids: null
+      categories: {}
     };
   }
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.enablings.categories.length || dispatch(getCategories({ type: 'enablings', tree: false }));
-    dispatch(getBmes());
-    dispatch(getEnablings());
+    this.props.impactCategories.length || dispatch(getCategories({ type: 'Impact', tree: true }));
   }
 
   /* Methods */
@@ -49,30 +46,73 @@ class NewImpactPage extends React.Component {
     });
   }
 
-  @Autobind
-  onRadioChange(evt) {
-    this.form = {
-      ...this.form,
-      assessment_value: evt.target.value
+  onCategoryChange(level, val) {
+    if (val) {
+      val = Array.isArray(val) ?
+        val.map(i => i.value) : val.value;
+    }
+
+    const categories = {
+      ...this.state.categories,
+      [level]: val
     };
+
+    if (level === 'parent') {
+      categories.children = null;
+      categories.nephew = [];
+    }
+
+    if (level === 'children') {
+      categories.nephew = [];
+    }
+
+    this.setState({ categories });
   }
 
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
-    // creates enabling condition
-    dispatch(createEnabling({
+    let categoryIds = [];
+
+    if (this.state.categories.nephew && this.state.categories.nephew.length) {
+      categoryIds = this.state.categories.nephew;
+    } else if (this.state.categories.children && this.state.categories.children.length) {
+      categoryIds = this.state.categories.children;
+    } else {
+      categoryIds = this.state.categories.parent;
+    }
+
+    // creates impact
+    dispatch(createImpact({
       data: {
         ...this.form,
-        ...this.state
+        ...{ category_id: categoryIds }
       },
       onSuccess: () => {
-        toastr.success('Enabling condition created!');
+        toastr.success('Impact created!');
       }
     }));
   }
 
   render() {
+    const { parent, children } = this.state.categories;
+
+    const parentOptions = this.props.impactCategories.map(cat => ({ value: cat.id, label: cat.name }));
+    let childrenOptions = [];
+    let nephewOptions = [];
+    let parentCategory = null;
+    let childrenCategory = null;
+
+    if (parent) {
+      parentCategory = this.props.impactCategories.find(cat => cat.id === this.state.categories.parent);
+      childrenOptions = parentCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
+
+      if (children) {
+        childrenCategory = parentCategory.children.find(child => child.id === this.state.categories.children);
+        nephewOptions = childrenCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
+      }
+    }
+
     return (
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
@@ -80,41 +120,50 @@ class NewImpactPage extends React.Component {
             <Link to="/enabling-condition" className="button alert">Cancel</Link>
             <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
-          <Input type="text" onChange={this.onInputChange} name="name" value="" label="Enabling condition title" validations={['required']} />
-          <Textarea onChange={this.onInputChange} name="description" value="" label="Description" validations={['required']} />
-          <Select
-            name="category"
-            label="Category"
-            validations={['required']}
-            value={this.state.category_id}
-            onChange={val => this.onSelectChange('category_id', val)}
-            options={this.props.categories.enablings.map(cat => ({ value: cat.id, label: cat.name }))}
-          />
-          <div className="radio-group">
-            <label htmlFor="success-barrier">Success factor/barrier</label>
-            <input
-              type="radio"
-              value="Success"
-              name="success-barrier"
-              onChange={this.onRadioChange}
-              defaultChecked
-            /> Success
-            <input
-              type="radio"
-              value="Barrier"
-              name="success-barrier"
-              onChange={this.onRadioChange}
-            /> Barrier
+          {/* Categories */}
+          <div className="row expanded">
+            <div className="small-4 columns">
+              <Select
+                name="categories"
+                value={this.state.categories.parent}
+                onChange={val => this.onCategoryChange('parent', val)}
+                label="Category"
+                options={parentOptions}
+              />
+            </div>
+            <div className="small-4 columns">
+              <Select
+                name="categories"
+                value={this.state.categories.children}
+                onChange={val => this.onCategoryChange('children', val)}
+                label="Sub-category"
+                options={childrenOptions}
+              />
+            </div>
+            <div className="small-4 columns">
+              <Select
+                multi
+                name="categories"
+                value={this.state.categories.nephew}
+                onChange={val => this.onCategoryChange('nephew', val)}
+                label="Sub-sub-category"
+                options={nephewOptions}
+              />
+            </div>
+            <div className="small-12 columns">
+              {/* Name */}
+              <Input type="text" onChange={this.onInputChange} name="name" value="" label="Impact name" validations={['required']} />
+            </div>
+            <div className="small-6 columns">
+              {/* Unit */}
+              <Input type="text" onChange={this.onInputChange} name="impact_unit" value="" label="Unit" validations={['required']} />
+            </div>
+            <div className="small-6 columns">
+              {/* Value */}
+              <Input type="text" onChange={this.onInputChange} name="impact_value" value="" label="Value" validations={['required']} />
+            </div>
+            {/* TODO: add source */}
           </div>
-          <Select
-            name="bme_ids"
-            label="Affected business model elements"
-            multi
-            validations={['required']}
-            value={this.state.bme_ids}
-            onChange={val => this.onSelectChange('bme_ids', val)}
-            options={this.props.bmes.list.map(bme => ({ value: bme.id, label: bme.name }))}
-          />
         </Form>
       </section>
     );
@@ -127,7 +176,7 @@ NewImpactPage.propTypes = {
 
 // Map state to props
 const mapStateToProps = ({ categories }) => ({
-  impactCategories: categories.impact
+  impactCategories: categories.Impact
 });
 
 export default connect(mapStateToProps, null)(NewImpactPage);
