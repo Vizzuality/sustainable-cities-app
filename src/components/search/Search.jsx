@@ -3,6 +3,7 @@ import Icon from 'components/ui/icon';
 import classnames from 'classnames';
 import { Autobind } from 'es-decorators';
 import _debounce from 'lodash/debounce';
+import PropTypes from 'prop-types';
 
 export default class Search extends React.Component {
 
@@ -37,9 +38,9 @@ export default class Search extends React.Component {
 }
 
 Search.propTypes = {
-  className: React.PropTypes.string,
-  debounce: React.PropTypes.number,
-  onChange: React.PropTypes.func
+  className: PropTypes.string,
+  debounce: PropTypes.number,
+  onChange: PropTypes.func
 };
 
 Search.defaultProps = {

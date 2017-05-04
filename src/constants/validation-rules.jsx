@@ -2,7 +2,7 @@ import React from 'react';
 import validator from 'validator';
 
 const required = {
-  rule: value => value.toString().trim(),
+  rule: value => (value ? value.toString().trim() : ''),
   hint: () => <span className="form-error -required">Required</span>
 };
 
@@ -12,9 +12,7 @@ const email = {
 };
 
 const passwordConfirmation = {
-  rule: (value, components) => {
-    return value === components.password.state.value;
-  },
+  rule: (value, components) => value === components.password.state.value,
   hint: () => <span className="form-error -password-confirmation">Passwords don't match</span>
 };
 
