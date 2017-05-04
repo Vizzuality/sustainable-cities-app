@@ -81,9 +81,7 @@ class StudyCasesPage extends React.Component {
         <Link className="button" to="/study-cases/new">New study case</Link>
         <Search onChange={this.search} />
         <StudyCaseList data={this.props.studyCases.list} />
-        <div style={{ position: 'relative' }}>
-          <Spinner isLoading={this.props.studyCases.loading} />
-        </div>
+        <Spinner className="-fixed" isLoading={this.props.studyCases.loading} />
       </div>
     );
   }
