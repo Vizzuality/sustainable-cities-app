@@ -1,4 +1,5 @@
 import { get, post, _delete, patch } from 'utils/request';
+import { push } from 'react-router-redux';
 import { deserialize } from 'utils/json-api';
 import { getIdRelations } from 'utils/relation';
 
@@ -133,6 +134,13 @@ function getEnablings(paramsConfig = {}) {
           itemCount: meta.total_items
         }));
         onSuccess && onSuccess();
+      },
+      onError(data) {
+        const { status, title } = data.errors[0];
+        console.error(status, title);
+
+        // redirects to list
+        dispatch(push('/enabling-condition'));
       }
     });
   };

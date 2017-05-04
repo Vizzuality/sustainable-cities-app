@@ -1,4 +1,5 @@
 import { get, post, _delete, patch } from 'utils/request';
+import { push } from 'react-router-redux';
 import {
   DEFAULT_PAGINATION_SIZE,
   DEFAULT_PAGINATION_NUMBER,
@@ -131,6 +132,13 @@ function getImpacts(paramsConfig = {}) {
         dispatch(setImpactLoading(false));
         dispatch(setImpacts(impactData));
         onSuccess && onSuccess();
+      },
+      onError(data) {
+        const { status, title } = data.errors[0];
+        console.error(status, title);
+
+        // redirects to list
+        dispatch(push('/impact'));
       }
     });
   };
