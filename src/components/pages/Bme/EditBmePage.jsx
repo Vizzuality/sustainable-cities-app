@@ -65,14 +65,17 @@ class EditBmePage extends React.Component {
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
+
+    const data = {
+      ...this.form,
+      category_ids: [...this.state.timing, ...[this.state.categories.nephew]],
+      enabling_ids: this.state.enablings
+    };
+
     // Update BME
     dispatch(updateBme({
       id: this.props.bmesDetail.id,
-      data: {
-        ...this.form,
-        category_ids: [...this.state.timing, ...[this.state.categories.nephew]],
-        enabling_ids: this.state.enablings
-      },
+      data,
       onSuccess() {
         toastr.success('Business model element edited!');
       }
