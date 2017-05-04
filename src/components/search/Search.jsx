@@ -1,5 +1,5 @@
 import React from 'react';
-import Icon from 'components/ui/icon';
+import Icon from 'components/ui/Icon';
 import classnames from 'classnames';
 import { Autobind } from 'es-decorators';
 import _debounce from 'lodash/debounce';
