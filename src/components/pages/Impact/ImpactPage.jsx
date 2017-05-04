@@ -8,8 +8,10 @@ import isEqual from 'lodash/isEqual';
 
 import { getImpacts, deleteImpact, setFilters } from 'modules/impacts';
 import { getCategories } from 'modules/categories';
+import { toggleModal } from 'modules/modal';
 import { getIdRelations } from 'utils/relation';
 
+import Confirm from 'components/confirm/Confirm';
 import Spinner from 'components/ui/Spinner';
 import Table from 'components/ui/Table';
 
@@ -44,6 +46,24 @@ class EnablingPage extends React.Component {
     });
   }
 
+  deleteImpact(impact) {
+    const { impacts } = this.props;
+
+    dispatch(
+      deleteImpact({
+        id: impact.id,
+        onSuccess: () => {
+          dispatch(getImpacts({
+            pageSize: impacts.pagination.pageSize,
+            pageNumber: impacts.pagination.pageNumber,
+            sort: impacts.sort,
+            onSuccess: () => toastr.success('The impact has been removed')
+          }));
+        }
+      })
+    );
+  }
+
 
   render() {
     let impacts = null;
@@ -66,7 +86,10 @@ class EnablingPage extends React.Component {
           editUrl="/impact/edit"
           pagination={this.props.impacts.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
-          onDelete={item => dispatch(deleteImpact({ id: item.id, onSuccess: () => toastr.success('The business model elemen has been removed') }))}
+          onDelete={(item) => {
+            const confirm = <Confirm text={`Impact "${item.name}" will be deleted. Are you sure?`} onAccept={() => this.deleteImpact(item)} />;
+            dispatch(toggleModal(true, confirm));
+          }}
         />
         <Spinner isLoading={this.props.impacts.loading} />
       </div>

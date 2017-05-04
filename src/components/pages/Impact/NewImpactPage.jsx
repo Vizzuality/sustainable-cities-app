@@ -94,7 +94,7 @@ class NewImpactPage extends React.Component {
 
   loadFirstChildrenOption(parentId) {
     const parentCategory = this.props.impactCategories.find(cat => cat.id === parentId);
-    return parentCategory.children ? parentCategory.children[0].id : null;
+    return parentCategory && parentCategory.children ? parentCategory.children[0].id : null;
   }
 
   render() {
