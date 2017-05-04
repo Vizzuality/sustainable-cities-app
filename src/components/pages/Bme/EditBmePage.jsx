@@ -92,11 +92,11 @@ class EditBmePage extends React.Component {
 
     if (level === 'parent') {
       categories.children = null;
-      categories.nephew = [];
+      categories.nephew = {};
     }
 
     if (level === 'children') {
-      categories.nephew = [];
+      categories.nephew = {};
     }
 
     this.setState({ categories });
@@ -127,7 +127,7 @@ class EditBmePage extends React.Component {
 
     if (!nephewCategories.length) return;
 
-    const nephewCategoriesIds = nephewCategories.map(cat => cat.id);
+    const nephewCategoriesId = nephewCategories.map(cat => cat.id)[0];
 
     const childrenCategoryId = nephewCategories ? nephewCategories[0].relationships.parent.data.id : {};
 
@@ -139,7 +139,7 @@ class EditBmePage extends React.Component {
       categories: {
         parent: parentCategory.id,
         children: childrenCategoryId,
-        nephew: nephewCategoriesIds
+        nephew: nephewCategoriesId
       }
     });
   }
@@ -209,7 +209,6 @@ class EditBmePage extends React.Component {
             <div className="small-4 columns">
               { /* Nephew Category */}
               <Select
-                multi
                 name="categories"
                 value={this.state.categories.nephew}
                 onChange={val => this.onCategoryChange('nephew', val)}
