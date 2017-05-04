@@ -164,13 +164,11 @@ class EditBmePage extends React.Component {
   }
 
   setCategories({ bmesDetail, bmeCategories }) {
-    const nephewCategories = bmesDetail.categories.filter(cat => cat.category_type === 'Bme');
+    const nephewCategory = bmesDetail.categories.filter(cat => cat.category_type === 'Bme')[0];
 
-    if (!nephewCategories.length) return;
+    if (!nephewCategory) return;
 
-    const nephewCategoriesId = nephewCategories.map(cat => cat.id)[0];
-
-    const childrenCategoryId = nephewCategories ? nephewCategories[0].relationships.parent.data.id : {};
+    const childrenCategoryId = nephewCategory ? nephewCategory.relationships.parent.data.id : {};
 
     const parentCategory = childrenCategoryId ? bmeCategories.find((cat) => {
       return cat.children.find(c => c.id === childrenCategoryId);
@@ -180,7 +178,7 @@ class EditBmePage extends React.Component {
       categories: {
         parent: parentCategory.id,
         children: childrenCategoryId,
-        nephew: nephewCategoriesId
+        nephew: nephewCategory.id
       }
     });
   }
