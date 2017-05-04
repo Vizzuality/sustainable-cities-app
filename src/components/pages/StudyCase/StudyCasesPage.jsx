@@ -5,6 +5,7 @@ import { getStudyCases } from 'modules/study-cases';
 import { connect } from 'react-redux';
 import StudyCaseList from 'components/study-case/StudyCaseList';
 import Spinner from 'components/ui/Spinner';
+import debounce from 'lodash/debounce';
 
 class StudyCasesPage extends React.Component {
 
@@ -23,7 +24,7 @@ class StudyCasesPage extends React.Component {
   }
 
   setScrollListener() {
-    this._scrollListener = () => {
+    this._scrollListener = debounce(() => {
       if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
         if (this.props.studyCases.list.length === this.props.studyCases.itemCount) {
           // We have already get all items, remove listener then
@@ -33,8 +34,9 @@ class StudyCasesPage extends React.Component {
         this.page = this.page + 1;
         this.fetchPage();
       }
-    };
-    window.addEventListener('scroll', this._scrollListener);
+    }, 100);
+
+    window.addEventListener('scroll', this._scrollListener, { passive: true });
   }
 
   fetchPage() {
