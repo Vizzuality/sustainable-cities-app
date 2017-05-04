@@ -3,7 +3,7 @@ import { dispatch } from 'main';
 import { getUserData } from 'modules/user';
 import Header from 'components/header/HeaderContainer';
 import ReduxToastr from 'react-redux-toastr'
-import Modal from 'components/ui/modal';
+import Modal from 'components/ui/Modal';
 
 export default class App extends React.Component {
 
