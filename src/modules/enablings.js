@@ -1,5 +1,6 @@
 import { get, post, _delete, patch } from 'utils/request';
 import { push } from 'react-router-redux';
+import { toastr } from 'react-redux-toastr';
 import { deserialize } from 'utils/json-api';
 import { getIdRelations } from 'utils/relation';
 
@@ -139,8 +140,12 @@ function getEnablings(paramsConfig = {}) {
         const { status, title } = data.errors[0];
         console.error(status, title);
 
-        // redirects to list
-        dispatch(push('/enabling-condition'));
+        if (status === '404') {
+          toastr.error('Ops! Enabling Condition Not Found!');
+
+          // redirects to list
+          dispatch(push('/enabling-condition'));
+        }
       }
     });
   };

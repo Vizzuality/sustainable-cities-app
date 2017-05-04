@@ -1,5 +1,6 @@
 import { get, post, _delete, patch } from 'utils/request';
 import { push } from 'react-router-redux';
+import { toastr } from 'react-redux-toastr';
 import {
   DEFAULT_PAGINATION_SIZE,
   DEFAULT_PAGINATION_NUMBER,
@@ -137,8 +138,12 @@ function getImpacts(paramsConfig = {}) {
         const { status, title } = data.errors[0];
         console.error(status, title);
 
-        // redirects to list
-        dispatch(push('/impact'));
+        if (status === '404') {
+          toastr.error('Ops! Impact Not Found!');
+
+          // redirects to list
+          dispatch(push('/impact'));
+        }
       }
     });
   };
