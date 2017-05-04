@@ -152,8 +152,8 @@ function createStudyCase({ data, onSuccess }) {
   return (dispatch) => {
     dispatch(setStudyCasesLoading(true));
     post({
-      url: `${config.API_URL}/study-cases`,
-      body: { bme: data },
+      url: `${config.API_URL}/projects`,
+      body: { project: data },
       headers: {
         Authorization: `Bearer ${localStorage.token}`
       },
@@ -171,7 +171,7 @@ function updateStudyCase({ id, data, onSuccess }) {
     patch({
       url: `${config.API_URL}/study-cases/${id}`,
       body: {
-        bme: data
+        project: data
       },
       onSuccess() {
         dispatch(setStudyCasesLoading(false));
