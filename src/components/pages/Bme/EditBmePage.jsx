@@ -65,14 +65,17 @@ class EditBmePage extends React.Component {
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
+
+    const data = {
+      ...this.form,
+      category_ids: [...this.state.timing, ...[this.state.categories.nephew]],
+      enabling_ids: this.state.enablings
+    };
+
     // Update BME
     dispatch(updateBme({
       id: this.props.bmesDetail.id,
-      data: {
-        ...this.form,
-        category_ids: [...this.state.categories.nephew, ...this.state.timing],
-        enabling_ids: this.state.enablings
-      },
+      data,
       onSuccess() {
         toastr.success('Business model element edited!');
       }
@@ -91,15 +94,56 @@ class EditBmePage extends React.Component {
     };
 
     if (level === 'parent') {
-      categories.children = null;
-      categories.nephew = [];
+      let options = {};
+      if (val) {
+        options = this.getFirstSelectOption(val, 'parent');
+      }
+      categories.children = val ? options.children : {};
+      categories.nephew = val ? options.nephew : {};
     }
 
     if (level === 'children') {
-      categories.nephew = [];
+      let options = {};
+      if (val) {
+        options = this.getFirstSelectOption(val, 'children');
+      }
+      categories.nephew = val ? options.nephew : {};
     }
 
     this.setState({ categories });
+  }
+
+  getFirstSelectOption(value, source) {
+    const options = {
+      children: {},
+      nephew: {}
+    };
+
+    if (source === 'parent') {
+      // populates children selector based on parent selection
+      const parentCategory = this.props.bmeCategories.find(cat => cat.id === value);
+      if (parentCategory.children && parentCategory.children.length) {
+        options.children = parentCategory.children[0].id;
+      }
+
+      // populates nephew selector based on children selection
+      const childrenCategory = parentCategory.children.find(child => child.id === options.children);
+      if (childrenCategory.children && childrenCategory.children.length) {
+        options.nephew = childrenCategory.children[0].id;
+      }
+    }
+
+    if (source === 'children') {
+      // populates nephew selector based on children selection
+      const parentId = this.state.categories.parent;
+      const parentCategory = this.props.bmeCategories.find(cat => cat.id === parentId);
+      const childrenCategory = parentCategory.children.find(child => child.id === value);
+      if (childrenCategory.children && childrenCategory.children.length) {
+        options.nephew = childrenCategory.children[0].id;
+      }
+    }
+
+    return options;
   }
 
   setTimingCategory(bmesDetail) {
@@ -123,13 +167,11 @@ class EditBmePage extends React.Component {
   }
 
   setCategories({ bmesDetail, bmeCategories }) {
-    const nephewCategories = bmesDetail.categories.filter(cat => cat.category_type === 'Bme');
+    const nephewCategory = bmesDetail.categories.filter(cat => cat.category_type === 'Bme')[0];
 
-    if (!nephewCategories.length) return;
+    if (!nephewCategory) return;
 
-    const nephewCategoriesIds = nephewCategories.map(cat => cat.id);
-
-    const childrenCategoryId = nephewCategories ? nephewCategories[0].relationships.parent.data.id : {};
+    const childrenCategoryId = nephewCategory ? nephewCategory.relationships.parent.data.id : {};
 
     const parentCategory = childrenCategoryId ? bmeCategories.find((cat) => {
       return cat.children.find(c => c.id === childrenCategoryId);
@@ -139,7 +181,7 @@ class EditBmePage extends React.Component {
       categories: {
         parent: parentCategory.id,
         children: childrenCategoryId,
-        nephew: nephewCategoriesIds
+        nephew: nephewCategory.id
       }
     });
   }
@@ -151,18 +193,18 @@ class EditBmePage extends React.Component {
 
   render() {
     const { parent, children } = this.state.categories;
-    let parentCategory = null;
+
     let childrenOptions = [];
     let nephewOptions = [];
+    let parentCategory = null;
+    let childrenCategory = null;
 
-    if (this.props.bmeCategories) {
-      if (parent) {
-        parentCategory = this.props.bmeCategories.find(cat => cat.id === this.state.categories.parent);
-        childrenOptions = parentCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
-      }
+    if (parent) {
+      parentCategory = this.props.bmeCategories.find(cat => cat.id === this.state.categories.parent);
+      childrenOptions = parentCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
 
       if (children) {
-        const childrenCategory = parentCategory.children.find(child => child.id === this.state.categories.children);
+        childrenCategory = parentCategory.children.find(child => child.id === this.state.categories.children);
         nephewOptions = childrenCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
       }
     }
@@ -209,7 +251,6 @@ class EditBmePage extends React.Component {
             <div className="small-4 columns">
               { /* Nephew Category */}
               <Select
-                multi
                 name="categories"
                 value={this.state.categories.nephew}
                 onChange={val => this.onCategoryChange('nephew', val)}
