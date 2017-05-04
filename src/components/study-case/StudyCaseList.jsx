@@ -3,7 +3,7 @@ import StudyCaseItem from 'components/study-case/StudyCaseItem';
 
 export default function StudyCaseList({ data }) {
   return (
-    <ul className="c-sc-list row">
+    <ul className="c-sc-list row expanded">
       {data.map((sc, i) => <li className="column small-4" key={i}><StudyCaseItem data={sc} /></li>)}
     </ul>
   );

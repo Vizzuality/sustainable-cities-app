@@ -4,6 +4,7 @@ import { dispatch } from 'main';
 import { getStudyCases } from 'modules/study-cases';
 import { connect } from 'react-redux';
 import StudyCaseList from 'components/study-case/StudyCaseList';
+import Search from 'components/search/Search';
 import Spinner from 'components/ui/Spinner';
 import debounce from 'lodash/debounce';
 
@@ -55,6 +56,7 @@ class StudyCasesPage extends React.Component {
     return (
       <div>
         <Link className="button" to="/study-cases/new">New study case</Link>
+        <Search onChange={val => console.log(val)} />
         <StudyCaseList data={this.props.studyCases.list} />
         <div style={{ position: 'relative' }}>
           <Spinner isLoading={this.props.studyCases.loading} />
