@@ -3,6 +3,7 @@ import { dispatch } from 'main';
 import { getUserData } from 'modules/user';
 import Header from 'components/header/HeaderContainer';
 import ReduxToastr from 'react-redux-toastr'
+import Modal from 'components/ui/modal';
 
 export default class App extends React.Component {
 
@@ -30,6 +31,7 @@ export default class App extends React.Component {
         </main>
         {this.props.footer}
         <ReduxToastr />
+        <Modal />
       </div>
     );
   }

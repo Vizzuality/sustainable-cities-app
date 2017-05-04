@@ -1,0 +1,13 @@
+.c-sc-list {
+  list-style-type: none;
+}
+
+.c-sc {
+  padding-bottom: $space-1 * 4;
+
+  .sc-img {
+    height: 170px;
+    background-color: palette(gray, light);
+    margin-bottom: $space-1;
+  }
+}

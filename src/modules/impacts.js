@@ -5,21 +5,20 @@ import {
   DEFAULT_PAGINATION_SIZE,
   DEFAULT_PAGINATION_NUMBER,
   DEFAULT_SORT_FIELD
-} from 'constants/bmes';
+} from 'constants/impacts';
 import { deserialize } from 'utils/json-api';
 import { getIdRelations } from 'utils/relation';
 
 /* Constants */
-const SET_BMES = 'SET_BMES';
-const SET_BMES_LOADING = 'SET_BMES_LOADING';
-const SET_BMES_FILTERS = 'SET_BMES_FILTERS';
-const SET_BMES_DETAIL = 'SET_BMES_DETAIL';
+const SET_IMPACT = 'SET_IMPACT';
+const SET_IMPACT_LOADING = 'SET_IMPACT_LOADING';
+const SET_IMPACT_FILTERS = 'SET_IMPACT_FILTERS';
+const SET_IMPACT_DETAIL = 'SET_IMPACT_DETAIL';
 
 /* Initial state */
 const initialState = {
   loading: false,
   list: [],
-  included: [],
   itemCount: null,
   detailId: null,
   filters: {},
@@ -30,26 +29,25 @@ const initialState = {
 };
 
 /* Reducer */
-function bmesReducer(state = initialState, action) {
+function impactReducer(state = initialState, action) {
   switch (action.type) {
-    case SET_BMES:
+    case SET_IMPACT:
       return {
         ...state,
         list: action.payload.list,
-        included: action.payload.included,
         itemCount: action.payload.itemCount
       };
-    case SET_BMES_LOADING:
+    case SET_IMPACT_LOADING:
       return {
         ...state,
         loading: action.payload
       };
-    case SET_BMES_FILTERS:
+    case SET_IMPACT_FILTERS:
       return {
         ...state,
         ...action.payload
       };
-    case SET_BMES_DETAIL:
+    case SET_IMPACT_DETAIL:
       return {
         ...state,
         detailId: action.payload
@@ -60,15 +58,14 @@ function bmesReducer(state = initialState, action) {
 }
 
 /* Action creators */
-function setBmes(data) {
+function setImpacts(data) {
   return {
-    type: SET_BMES,
+    type: SET_IMPACT,
     payload: {
       list: data.list.map((l) => {
         return {
           ...l,
-          ...{ categories: getIdRelations(l.relationships.categories.data, data.included) },
-          ...{ enablings: getIdRelations(l.relationships.enablings.data, data.included) }
+          ...{ category: l.relationships.category.data ? l.relationships.category.data.id : null }
         };
       }),
       included: data.included,
@@ -77,9 +74,9 @@ function setBmes(data) {
   };
 }
 
-function setBmesLoading(loading) {
+function setImpactLoading(loading) {
   return {
-    type: SET_BMES_LOADING,
+    type: SET_IMPACT_LOADING,
     payload: loading
   };
 }
@@ -89,19 +86,19 @@ function setFilters(field, value) {
   filter[field] = value;
 
   return {
-    type: SET_BMES_FILTERS,
+    type: SET_IMPACT_FILTERS,
     payload: filter
   };
 }
 
-function setBmesDetail(id) {
+function setImpactDetail(id) {
   return {
-    type: SET_BMES_DETAIL,
+    type: SET_IMPACT_DETAIL,
     payload: id
   };
 }
 
-function getBmes(paramsConfig = {}) {
+function getImpacts(paramsConfig = {}) {
   return (dispatch) => {
     let { pageSize, pageNumber, sort } = paramsConfig;
     const { onSuccess, id } = paramsConfig;
@@ -111,10 +108,10 @@ function getBmes(paramsConfig = {}) {
     sort = sort || DEFAULT_SORT_FIELD;
 
     const url = id ?
-      `${config.API_URL}/business-model-elements/${id}` :
-      `${config.API_URL}/business-model-elements?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}`;
+      `${config.API_URL}/impacts/${id}` :
+      `${config.API_URL}/impacts?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}`;
 
-    dispatch(setBmesLoading(true));
+    dispatch(setImpactLoading(true));
 
     get({
       url,
@@ -124,17 +121,17 @@ function getBmes(paramsConfig = {}) {
           data = [data];
         }
 
-        const bmeData = {
+        const impactData = {
           list: deserialize(data),
           itemCount: meta.total_items
         };
 
         if (included) {
-          bmeData.included = included.map(incl => deserialize([incl])[0]);
+          impactData.included = included.map(incl => deserialize([incl])[0]);
         }
 
-        dispatch(setBmesLoading(false));
-        dispatch(setBmes(bmeData));
+        dispatch(setImpactLoading(false));
+        dispatch(setImpacts(impactData));
         onSuccess && onSuccess();
       },
       onError(data) {
@@ -142,60 +139,60 @@ function getBmes(paramsConfig = {}) {
         console.error(status, title);
 
         if (status === '404') {
-          toastr.error('Ops! Business Model Element Not Found!');
+          toastr.error('Ops! Impact Not Found!');
 
           // redirects to list
-          dispatch(push('/business-model-element'));
+          dispatch(push('/impact'));
         }
       }
     });
   };
 }
 
-function createBme({ data, onSuccess }) {
+function createImpact({ data, onSuccess }) {
   return (dispatch) => {
-    dispatch(setBmesLoading(true));
+    dispatch(setImpactLoading(true));
     post({
-      url: `${config.API_URL}/business-model-elements`,
-      body: { bme: data },
+      url: `${config.API_URL}/impacts`,
+      body: { impact: data },
       headers: {
         Authorization: `Bearer ${localStorage.token}`
       },
       onSuccess() {
-        dispatch(setBmesLoading(false));
+        dispatch(setImpactLoading(false));
         onSuccess && onSuccess();
       }
     });
   };
 }
 
-function updateBme({ id, data, onSuccess }) {
+function updateImpact({ id, data, onSuccess }) {
   return (dispatch) => {
-    dispatch(setBmesLoading(true));
+    dispatch(setImpactLoading(true));
     patch({
-      url: `${config.API_URL}/business-model-elements/${id}`,
+      url: `${config.API_URL}/impacts/${id}`,
       body: {
-        bme: data
+        impact: data
       },
       onSuccess() {
-        dispatch(setBmesLoading(false));
+        dispatch(setImpactLoading(false));
         onSuccess && onSuccess(id);
       }
     });
   };
 }
 
-function deleteBme({ id, onSuccess }) {
+function deleteImpact({ id, onSuccess }) {
   return (dispatch) => {
-    dispatch(setBmesLoading(true));
+    dispatch(setImpactLoading(true));
     _delete({
-      url: `${config.API_URL}/business-model-elements/${id}`,
+      url: `${config.API_URL}/impacts/${id}`,
       onSuccess() {
-        dispatch(setBmesLoading(false));
+        dispatch(setImpactLoading(false));
         onSuccess && onSuccess(id);
       }
     });
   };
 }
 
-export { bmesReducer, getBmes, createBme, deleteBme, setBmesDetail, updateBme, setFilters };
+export { impactReducer, getImpacts, createImpact, deleteImpact, setImpactDetail, updateImpact, setFilters };

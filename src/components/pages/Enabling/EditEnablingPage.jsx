@@ -31,15 +31,11 @@ class EditBmePage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    dispatch(getBmes());
+    dispatch(getBmes({ pageSize: 9999 }));
     dispatch(getCategories({ type: 'enablings', tree: false }));
     if (!this.props.enablingDetail) {
       dispatch(getEnablings({ id: this.props.enablings.detailId }));
-    }
-  }
-
-  componentDidMount() {
-    if (this.props.enablingDetail) {
+    } else {
       this.fillFields(this.props);
     }
   }

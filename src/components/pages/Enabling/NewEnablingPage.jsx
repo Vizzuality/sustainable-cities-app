@@ -11,6 +11,7 @@ import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
 import { toastr } from 'react-redux-toastr';
 import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
 
 class NewEnablingPage extends React.Component {
 
@@ -67,6 +68,7 @@ class NewEnablingPage extends React.Component {
         ...this.state
       },
       onSuccess: () => {
+        dispatch(push('/enabling-condition'));
         toastr.success('Enabling condition created!');
       }
     }));

@@ -5,8 +5,9 @@ import { connect } from 'react-redux';
 import { dispatch } from 'main';
 import { toastr } from 'react-redux-toastr';
 import isEqual from 'lodash/isEqual';
-
 import { getEnablings, deleteEnabling, setFilters } from 'modules/enablings';
+import { toggleModal } from 'modules/modal';
+import Confirm from 'components/confirm/Confirm';
 
 import Spinner from 'components/ui/Spinner';
 import Table from 'components/ui/Table';
@@ -30,6 +31,22 @@ class EnablingPage extends React.Component {
     }
   }
 
+  deleteEnabling(item) {
+    const { enablings } = this.props;
+
+    dispatch(deleteEnabling({
+      id: item.id,
+      onSuccess() {
+        dispatch(getEnablings({
+          pageSize: enablings.pagination.pageSize,
+          pageNumber: enablings.pagination.pageNumber,
+          sort: enablings.sort,
+          onSuccess: () => toastr.success('The enabling condition has been removed')
+        }));
+      }
+    }));
+  }
+
   render() {
     return (
       <div className="c-page">
@@ -43,7 +60,10 @@ class EnablingPage extends React.Component {
           editUrl="/enabling-condition/edit"
           pagination={this.props.enablings.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
-          onDelete={item => dispatch(deleteEnabling({ id: item.id, onSuccess: () => toastr.success('The business model elemen has been removed') }))}
+          onDelete={(item) => {
+            const confirm = <Confirm text={`Enabling condition "${item.name}" will be deleted. Are you sure?`} onAccept={() => this.deleteEnabling(item)} />;
+            dispatch(toggleModal(true, confirm));
+          }}
         />
         <Spinner isLoading={this.props.enablings.loading} />
       </div>

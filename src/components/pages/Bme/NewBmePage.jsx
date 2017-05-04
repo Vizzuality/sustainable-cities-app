@@ -10,6 +10,7 @@ import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
 import { toastr } from 'react-redux-toastr';
 import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
 
 class NewBmePage extends React.Component {
 
@@ -42,14 +43,16 @@ class NewBmePage extends React.Component {
 
     const data = {
       ...this.form,
-      category_ids: [...this.state.categories.nephew, ...this.state.timing],
+      category_ids: [...this.state.timing, ...[this.state.categories.nephew]],
       enabling_ids: this.state.enablings
     };
 
     // Create Bme
     dispatch(createBme({
       data,
-      onSuccess: () => {
+      onSuccess() {
+        // Redirect to bme list
+        dispatch(push('/business-model-element'));
         toastr.success('Business model element created!');
       }
     }));
@@ -73,15 +76,56 @@ class NewBmePage extends React.Component {
     };
 
     if (level === 'parent') {
-      categories.children = null;
-      categories.nephew = [];
+      let options = {};
+      if (val) {
+        options = this.getFirstSelectOption(val, 'parent');
+      }
+      categories.children = val ? options.children : {};
+      categories.nephew = val ? options.nephew : {};
     }
 
     if (level === 'children') {
-      categories.nephew = [];
+      let options = {};
+      if (val) {
+        options = this.getFirstSelectOption(val, 'children');
+      }
+      categories.nephew = val ? options.nephew : {};
     }
 
     this.setState({ categories });
+  }
+
+  getFirstSelectOption(value, source) {
+    const options = {
+      children: {},
+      nephew: {}
+    };
+
+    if (source === 'parent') {
+      // populates children selector based on parent selection
+      const parentCategory = this.props.bmeCategories.find(cat => cat.id === value);
+      if (parentCategory.children && parentCategory.children.length) {
+        options.children = parentCategory.children[0].id;
+      }
+
+      // populates nephew selector based on children selection
+      const childrenCategory = parentCategory.children.find(child => child.id === options.children);
+      if (childrenCategory.children && childrenCategory.children.length) {
+        options.nephew = childrenCategory.children[0].id;
+      }
+    }
+
+    if (source === 'children') {
+      // populates nephew selector based on children selection
+      const parentId = this.state.categories.parent;
+      const parentCategory = this.props.bmeCategories.find(cat => cat.id === parentId);
+      const childrenCategory = parentCategory.children.find(child => child.id === value);
+      if (childrenCategory.children && childrenCategory.children.length) {
+        options.nephew = childrenCategory.children[0].id;
+      }
+    }
+
+    return options;
   }
 
   render() {
@@ -134,7 +178,6 @@ class NewBmePage extends React.Component {
             </div>
             <div className="small-4 columns">
               <Select
-                multi
                 name="categories"
                 value={this.state.categories.nephew}
                 onChange={val => this.onCategoryChange('nephew', val)}
