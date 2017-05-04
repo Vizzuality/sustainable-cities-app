@@ -29,7 +29,7 @@ class EditBmePage extends React.Component {
   componentWillMount() {
     this.props.bmeCategories.length || dispatch(getCategories({ type: 'Bme', tree: true }));
     this.props.timingCategories.length || dispatch(getCategories({ type: 'timing' }));
-    this.props.enablings.list.length || dispatch(getEnablings());
+    this.props.enablings.list.length || dispatch(getEnablings({ pageSize: 9999 }));
 
     if (!this.props.bmesDetail) {
       dispatch(getBmes({ id: this.props.bmes.detailId }));
@@ -179,7 +179,7 @@ class EditBmePage extends React.Component {
 
     this.setState({
       categories: {
-        parent: parentCategory.id,
+        parent: parentCategory ? parentCategory.id : null,
         children: childrenCategoryId,
         nephew: nephewCategory.id
       }
