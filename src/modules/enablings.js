@@ -42,7 +42,10 @@ function enablingsReducer(state = initialState, action) {
         itemCount: action.payload.itemCount
       };
     case RESET_ENABLINGS:
-      return initialState;
+      return {
+        ...state,
+        pagination: initialState.pagination
+      };
     case SET_ENABLINGS_SEARCH:
       return {
         ...state,

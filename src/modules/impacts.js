@@ -46,7 +46,10 @@ function impactReducer(state = initialState, action) {
         search: action.payload
       };
     case RESET_IMPACTS:
-      return initialState;
+      return {
+        ...state,
+        pagination: initialState.pagination
+      };
     case SET_IMPACT_LOADING:
       return {
         ...state,

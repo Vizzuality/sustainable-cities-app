@@ -53,7 +53,10 @@ function bmesReducer(state = initialState, action) {
         ...action.payload
       };
     case RESET_BMES:
-      return initialState;
+      return {
+        ...state,
+        pagination: initialState.pagination
+      };
     case SET_BMES_SEARCH: {
       return {
         ...state,
