@@ -44,7 +44,8 @@ function enablingsReducer(state = initialState, action) {
     case RESET_ENABLINGS:
       return {
         ...state,
-        pagination: initialState.pagination
+        pagination: initialState.pagination,
+        search: initialState.search
       };
     case SET_ENABLINGS_SEARCH:
       return {
