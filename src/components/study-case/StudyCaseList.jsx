@@ -9,7 +9,7 @@ export default function StudyCaseList({ data }) {
         const cNames = classnames('column', 'small-4', {
           end: (i + 1) === data.length
         });
-        return <li className={cNames} key={i}><StudyCaseItem data={sc} /></li>;
+        return <li className={cNames} key={sc.id}><StudyCaseItem data={sc} /></li>;
       })}
     </ul>
   );

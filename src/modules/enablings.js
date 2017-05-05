@@ -11,9 +11,11 @@ import {
 } from 'constants/enablings';
 
 const SET_ENABLINGS = 'SET_ENABLINGS';
+const SET_ENABLINGS_SEARCH = 'SET_ENABLINGS_SEARCH';
 const SET_ENABLINGS_LOADING = 'SET_ENABLINGS_LOADING';
 const SET_ENABLINGS_FILTERS = 'SET_ENABLINGS_FILTERS';
 const SET_ENABLINGS_DETAIL = 'SET_ENABLINGS_DETAIL';
+const RESET_ENABLINGS = 'RESET_ENABLINGS';
 
 /* Initial state */
 const initialState = {
@@ -38,6 +40,13 @@ function enablingsReducer(state = initialState, action) {
         list: action.payload.list,
         included: action.payload.included,
         itemCount: action.payload.itemCount
+      };
+    case RESET_ENABLINGS:
+      return initialState;
+    case SET_ENABLINGS_SEARCH:
+      return {
+        ...state,
+        search: action.payload
       };
     case SET_ENABLINGS_LOADING: {
       return {
@@ -78,6 +87,12 @@ function setEnablings(data) {
   };
 }
 
+function resetEnablings() {
+  return {
+    type: RESET_ENABLINGS
+  };
+}
+
 function setEnablingsLoading(loading) {
   return {
     type: SET_ENABLINGS_LOADING,
@@ -102,18 +117,26 @@ function setFilters(field, value) {
   };
 }
 
+function setEnablingsSearch(term) {
+  return {
+    type: SET_ENABLINGS_SEARCH,
+    payload: term
+  };
+}
+
 /* Redux-thunk async actions */
 function getEnablings(paramsConfig = {}) {
-  let { pageSize, pageNumber, sort } = paramsConfig;
+  let { search, pageSize, pageNumber, sort } = paramsConfig;
   const { id, onSuccess } = paramsConfig;
 
   pageSize = pageSize || DEFAULT_PAGINATION_SIZE;
   pageNumber = pageNumber || DEFAULT_PAGINATION_NUMBER;
   sort = sort || DEFAULT_SORT_FIELD;
+  search = search && search.length ? `&search=${search}` : '';
 
   const url = id ?
     `${config.API_URL}/enablings/${id}` :
-    `${config.API_URL}/enablings?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}`;
+    `${config.API_URL}/enablings?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}${search}`;
 
   return (dispatch) => {
     dispatch(setEnablingsLoading(true));
@@ -197,4 +220,4 @@ function updateEnabling({ id, data, onSuccess }) {
   };
 }
 
-export { enablingsReducer, getEnablings, deleteEnabling, createEnabling, updateEnabling, setFilters, setEnablingDetail };
+export { enablingsReducer, getEnablings, deleteEnabling, createEnabling, updateEnabling, setFilters, setEnablingDetail, resetEnablings, setEnablingsSearch };

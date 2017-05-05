@@ -107,17 +107,17 @@ function setStudyCaseDetail(id) {
 
 function getStudyCases(paramsConfig = {}) {
   return (dispatch) => {
-    let { pageSize, pageNumber, sort } = paramsConfig;
-    const { search, onSuccess, id, concat } = paramsConfig;
+    let { search, pageSize, pageNumber, sort } = paramsConfig;
+    const { onSuccess, id, concat } = paramsConfig;
 
     pageSize = pageSize || DEFAULT_PAGINATION_SIZE;
     pageNumber = pageNumber || DEFAULT_PAGINATION_NUMBER;
     sort = sort || DEFAULT_SORT_FIELD;
-    const _search = search && search.length ? `&search=${search}` : '';
+    search = search && search.length ? `&search=${search}` : '';
 
     const url = id ?
       `${config.API_URL}/study-cases/${id}` :
-      `${config.API_URL}/study-cases?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}${_search}`;
+      `${config.API_URL}/study-cases?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}${search}`;
 
     dispatch(setStudyCasesLoading(true));
 

@@ -14,6 +14,8 @@ const SET_BMES = 'SET_BMES';
 const SET_BMES_LOADING = 'SET_BMES_LOADING';
 const SET_BMES_FILTERS = 'SET_BMES_FILTERS';
 const SET_BMES_DETAIL = 'SET_BMES_DETAIL';
+const SET_BMES_SEARCH = 'SET_BMES_SEARCH';
+const RESET_BMES = 'RESET_BMES';
 
 /* Initial state */
 const initialState = {
@@ -23,6 +25,7 @@ const initialState = {
   itemCount: null,
   detailId: null,
   filters: {},
+  search: '',
   pagination: {
     pageSize: DEFAULT_PAGINATION_SIZE,
     pageNumber: DEFAULT_PAGINATION_NUMBER
@@ -49,6 +52,14 @@ function bmesReducer(state = initialState, action) {
         ...state,
         ...action.payload
       };
+    case RESET_BMES:
+      return initialState;
+    case SET_BMES_SEARCH: {
+      return {
+        ...state,
+        search: action.payload
+      };
+    }
     case SET_BMES_DETAIL:
       return {
         ...state,
@@ -101,18 +112,26 @@ function setBmesDetail(id) {
   };
 }
 
+function setBmesSearch(term) {
+  return {
+    type: SET_BMES_SEARCH,
+    payload: term
+  };
+}
+
 function getBmes(paramsConfig = {}) {
   return (dispatch) => {
-    let { pageSize, pageNumber, sort } = paramsConfig;
+    let { search, pageSize, pageNumber, sort } = paramsConfig;
     const { onSuccess, id } = paramsConfig;
 
     pageSize = pageSize || DEFAULT_PAGINATION_SIZE;
     pageNumber = pageNumber || DEFAULT_PAGINATION_NUMBER;
     sort = sort || DEFAULT_SORT_FIELD;
+    search = search && search.length ? `&search=${search}` : '';
 
     const url = id ?
       `${config.API_URL}/business-model-elements/${id}` :
-      `${config.API_URL}/business-model-elements?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}`;
+      `${config.API_URL}/business-model-elements?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}${search}`;
 
     dispatch(setBmesLoading(true));
 
@@ -198,4 +217,10 @@ function deleteBme({ id, onSuccess }) {
   };
 }
 
-export { bmesReducer, getBmes, createBme, deleteBme, setBmesDetail, updateBme, setFilters };
+function resetBmes() {
+  return {
+    type: RESET_BMES
+  };
+}
+
+export { bmesReducer, getBmes, createBme, deleteBme, setBmesDetail, updateBme, setFilters, setBmesSearch, resetBmes };

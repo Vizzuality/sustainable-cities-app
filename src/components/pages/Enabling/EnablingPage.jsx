@@ -5,12 +5,13 @@ import { connect } from 'react-redux';
 import { dispatch } from 'main';
 import { toastr } from 'react-redux-toastr';
 import isEqual from 'lodash/isEqual';
-import { getEnablings, deleteEnabling, setFilters } from 'modules/enablings';
+import { getEnablings, deleteEnabling, setFilters, resetEnablings, setEnablingsSearch } from 'modules/enablings';
 import { toggleModal } from 'modules/modal';
 import Confirm from 'components/confirm/Confirm';
-
 import Spinner from 'components/ui/Spinner';
 import Table from 'components/ui/Table';
+import Search from 'components/search/Search';
+import { Autobind } from 'es-decorators';
 
 class EnablingPage extends React.Component {
 
@@ -22,13 +23,19 @@ class EnablingPage extends React.Component {
     const { filters, sort, pagination } = this.props.enablings;
     if (!isEqual(filters, nextProps.enablings.filters)
       || !isEqual(sort, nextProps.enablings.sort)
-      || !isEqual(pagination, nextProps.enablings.pagination)) {
+      || !isEqual(pagination, nextProps.enablings.pagination)
+      || this.props.enablings.search !== nextProps.enablings.search) {
       dispatch(getEnablings({
         pageSize: nextProps.enablings.pagination.pageSize,
         pageNumber: nextProps.enablings.pagination.pageNumber,
-        sort: nextProps.enablings.sort
+        sort: nextProps.enablings.sort,
+        search: nextProps.enablings.search
       }));
     }
+  }
+
+  componentWillUnmount() {
+    dispatch(resetEnablings());
   }
 
   deleteEnabling(item) {
@@ -47,10 +54,20 @@ class EnablingPage extends React.Component {
     }));
   }
 
+  @Autobind
+  search(val) {
+    dispatch(setEnablingsSearch(val.toLowerCase()));
+    dispatch(setFilters('pagination', {
+      pageNumber: 1,
+      pageSize: 20
+    }));
+  }
+
   render() {
     return (
       <div className="c-page">
         <Link className="button" to="/enabling-condition/new">New Enabling Condition</Link>
+        <Search onChange={this.search} />
         <Table
           items={this.props.enablings.list}
           itemCount={this.props.enablings.itemCount}
