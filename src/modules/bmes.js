@@ -81,8 +81,8 @@ function setBmes(data) {
       list: data.list.map((l) => {
         return {
           ...l,
-          ...{ categories: getIdRelations(l.relationships.categories.data, data.included) },
-          ...{ enablings: getIdRelations(l.relationships.enablings.data, data.included) }
+          ...{ categories: getIdRelations(l.relationships.categories.data, data.included, 'categories') },
+          ...{ enablings: getIdRelations(l.relationships.enablings.data, data.included, 'enablings') }
         };
       }),
       included: data.included,
