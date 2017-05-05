@@ -14,6 +14,8 @@ const SET_IMPACT = 'SET_IMPACT';
 const SET_IMPACT_LOADING = 'SET_IMPACT_LOADING';
 const SET_IMPACT_FILTERS = 'SET_IMPACT_FILTERS';
 const SET_IMPACT_DETAIL = 'SET_IMPACT_DETAIL';
+const SET_IMPACT_SEARCH = 'SET_IMPACT_SEARCH';
+const RESET_IMPACTS = 'RESET_IMPACTS';
 
 /* Initial state */
 const initialState = {
@@ -22,6 +24,7 @@ const initialState = {
   itemCount: null,
   detailId: null,
   filters: {},
+  search: '',
   pagination: {
     pageSize: DEFAULT_PAGINATION_SIZE,
     pageNumber: DEFAULT_PAGINATION_NUMBER
@@ -36,6 +39,16 @@ function impactReducer(state = initialState, action) {
         ...state,
         list: action.payload.list,
         itemCount: action.payload.itemCount
+      };
+    case SET_IMPACT_SEARCH:
+      return {
+        ...state,
+        search: action.payload
+      };
+    case RESET_IMPACTS:
+      return {
+        ...state,
+        pagination: initialState.pagination
       };
     case SET_IMPACT_LOADING:
       return {
@@ -74,6 +87,12 @@ function setImpacts(data) {
   };
 }
 
+function resetImpacts() {
+  return {
+    type: RESET_IMPACTS
+  };
+}
+
 function setImpactLoading(loading) {
   return {
     type: SET_IMPACT_LOADING,
@@ -98,18 +117,26 @@ function setImpactDetail(id) {
   };
 }
 
+function setImpactSearch(term) {
+  return {
+    type: SET_IMPACT_SEARCH,
+    payload: term
+  };
+}
+
 function getImpacts(paramsConfig = {}) {
   return (dispatch) => {
-    let { pageSize, pageNumber, sort } = paramsConfig;
+    let { search, pageSize, pageNumber, sort } = paramsConfig;
     const { onSuccess, id } = paramsConfig;
 
     pageSize = pageSize || DEFAULT_PAGINATION_SIZE;
     pageNumber = pageNumber || DEFAULT_PAGINATION_NUMBER;
     sort = sort || DEFAULT_SORT_FIELD;
+    search = search && search.length ? `&search=${search}` : '';
 
     const url = id ?
       `${config.API_URL}/impacts/${id}` :
-      `${config.API_URL}/impacts?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}`;
+      `${config.API_URL}/impacts?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}${search}`;
 
     dispatch(setImpactLoading(true));
 
@@ -195,4 +222,4 @@ function deleteImpact({ id, onSuccess }) {
   };
 }
 
-export { impactReducer, getImpacts, createImpact, deleteImpact, setImpactDetail, updateImpact, setFilters };
+export { impactReducer, getImpacts, createImpact, deleteImpact, setImpactDetail, updateImpact, setFilters, resetImpacts, setImpactSearch };

@@ -5,8 +5,9 @@ import { connect } from 'react-redux';
 import { dispatch } from 'main';
 import { toastr } from 'react-redux-toastr';
 import isEqual from 'lodash/isEqual';
+import { Autobind } from 'es-decorators';
 
-import { getImpacts, deleteImpact, setFilters } from 'modules/impacts';
+import { getImpacts, deleteImpact, setFilters, resetImpacts, setImpactSearch } from 'modules/impacts';
 import { getCategories } from 'modules/categories';
 import { toggleModal } from 'modules/modal';
 import { getIdRelations } from 'utils/relation';
@@ -14,31 +15,38 @@ import { getIdRelations } from 'utils/relation';
 import Confirm from 'components/confirm/Confirm';
 import Spinner from 'components/ui/Spinner';
 import Table from 'components/ui/Table';
+import Search from 'components/search/Search';
 
 class EnablingPage extends React.Component {
 
   componentWillMount() {
     dispatch(getImpacts());
-    dispatch(getCategories({ type: 'impact', tree: false }))
+    dispatch(getCategories({ type: 'impact', tree: false }));
   }
 
   componentWillReceiveProps(nextProps) {
     const { filters, sort, pagination } = this.props.impacts;
     if (!isEqual(filters, nextProps.impacts.filters)
       || !isEqual(sort, nextProps.impacts.sort)
-      || !isEqual(pagination, nextProps.impacts.pagination)) {
+      || !isEqual(pagination, nextProps.impacts.pagination)
+      || this.props.impacts.search !== nextProps.impacts.search) {
       dispatch(getImpacts({
         pageSize: nextProps.impacts.pagination.pageSize,
         pageNumber: nextProps.impacts.pagination.pageNumber,
-        sort: nextProps.impacts.sort
+        sort: nextProps.impacts.sort,
+        search: nextProps.impacts.search
       }));
     }
+  }
+
+  componentWillUnmount() {
+    dispatch(resetImpacts());
   }
 
   setCategory() {
     return this.props.impacts.list.map((imp) => {
       if (!imp.relationships.category.data) return {};
-      const category = getIdRelations([imp.relationships.category.data], this.props.impactCategories);
+      const category = getIdRelations([imp.relationships.category.data], this.props.impactCategories, 'categories');
       return {
         ...imp,
         ...{ category: category ? category[0].name : '-' }
@@ -64,19 +72,26 @@ class EnablingPage extends React.Component {
     );
   }
 
+  @Autobind
+  search(val) {
+    dispatch(setImpactSearch(val.toLowerCase()));
+    dispatch(setFilters('pagination', {
+      pageNumber: 1,
+      pageSize: 20
+    }));
+  }
 
   render() {
-    let impacts = null;
+    let impacts = [];
 
     if (this.props.impacts.list.length && this.props.impactCategories && this.props.impactCategories.length) {
       impacts = this.setCategory();
     }
 
-    if (!impacts) return null;
-
     return (
       <div className="c-page">
         <Link className="button" to="/impact/new">New Impact</Link>
+        <Search onChange={this.search} />
         <Table
           items={impacts}
           itemCount={this.props.impacts.itemCount}

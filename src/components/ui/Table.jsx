@@ -130,3 +130,7 @@ Table.propTypes = {
   onDelete: React.PropTypes.func,
   onUpdateFilters: React.PropTypes.func
 };
+
+Table.defaultProps = {
+  items: []
+};

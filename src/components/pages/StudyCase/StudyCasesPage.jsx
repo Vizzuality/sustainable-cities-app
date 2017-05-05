@@ -81,7 +81,14 @@ class StudyCasesPage extends React.Component {
         <Link className="button" to="/study-cases/new">New study case</Link>
         <Search onChange={this.search} />
         <StudyCaseList data={this.props.studyCases.list} />
-        <Spinner className="-fixed" isLoading={this.props.studyCases.loading} />
+        <div style={{ position: 'relative', height: '50px' }}>
+          <Spinner isLoading={this.props.studyCases.loading} />
+        </div>
+        {this.props.studyCases.list.length === this.props.studyCases.itemCount &&
+          <div>
+            <p className="text-center">Theres no more study cases with current filters</p>
+          </div>
+        }
       </div>
     );
   }
