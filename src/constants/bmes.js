@@ -2,6 +2,7 @@
 const DEFAULT_SORT_FIELD = 'name';
 const BME_TABLE_FIELDS = [
   { label: 'Name', value: 'name', sortable: true },
+  { label: 'Category', value: 'category', sortable: true },
   { label: 'Description', value: 'description' }
 ];
 
