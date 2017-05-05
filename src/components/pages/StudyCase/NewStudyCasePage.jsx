@@ -9,6 +9,9 @@ import { createStudyCase } from 'modules/study-cases';
 import { getCategories } from 'modules/categories';
 import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
+import EntityContainer from 'components/study-case/EntityContainer';
+import CreateImpactForm from 'components/form/Impact/CreateImpactForm';
+import AddImpactForm from 'components/form/Impact/AddImpactForm';
 import { validation } from 'utils/validation';
 import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
@@ -26,7 +29,7 @@ class NewStudyCasePage extends React.Component {
       // stores the bmes the user saves
       bmes: [],
       // stores the impacts the user saves
-      impacts: [],
+      impacts: [AddImpactForm],
       // stores the changes produced in solution categories selectors
       solution_categories: {}
     };
@@ -127,6 +130,13 @@ class NewStudyCasePage extends React.Component {
     }
 
     return options;
+  }
+
+  onAddImpact() {
+    const { impacts } = this.state;
+    impacts.push(AddImpactForm);
+
+    this.setState({ impacts });
   }
 
   render() {
@@ -251,6 +261,17 @@ class NewStudyCasePage extends React.Component {
               />
             </div>
           </div>
+
+          <div className="row expanded">
+            <fieldset>
+              <EntityContainer
+                items={this.state.impacts}
+                maxItems={MAX_IMPACTS_PER_PAGE}
+                onAdd={() => this.onAddImpact()}
+              />
+            </fieldset>
+          </div>
+
         </Form>
       </section>
     );

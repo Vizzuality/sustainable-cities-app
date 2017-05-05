@@ -3,9 +3,13 @@ import PropTypes from 'prop-types';
 
 export default class EntityContainer extends React.Component {
 
-  onAdd() {
-    if (this.props.items.length < this.props.maxItems) {
-      this.props.onAdd();
+  onSaveItemStatus(status) {
+    console.log(status);
+
+    if (status) {
+      if (this.props.items.length < this.props.maxItems) {
+        this.props.onAdd();
+      }
     }
   }
 
@@ -13,9 +17,10 @@ export default class EntityContainer extends React.Component {
     return (
       <div className="c-entity-container">
         <ul className="entity-list">
-          {this.props.items.map((Item, i) => <li key={i}><Item /></li>)}
+          {this.props.items.map((Item, i) =>
+            <li key={i}><Item onSave={status => this.onSaveItemStatus(status)} /></li>
+          )}
         </ul>
-        <button onClick={this.onAdd}>Add +</button>
       </div>
     );
   }
