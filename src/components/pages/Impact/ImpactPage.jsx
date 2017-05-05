@@ -46,7 +46,7 @@ class EnablingPage extends React.Component {
   setCategory() {
     return this.props.impacts.list.map((imp) => {
       if (!imp.relationships.category.data) return {};
-      const category = getIdRelations([imp.relationships.category.data], this.props.impactCategories);
+      const category = getIdRelations([imp.relationships.category.data], this.props.impactCategories, 'categories');
       return {
         ...imp,
         ...{ category: category ? category[0].name : '-' }

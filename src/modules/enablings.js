@@ -80,7 +80,7 @@ function setEnablings(data) {
       list: data.list.map((l) => {
         return {
           ...l,
-          ...{ bmes: getIdRelations(l.relationships.bmes.data, data.included) },
+          ...{ bmes: getIdRelations(l.relationships.bmes.data, data.included, 'bmes') },
           ...{ category: l.relationships.category.data ? l.relationships.category.data.id : null }
         };
       }),
