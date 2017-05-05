@@ -9,8 +9,6 @@ import { createStudyCase } from 'modules/study-cases';
 import { getCategories } from 'modules/categories';
 import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
-import EntityContainer from 'components/study-case/EntityContainer';
-import AddImpactForm from 'components/form/addImpactForm';
 import { validation } from 'utils/validation';
 import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
@@ -26,9 +24,9 @@ class NewStudyCasePage extends React.Component {
     this.form = {};
     this.state = {
       // stores the bmes the user saves
-      bmes: [{}],
+      bmes: [],
       // stores the impacts the user saves
-      impacts: [AddImpactForm],
+      impacts: [],
       // stores the changes produced in solution categories selectors
       solution_categories: {}
     };
@@ -36,8 +34,6 @@ class NewStudyCasePage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.bmeCategories.length || dispatch(getCategories({ type: 'Bme', tree: true }));
-    this.props.impactCategories.length || dispatch(getCategories({ type: 'Impact', tree: true }));
     this.props.solutionCategories.length || dispatch(getCategories({ type: 'Solution', tree: true }));
   }
 
@@ -51,11 +47,11 @@ class NewStudyCasePage extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
 
-    // TODO: REVIEW
+    // needs to be validated by an admin before it appears in the list
     const data = {
       ...this.form,
-      category_ids: this.state.categories.nephew ? [...this.state.categories.nephew, ...this.state.timing] : null,
-      enabling_ids: this.state.enablings
+      category_id: this.state.solution_categories.nephew,
+      project_type: 'StudyCase'
     };
 
     // Create study case
@@ -69,12 +65,6 @@ class NewStudyCasePage extends React.Component {
     }));
   }
 
-  // onSelectChange(field, val) {
-  //   this.setState({
-  //     [field]: val.map(v => v.value)
-  //   });
-  // }
-
   onCategoryChange(type, level, val) {
     if (val) {
       val = Array.isArray(val) ?
@@ -87,21 +77,56 @@ class NewStudyCasePage extends React.Component {
     };
 
     if (level === 'parent') {
-      categories.children = null;
-      categories.nephew = null;
+      let options = {};
+      if (val) {
+        options = this.getFirstSelectOption(val, 'parent');
+      }
+      categories.children = val ? options.children : {};
+      categories.nephew = val ? options.nephew : {};
     }
 
     if (level === 'children') {
-      categories.nephew = null;
+      let options = {};
+      if (val) {
+        options = this.getFirstSelectOption(val, 'children');
+      }
+      categories.nephew = val ? options.nephew : {};
     }
 
     this.setState({ [type]: categories });
   }
 
-  onAddImpact() {
-    const { impacts } = this.state;
+  getFirstSelectOption(value, source) {
+    const options = {
+      children: {},
+      nephew: {}
+    };
 
-    impacts.push(<addImpactForm />);
+    if (source === 'parent') {
+      // populates children selector based on parent selection
+      const parentCategory = this.props.solutionCategories.find(cat => cat.id === value);
+      if (parentCategory.children && parentCategory.children.length) {
+        options.children = parentCategory.children[0].id;
+      }
+
+      // populates nephew selector based on children selection
+      const childrenCategory = parentCategory.children.find(child => child.id === options.children);
+      if (childrenCategory.children && childrenCategory.children.length) {
+        options.nephew = childrenCategory.children[0].id;
+      }
+    }
+
+    if (source === 'children') {
+      // populates nephew selector based on children selection
+      const parentId = this.state.solution_categories.parent;
+      const parentCategory = this.props.solutionCategories.find(cat => cat.id === parentId);
+      const childrenCategory = parentCategory.children.find(child => child.id === value);
+      if (childrenCategory.children && childrenCategory.children.length) {
+        options.nephew = childrenCategory.children[0].id;
+      }
+    }
+
+    return options;
   }
 
   render() {
@@ -123,22 +148,6 @@ class NewStudyCasePage extends React.Component {
         solutionNephewOptions = childrenCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
       }
     }
-    //
-    // const parentOptions = this.props.bmeCategories.map(cat => ({ value: cat.id, label: cat.name }));
-    // let childrenOptions = [];
-    // let nephewOptions = [];
-    // let parentCategory = null;
-    // let childrenCategory = null;
-    //
-    // if (parent) {
-    //   parentCategory = this.props.bmeCategories.find(cat => cat.id === this.state.categories.parent);
-    //   childrenOptions = parentCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
-    //
-    //   if (children) {
-    //     childrenCategory = parentCategory.children.find(child => child.id === this.state.categories.children);
-    //     nephewOptions = childrenCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
-    //   }
-    // }
 
     return (
       <section className="c-form">
@@ -166,7 +175,7 @@ class NewStudyCasePage extends React.Component {
               <Textarea
                 validations={[]}
                 onChange={this.onInputChange}
-                name="driver_description"
+                name="situation"
                 value=""
                 label="Driver description"
               />
@@ -178,7 +187,7 @@ class NewStudyCasePage extends React.Component {
               <Textarea
                 validations={[]}
                 onChange={this.onInputChange}
-                name="solution_description"
+                name="solution"
                 value=""
                 label="Solution description"
               />
@@ -242,13 +251,6 @@ class NewStudyCasePage extends React.Component {
               />
             </div>
           </div>
-          <div className="row expanded">
-            <EntityContainer
-              items={this.state.impacts}
-              maxItems={MAX_IMPACTS_PER_PAGE}
-              onAdd={() => this.onAddImpact()}
-            />
-          </div>
         </Form>
       </section>
     );
@@ -256,15 +258,11 @@ class NewStudyCasePage extends React.Component {
 }
 
 NewStudyCasePage.propTypes = {
-  bmeCategories: PropTypes.array,
-  impactCategories: PropTypes.array,
   solutionCategories: PropTypes.array
 };
 
 // Map state to props
 const mapStateToProps = ({ categories }) => ({
-  bmeCategories: categories.Bme,
-  impactCategories: categories.Impact,
   solutionCategories: categories.Solution
 });
 
