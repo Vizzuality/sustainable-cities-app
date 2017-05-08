@@ -5,11 +5,8 @@ import { deserialize } from 'utils/json-api';
 import { getIdRelations } from 'utils/relation';
 import * as queryString from 'query-string';
 
-import {
-  DEFAULT_PAGINATION_SIZE,
-  DEFAULT_PAGINATION_NUMBER,
-  DEFAULT_SORT_FIELD
-} from 'constants/enablings';
+import { DEFAULT_SORT_FIELD } from 'constants/enablings';
+import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
 
 const SET_ENABLINGS = 'SET_ENABLINGS';
 const SET_ENABLINGS_SEARCH = 'SET_ENABLINGS_SEARCH';

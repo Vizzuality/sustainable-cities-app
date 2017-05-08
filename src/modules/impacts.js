@@ -1,13 +1,9 @@
 import { get, post, _delete, patch } from 'utils/request';
 import { push } from 'react-router-redux';
 import { toastr } from 'react-redux-toastr';
-import {
-  DEFAULT_PAGINATION_SIZE,
-  DEFAULT_PAGINATION_NUMBER,
-  DEFAULT_SORT_FIELD
-} from 'constants/impacts';
+import { DEFAULT_SORT_FIELD } from 'constants/impacts';
+import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
 import { deserialize } from 'utils/json-api';
-import { getIdRelations } from 'utils/relation';
 import * as queryString from 'query-string';
 
 /* Constants */
