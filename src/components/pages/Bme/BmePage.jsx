@@ -14,6 +14,7 @@ import Search from 'components/search/Search';
 import { Autobind } from 'es-decorators';
 
 import { DEFAULT_SORT_FIELD, BME_TABLE_FIELDS } from 'constants/bmes';
+import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
 
 class BmePage extends React.Component {
 
@@ -63,8 +64,8 @@ class BmePage extends React.Component {
   search(val) {
     dispatch(setBmesSearch(val.toLowerCase()));
     dispatch(setFilters('pagination', {
-      pageNumber: 1,
-      pageSize: 20
+      pageNumber: DEFAULT_PAGINATION_NUMBER,
+      pageSize: DEFAULT_PAGINATION_SIZE
     }));
   }
 

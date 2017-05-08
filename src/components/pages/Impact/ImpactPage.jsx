@@ -18,6 +18,7 @@ import Table from 'components/ui/Table';
 import Search from 'components/search/Search';
 
 import { DEFAULT_SORT_FIELD, IMPACT_TABLE_FIELDS } from 'constants/impacts';
+import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
 
 class EnablingPage extends React.Component {
 
@@ -78,8 +79,8 @@ class EnablingPage extends React.Component {
   search(val) {
     dispatch(setImpactSearch(val.toLowerCase()));
     dispatch(setFilters('pagination', {
-      pageNumber: 1,
-      pageSize: 20
+      pageNumber: DEFAULT_PAGINATION_NUMBER,
+      pageSize: DEFAULT_PAGINATION_SIZE
     }));
   }
 

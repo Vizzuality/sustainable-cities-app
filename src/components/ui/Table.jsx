@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Icon from 'components/ui/Icon';
 import BtnGroup from 'components/ui/BtnGroup';
-import { DEFAULT_PAGINATION_NUMBER } from 'constants/enablings';
+import { DEFAULT_PAGINATION_NUMBER } from 'constants/table';
 import { Link } from 'react-router';
 import capitalize from 'lodash/capitalize';
 
@@ -31,7 +31,6 @@ export default class Table extends React.Component {
   onChangePageNumber(e, pageNumber) {
     e.preventDefault();
     let nextPage = pageNumber;
-
 
     if (pageNumber < DEFAULT_PAGINATION_NUMBER) {
       nextPage = DEFAULT_PAGINATION_NUMBER;
@@ -72,16 +71,16 @@ export default class Table extends React.Component {
   }
 
   renderTableContent() {
-    const { items } = this.props;
+    const { items, fields, editUrl, onDelete } = this.props;
 
     return items.map((item, index) => {
       return (
         <tr key={index}>
-          {this.props.fields.map((field, i) => <td key={i}>{item[field.value]}</td>)}
+          {fields.map((field, i) => <td key={i}>{item[field.value]}</td>)}
           <td>
             <BtnGroup>
-              <Link to={`${this.props.editUrl}/${item.id}`} className="tiny button">Edit</Link>
-              <button className="tiny button" onClick={() => this.props.onDelete && this.props.onDelete(item)}>Delete</button>
+              <Link to={`${editUrl}/${item.id}`} className="tiny button">Edit</Link>
+              <button className="tiny button" onClick={() => onDelete && onDelete(item)}>Delete</button>
             </BtnGroup>
           </td>
         </tr>

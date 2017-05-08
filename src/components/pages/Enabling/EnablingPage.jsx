@@ -14,6 +14,7 @@ import Search from 'components/search/Search';
 import { Autobind } from 'es-decorators';
 
 import { DEFAULT_SORT_FIELD, ENABLINGS_TABLE_FIELDS } from 'constants/enablings';
+import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
 
 class EnablingPage extends React.Component {
 
@@ -60,8 +61,8 @@ class EnablingPage extends React.Component {
   search(val) {
     dispatch(setEnablingsSearch(val.toLowerCase()));
     dispatch(setFilters('pagination', {
-      pageNumber: 1,
-      pageSize: 20
+      pageNumber: DEFAULT_PAGINATION_NUMBER,
+      pageSize: DEFAULT_PAGINATION_SIZE
     }));
   }
 
