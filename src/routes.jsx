@@ -18,6 +18,7 @@ import NewBmePage from 'components/pages/Bme/NewBmePage.jsx';
 import EditBmePage from 'components/pages/Bme/EditBmePage';
 //    - Study case
 import StudyCasePage from 'components/pages/StudyCase/StudyCasesPage';
+import NewStudyCasePage from 'components/pages/StudyCase/NewStudyCasePage';
 //    - Impact
 import ImpactPage from 'components/pages/Impact/ImpactPage';
 import NewImpactPage from 'components/pages/Impact/NewImpactPage';
@@ -42,6 +43,7 @@ const Routes = ({ history }) => (
       </Route>
       <Route path="study-cases">
         <IndexRoute components={{ main: StudyCasePage, nav: Sidebar }} />
+        <Route path="new" components={{ main: NewStudyCasePage, nav: Sidebar }} />
       </Route>
       <Route path="business-model-element">
         <IndexRoute components={{ main: BmePage, nav: Sidebar }} />

@@ -7,6 +7,7 @@ import StudyCaseList from 'components/study-case/StudyCaseList';
 import Search from 'components/search/Search';
 import Spinner from 'components/ui/Spinner';
 import debounce from 'lodash/debounce';
+import isEqual from 'lodash/isEqual';
 import { Autobind } from 'es-decorators';
 
 
@@ -27,6 +28,9 @@ class StudyCasesPage extends React.Component {
       page: 1,
       search: ''
     };
+
+    // Bindings
+    this.scrollListener = this.scrollListener.bind(this);
   }
 
   componentWillMount() {
@@ -45,22 +49,26 @@ class StudyCasesPage extends React.Component {
     }
   }
 
-  componentWillUnmount() {
-    this.removeScrollListener();
+  setScrollListener() {
+    this._scrollListener = debounce(this.scrollListener, 100);
+    window.addEventListener('scroll', this._scrollListener, { passive: true });
   }
 
-  setScrollListener() {
-    this._scrollListener = debounce(() => {
-      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-        if (this.props.studyCases.list.length === this.props.studyCases.itemCount) {
-          // We have already get all items, return
-          return;
-        }
-        this.setState({ page: this.state.page + 1 });
+  scrollListener() {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+      if (this.props.studyCases.list.length === this.props.studyCases.itemCount) {
+        // We have already get all items, return
+        return;
       }
-    }, 100);
-
-    window.addEventListener('scroll', this._scrollListener);
+      this.setState({ page: this.state.page + 1 }, () => {
+        this.removeScrollListener();
+        /*
+          TODO: scroll moves at re-rendering and triggers bottom of the page
+          many times. Find a better solution
+        */
+        setTimeout(() => this.setScrollListener(), 500);
+      });
+    }
   }
 
   @Autobind
@@ -73,6 +81,7 @@ class StudyCasesPage extends React.Component {
 
   removeScrollListener() {
     window.removeEventListener('scroll', this._scrollListener);
+    this._scrollListener = null;
   }
 
   render() {

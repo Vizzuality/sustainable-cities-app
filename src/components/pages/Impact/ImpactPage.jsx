@@ -17,6 +17,9 @@ import Spinner from 'components/ui/Spinner';
 import Table from 'components/ui/Table';
 import Search from 'components/search/Search';
 
+import { DEFAULT_SORT_FIELD, IMPACT_TABLE_FIELDS } from 'constants/impacts';
+import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
+
 class EnablingPage extends React.Component {
 
   componentWillMount() {
@@ -76,8 +79,8 @@ class EnablingPage extends React.Component {
   search(val) {
     dispatch(setImpactSearch(val.toLowerCase()));
     dispatch(setFilters('pagination', {
-      pageNumber: 1,
-      pageSize: 20
+      pageNumber: DEFAULT_PAGINATION_NUMBER,
+      pageSize: DEFAULT_PAGINATION_SIZE
     }));
   }
 
@@ -95,9 +98,8 @@ class EnablingPage extends React.Component {
         <Table
           items={impacts}
           itemCount={this.props.impacts.itemCount}
-          fields={['name', 'category', 'impact_unit', 'impact_value']}
-          defaultSort="name"
-          sortableBy={['name', 'category', 'impact_unit', 'impact_value']}
+          fields={IMPACT_TABLE_FIELDS}
+          defaultSort={DEFAULT_SORT_FIELD}
           editUrl="/impact/edit"
           pagination={this.props.impacts.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}

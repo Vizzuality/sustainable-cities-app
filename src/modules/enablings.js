@@ -3,12 +3,10 @@ import { push } from 'react-router-redux';
 import { toastr } from 'react-redux-toastr';
 import { deserialize } from 'utils/json-api';
 import { getIdRelations } from 'utils/relation';
+import * as queryString from 'query-string';
 
-import {
-  DEFAULT_PAGINATION_SIZE,
-  DEFAULT_PAGINATION_NUMBER,
-  DEFAULT_SORT_FIELD
-} from 'constants/enablings';
+import { DEFAULT_SORT_FIELD } from 'constants/enablings';
+import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
 
 const SET_ENABLINGS = 'SET_ENABLINGS';
 const SET_ENABLINGS_SEARCH = 'SET_ENABLINGS_SEARCH';
@@ -44,7 +42,8 @@ function enablingsReducer(state = initialState, action) {
     case RESET_ENABLINGS:
       return {
         ...state,
-        pagination: initialState.pagination
+        pagination: initialState.pagination,
+        search: initialState.search
       };
     case SET_ENABLINGS_SEARCH:
       return {
@@ -129,17 +128,23 @@ function setEnablingsSearch(term) {
 
 /* Redux-thunk async actions */
 function getEnablings(paramsConfig = {}) {
-  let { search, pageSize, pageNumber, sort } = paramsConfig;
-  const { id, onSuccess } = paramsConfig;
+  let { pageSize, pageNumber, sort } = paramsConfig;
+  const { id, search, onSuccess } = paramsConfig;
 
   pageSize = pageSize || DEFAULT_PAGINATION_SIZE;
   pageNumber = pageNumber || DEFAULT_PAGINATION_NUMBER;
   sort = sort || DEFAULT_SORT_FIELD;
-  search = search && search.length ? `&search=${search}` : '';
+
+  const queryS = queryString.stringify({
+    'page[size]': pageSize,
+    'page[number]': pageNumber,
+    sort,
+    search
+  });
 
   const url = id ?
     `${config.API_URL}/enablings/${id}` :
-    `${config.API_URL}/enablings?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}${search}`;
+    `${config.API_URL}/enablings?${queryS}`;
 
   return (dispatch) => {
     dispatch(setEnablingsLoading(true));

@@ -1,13 +1,10 @@
 import { get, post, _delete, patch } from 'utils/request';
 import { push } from 'react-router-redux';
 import { toastr } from 'react-redux-toastr';
-import {
-  DEFAULT_PAGINATION_SIZE,
-  DEFAULT_PAGINATION_NUMBER,
-  DEFAULT_SORT_FIELD
-} from 'constants/impacts';
+import { DEFAULT_SORT_FIELD } from 'constants/impacts';
+import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
 import { deserialize } from 'utils/json-api';
-import { getIdRelations } from 'utils/relation';
+import * as queryString from 'query-string';
 
 /* Constants */
 const SET_IMPACT = 'SET_IMPACT';
@@ -48,7 +45,8 @@ function impactReducer(state = initialState, action) {
     case RESET_IMPACTS:
       return {
         ...state,
-        pagination: initialState.pagination
+        pagination: initialState.pagination,
+        search: initialState.search
       };
     case SET_IMPACT_LOADING:
       return {
@@ -126,17 +124,23 @@ function setImpactSearch(term) {
 
 function getImpacts(paramsConfig = {}) {
   return (dispatch) => {
-    let { search, pageSize, pageNumber, sort } = paramsConfig;
-    const { onSuccess, id } = paramsConfig;
+    let { pageSize, pageNumber, sort } = paramsConfig;
+    const { search, onSuccess, id } = paramsConfig;
 
     pageSize = pageSize || DEFAULT_PAGINATION_SIZE;
     pageNumber = pageNumber || DEFAULT_PAGINATION_NUMBER;
     sort = sort || DEFAULT_SORT_FIELD;
-    search = search && search.length ? `&search=${search}` : '';
+
+    const queryS = queryString.stringify({
+      'page[size]': pageSize,
+      'page[number]': pageNumber,
+      sort,
+      search
+    });
 
     const url = id ?
       `${config.API_URL}/impacts/${id}` :
-      `${config.API_URL}/impacts?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}${search}`;
+      `${config.API_URL}/impacts?${queryS}`;
 
     dispatch(setImpactLoading(true));
 

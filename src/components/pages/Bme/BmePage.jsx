@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { getBmes, deleteBme, setFilters, setBmesSearch, resetBmes } from 'modules/bmes';
 import { dispatch } from 'main';
@@ -12,12 +13,10 @@ import Confirm from 'components/confirm/Confirm';
 import Search from 'components/search/Search';
 import { Autobind } from 'es-decorators';
 
+import { DEFAULT_SORT_FIELD, BME_TABLE_FIELDS } from 'constants/bmes';
+import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
 
 class BmePage extends React.Component {
-
-  constructor(props) {
-    super(props);
-  }
 
   componentWillMount() {
     // Fetch Bems
@@ -65,8 +64,8 @@ class BmePage extends React.Component {
   search(val) {
     dispatch(setBmesSearch(val.toLowerCase()));
     dispatch(setFilters('pagination', {
-      pageNumber: 1,
-      pageSize: 20
+      pageNumber: DEFAULT_PAGINATION_NUMBER,
+      pageSize: DEFAULT_PAGINATION_SIZE
     }));
   }
 
@@ -78,9 +77,8 @@ class BmePage extends React.Component {
         <Table
           items={this.props.bmes.list}
           itemCount={this.props.bmes.itemCount}
-          fields={['name', 'description']}
-          defaultSort="name"
-          sortableBy={['name']}
+          fields={BME_TABLE_FIELDS}
+          defaultSort={DEFAULT_SORT_FIELD}
           editUrl="/business-model-element/edit"
           pagination={this.props.bmes.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
@@ -96,8 +94,7 @@ class BmePage extends React.Component {
 }
 
 BmePage.propTypes = {
-  // State
-  bmes: React.PropTypes.object
+  bmes: PropTypes.object
 };
 
 // Map state to props

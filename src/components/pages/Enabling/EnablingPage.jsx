@@ -13,6 +13,9 @@ import Table from 'components/ui/Table';
 import Search from 'components/search/Search';
 import { Autobind } from 'es-decorators';
 
+import { DEFAULT_SORT_FIELD, ENABLINGS_TABLE_FIELDS } from 'constants/enablings';
+import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
+
 class EnablingPage extends React.Component {
 
   componentWillMount() {
@@ -58,8 +61,8 @@ class EnablingPage extends React.Component {
   search(val) {
     dispatch(setEnablingsSearch(val.toLowerCase()));
     dispatch(setFilters('pagination', {
-      pageNumber: 1,
-      pageSize: 20
+      pageNumber: DEFAULT_PAGINATION_NUMBER,
+      pageSize: DEFAULT_PAGINATION_SIZE
     }));
   }
 
@@ -71,9 +74,8 @@ class EnablingPage extends React.Component {
         <Table
           items={this.props.enablings.list}
           itemCount={this.props.enablings.itemCount}
-          fields={['name', 'category']}
-          defaultSort="name"
-          sortableBy={['name', 'category']}
+          fields={ENABLINGS_TABLE_FIELDS}
+          defaultSort={DEFAULT_SORT_FIELD}
           editUrl="/enabling-condition/edit"
           pagination={this.props.enablings.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
