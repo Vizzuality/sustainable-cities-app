@@ -17,6 +17,8 @@ import Spinner from 'components/ui/Spinner';
 import Table from 'components/ui/Table';
 import Search from 'components/search/Search';
 
+import { DEFAULT_SORT_FIELD, IMPACT_TABLE_FIELDS } from 'constants/impacts';
+
 class EnablingPage extends React.Component {
 
   componentWillMount() {
@@ -95,9 +97,8 @@ class EnablingPage extends React.Component {
         <Table
           items={impacts}
           itemCount={this.props.impacts.itemCount}
-          fields={['name', 'category', 'impact_unit', 'impact_value']}
-          defaultSort="name"
-          sortableBy={['name', 'category', 'impact_unit', 'impact_value']}
+          fields={IMPACT_TABLE_FIELDS}
+          defaultSort={DEFAULT_SORT_FIELD}
           editUrl="/impact/edit"
           pagination={this.props.impacts.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
