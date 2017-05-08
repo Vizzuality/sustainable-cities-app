@@ -6,6 +6,7 @@ import {
 } from 'constants/bmes';
 import { deserialize } from 'utils/json-api';
 import { getIdRelations } from 'utils/relation';
+import * as queryString from 'query-string';
 
 /* Constants */
 const SET_STUDY_CASES = 'SET_STUDY_CASES';
@@ -107,17 +108,23 @@ function setStudyCaseDetail(id) {
 
 function getStudyCases(paramsConfig = {}) {
   return (dispatch) => {
-    let { search, pageSize, pageNumber, sort } = paramsConfig;
-    const { onSuccess, id, concat } = paramsConfig;
+    let { pageSize, pageNumber, sort } = paramsConfig;
+    const { search, onSuccess, id, concat } = paramsConfig;
 
     pageSize = pageSize || DEFAULT_PAGINATION_SIZE;
     pageNumber = pageNumber || DEFAULT_PAGINATION_NUMBER;
     sort = sort || DEFAULT_SORT_FIELD;
-    search = search && search.length ? `&search=${search}` : '';
+
+    const queryS = queryString.stringify({
+      'page[size]': pageSize,
+      'page[number]': pageNumber,
+      sort,
+      search
+    });
 
     const url = id ?
       `${config.API_URL}/study-cases/${id}` :
-      `${config.API_URL}/study-cases?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}${search}`;
+      `${config.API_URL}/study-cases?${queryS}`;
 
     dispatch(setStudyCasesLoading(true));
 

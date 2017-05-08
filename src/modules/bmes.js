@@ -8,6 +8,7 @@ import {
 } from 'constants/bmes';
 import { deserialize } from 'utils/json-api';
 import { getIdRelations } from 'utils/relation';
+import * as queryString from 'query-string';
 
 /* Constants */
 const SET_BMES = 'SET_BMES';
@@ -125,17 +126,23 @@ function setBmesSearch(term) {
 
 function getBmes(paramsConfig = {}) {
   return (dispatch) => {
-    let { search, pageSize, pageNumber, sort } = paramsConfig;
-    const { onSuccess, id } = paramsConfig;
+    let { pageSize, pageNumber, sort } = paramsConfig;
+    const { onSuccess, id, search } = paramsConfig;
 
     pageSize = pageSize || DEFAULT_PAGINATION_SIZE;
     pageNumber = pageNumber || DEFAULT_PAGINATION_NUMBER;
     sort = sort || DEFAULT_SORT_FIELD;
-    search = search && search.length ? `&search=${search}` : '';
+
+    const queryS = queryString.stringify({
+      'page[size]': pageSize,
+      'page[number]': pageNumber,
+      sort,
+      search
+    });
 
     const url = id ?
       `${config.API_URL}/business-model-elements/${id}` :
-      `${config.API_URL}/business-model-elements?page[size]=${pageSize}&page[number]=${pageNumber}&sort=${sort}${search}`;
+      `${config.API_URL}/business-model-elements?${queryS}`;
 
     dispatch(setBmesLoading(true));
 
