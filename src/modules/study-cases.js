@@ -151,12 +151,18 @@ function getStudyCases(paramsConfig = {}) {
   };
 }
 
-function createStudyCase({ data, onSuccess }) {
+function createProject({ data, onSuccess, type }) {
   return (dispatch) => {
     dispatch(setStudyCasesLoading(true));
     post({
       url: `${config.API_URL}/projects`,
-      body: { project: data },
+      body: {
+        project: {
+          ...data,
+          is_active: true,
+          project_type: type
+        }
+      },
       headers: {
         Authorization: `Bearer ${localStorage.token}`
       },
@@ -165,6 +171,16 @@ function createStudyCase({ data, onSuccess }) {
         onSuccess && onSuccess();
       }
     });
+  };
+}
+
+function createStudyCase({ data, onSuccess }) {
+  return (dispatch) => {
+    dispatch(createProject({
+      data,
+      onSuccess,
+      type: 'StudyCase'
+    }));
   };
 }
 

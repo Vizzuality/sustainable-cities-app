@@ -16,10 +16,10 @@ function withWrapper(Component) {
   };
 }
 
-const Form = withWrapper(Validation.components.Form);
+const Form = Validation.components.Form;
+const Button = Validation.components.Button;
 const Input = withWrapper(Validation.components.Input);
 const Textarea = withWrapper(Validation.components.Textarea);
 const Select = withWrapper(ReactSelect);
-const Button = Validation.components.Button;
 
 export { Input, Button, Form, Textarea, Select };
