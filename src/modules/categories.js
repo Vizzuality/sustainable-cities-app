@@ -11,6 +11,7 @@ const initialState = {
   Bme: [],
   enablings: [],
   Impact: [],
+  Solution: [],
   timing: []
 };
 
@@ -57,6 +58,7 @@ function getCategories({ type, tree }) {
     bme: 'business-model-element-categories?',
     enablings: 'enabling-categories?',
     impact: 'impact-categories?',
+    solution: 'solution-categories?',
     timing: 'timing-categories?'
   };
 
