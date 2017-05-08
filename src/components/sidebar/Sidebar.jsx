@@ -14,10 +14,10 @@ const links = [
   //   text: 'Solution',
   //   href: '/solution'
   // },
-  // {
-  //   text: 'Source',
-  //   href: '/source'
-  // },
+  {
+    text: 'Source',
+    href: '/source'
+  },
   {
     text: 'Impact',
     href: '/impact'

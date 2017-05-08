@@ -2,6 +2,7 @@ import { dispatch } from 'main';
 import { setBmesDetail } from 'modules/bmes';
 import { setImpactDetail } from 'modules/impacts';
 import { setEnablingDetail } from 'modules/enablings'
+import { setSourceDetail } from 'modules/sources';
 
 
 function onEnterEditBmePage({ params }, replaceUrl, done) {
@@ -22,4 +23,10 @@ function onEnterEditImpactPage({ params }, replaceUrl, done) {
   done();
 }
 
-export { onEnterEditBmePage, onEnterEditEnablingPage, onEnterEditImpactPage };
+function onEnterEditSourcePage({ params }, replaceUrl, done) {
+  const { id } = params;
+  dispatch(setSourceDetail(+id));
+  done();
+}
+
+export { onEnterEditBmePage, onEnterEditEnablingPage, onEnterEditImpactPage, onEnterEditSourcePage };

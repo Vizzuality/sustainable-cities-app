@@ -19,6 +19,10 @@ import EditBmePage from 'components/pages/Bme/EditBmePage';
 //    - Study case
 import StudyCasePage from 'components/pages/StudyCase/StudyCasesPage';
 import NewStudyCasePage from 'components/pages/StudyCase/NewStudyCasePage';
+//    - Source
+import SourcePage from 'components/pages/Source/SourcePage';
+import NewSourcePage from 'components/pages/Source/NewSourcePage';
+import EditSourcePage from 'components/pages/Source/EditSourcePage';
 //    - Impact
 import ImpactPage from 'components/pages/Impact/ImpactPage';
 import NewImpactPage from 'components/pages/Impact/NewImpactPage';
@@ -29,7 +33,12 @@ import NewEnablingPage from 'components/pages/Enabling/NewEnablingPage';
 import EditEnablingPage from 'components/pages/Enabling/EditEnablingPage';
 
 // Url hooks
-import { onEnterEditBmePage, onEnterEditEnablingPage, onEnterEditImpactPage } from 'modules/url';
+import {
+  onEnterEditBmePage,
+  onEnterEditEnablingPage,
+  onEnterEditImpactPage,
+  onEnterEditSourcePage
+} from 'modules/url';
 
 const Routes = ({ history }) => (
   <Router history={history}>
@@ -49,6 +58,11 @@ const Routes = ({ history }) => (
         <IndexRoute components={{ main: BmePage, nav: Sidebar }} />
         <Route path="new" components={{ main: NewBmePage, nav: Sidebar }} />
         <Route path="edit/:id" components={{ main: EditBmePage, nav: Sidebar }} onEnter={onEnterEditBmePage} />
+      </Route>
+      <Route path="source">
+        <IndexRoute components={{ main: SourcePage, nav: Sidebar }} />
+        <Route path="new" components={{ main: NewSourcePage, nav: Sidebar }} />
+        <Route path="edit/:id" components={{ main: EditSourcePage, nav: Sidebar }} onEnter={onEnterEditSourcePage} />
       </Route>
       <Route path="impact">
         <IndexRoute components={{ main: ImpactPage, nav: Sidebar }} />
