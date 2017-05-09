@@ -25,7 +25,8 @@ export default class NewStudyCasePage extends React.Component {
     super(props);
     this.state = {
       comments: [],
-      photos: []
+      photos: [],
+      files: []
     };
     this.form = {};
   }
@@ -33,10 +34,13 @@ export default class NewStudyCasePage extends React.Component {
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
+    const { photos, files } = this.state;
+
     dispatch(createStudyCase({
       data: {
         ...this.form,
-        photos: this.state.photos
+        photos,
+        files
       },
       onSuccess() {
         dispatch(push('/study-cases'));
@@ -58,12 +62,12 @@ export default class NewStudyCasePage extends React.Component {
   }
 
   @Autobind
-  onImageDrop(acceptedImg, rejectedFiles) {
+  onImageDrop(acceptedImgs, rejectedImgs) {
     const parsedPhotos = [];
 
-    rejectedFiles.forEach(file => toastr.error(`The file "${file.name}" is not a valid image`));
+    rejectedImgs.forEach(file => toastr.error(`The image "${file.name}" hast not a valid extension`));
 
-    acceptedImg.forEach((file, i) => {
+    acceptedImgs.forEach((file, i) => {
       toBase64(file, (parsedFile) => {
         parsedPhotos.push({
           name: file.name,
@@ -71,7 +75,7 @@ export default class NewStudyCasePage extends React.Component {
           attachment: parsedFile
         });
 
-        if (i === (acceptedImg.length - 1)) {
+        if (i === (acceptedImgs.length - 1)) {
           let photos = this.state.photos.slice();
           photos = [...photos, ...parsedPhotos];
           this.setState({ photos });
@@ -81,10 +85,40 @@ export default class NewStudyCasePage extends React.Component {
   }
 
   @Autobind
-  onDelete(index) {
+  onFileDrop(acceptedFiles, rejectedFiles) {
+    const parsedFiles = [];
+
+    rejectedFiles.forEach(file => toastr.error(`The file "${file.name}" has not a valid extension`));
+
+    acceptedFiles.forEach((file, i) => {
+      toBase64(file, (parsedFile) => {
+        parsedFiles.push({
+          name: file.name,
+          is_active: true,
+          attachment: parsedFile
+        });
+
+        if (i === (acceptedFiles.length - 1)) {
+          let files = this.state.files.slice();
+          files = [...files, ...parsedFiles];
+          this.setState({ files });
+        }
+      });
+    });
+  }
+
+  @Autobind
+  onDeleteImage(index) {
     const photos = this.state.photos.slice();
     photos.splice(index, 1);
     this.setState({ photos });
+  }
+
+  @Autobind
+  onDeleteFile(index) {
+    const files = this.state.files.slice();
+    files.splice(index, 1);
+    this.setState({ files });
   }
 
   render() {
@@ -102,10 +136,23 @@ export default class NewStudyCasePage extends React.Component {
         <Creator title="BMEs" items={this.state.comments} onAdd={this.onBmeAdd} />
         <div className="row expanded">
           <div className="column small-6">
-            <DropZone title="Images" accept={'image/png, image/jpg, image/jpeg'} images={this.state.photos} onDrop={this.onImageDrop} onDelete={this.onDelete} />
+            <DropZone
+              title="Images"
+              accept={'image/png, image/jpg, image/jpeg'}
+              files={this.state.photos}
+              onDrop={this.onImageDrop}
+              onDelete={this.onDeleteImage}
+              withImage
+            />
           </div>
           <div className="column small-6">
-            <DropZone title="Files" />
+            <DropZone
+              title="Files"
+              files={this.state.files}
+              accept={'application/pdf, application/json, application/msword, application/excel'}
+              onDrop={this.onFileDrop}
+              onDelete={this.onDeleteFile}
+            />
           </div>
         </div>
       </Form>

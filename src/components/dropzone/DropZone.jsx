@@ -3,15 +3,16 @@ import Dropzone from 'react-dropzone'
 import PropTypes from 'prop-types';
 import Icon from 'components/ui/Icon';
 
-export default function DropZone({ title, images, onDelete, ...props }) {
+export default function DropZone({ withImage, title, files, onDelete, ...props }) {
   return (
     <div className="c-dropzone">
       <span className="dropzone-title">{title}</span>
       <Dropzone {...props} />
       <ul className="dropzone-img-list">
-        {images.map((img, i) => {
+        {files.map((file, i) => {
           return (
-            <li className="img-item" key={i}><img className="img" alt={img.name} src={img.attachment} />
+            <li className="img-item" key={i}>
+              {withImage ? <img className="img" alt={file.name} src={file.attachment} /> : <span>{file.name}</span>}
               <button className="item-btn" onClick={() => onDelete && onDelete(i)}><Icon name="icon-cross" /></button>
             </li>
           );
@@ -23,10 +24,11 @@ export default function DropZone({ title, images, onDelete, ...props }) {
 
 DropZone.propTypes = {
   title: PropTypes.string,
-  images: PropTypes.array,
-  onDelete: PropTypes.func
+  files: PropTypes.array,
+  onDelete: PropTypes.func,
+  withImage: PropTypes.bool
 };
 
 DropZone.defaultProps = {
-  images: []
+  files: []
 };
