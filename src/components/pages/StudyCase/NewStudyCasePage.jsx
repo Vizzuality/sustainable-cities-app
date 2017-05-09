@@ -11,6 +11,14 @@ import { push } from 'react-router-redux';
 import Creator from 'components/creator/Creator';
 import DropZone from 'components/dropzone/DropZone';
 
+function toBase64(file, cb) {
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    cb && cb(event.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
 export default class NewStudyCasePage extends React.Component {
 
   constructor(props) {
@@ -26,7 +34,10 @@ export default class NewStudyCasePage extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
     dispatch(createStudyCase({
-      data: this.form,
+      data: {
+        ...this.form,
+        photos: this.state.photos
+      },
       onSuccess() {
         dispatch(push('/study-cases'));
         toastr.success('Study case created!');
@@ -48,9 +59,23 @@ export default class NewStudyCasePage extends React.Component {
 
   @Autobind
   onImageDrop(acceptedImg) {
-    let photos = this.state.photos.slice();
-    photos = [...photos, ...acceptedImg];
-    this.setState({ photos });
+    const parsedPhotos = [];
+
+    acceptedImg.forEach((file, i) => {
+      toBase64(file, (parsedFile) => {
+        parsedPhotos.push({
+          name: file.name,
+          is_active: true,
+          attachment: parsedFile
+        });
+
+        if (i === (acceptedImg.length - 1)) {
+          let photos = this.state.photos.slice();
+          photos = [...photos, ...parsedPhotos];
+          this.setState({ photos });
+        }
+      });
+    });
   }
 
   render() {

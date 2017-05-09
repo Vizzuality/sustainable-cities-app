@@ -7,8 +7,8 @@ export default function DropZone({ title, onDrop, images }) {
     <div className="c-dropzone">
       <span className="dropzone-title">{title}</span>
       <Dropzone onDrop={onDrop} />
-      <ul>
-        {images.map((img, i) => <li key={i}><img alt={img.name} src={img.preview} /></li>)}
+      <ul className="dropzone-img-list">
+        {images.map((img, i) => <li className="img-item" key={i}><img className="img" alt={img.name} src={img.attachment} /></li>)}
       </ul>
     </div>
   );

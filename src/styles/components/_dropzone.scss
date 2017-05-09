@@ -1,3 +1,11 @@
 .c-dropzone {
-  
+  .dropzone-img-list {
+    max-width: 200px;
+    list-style-type: none;
+    margin: 0;
+  }
+
+  .img {
+    max-width: 100%;
+  }
 }
