@@ -26,9 +26,9 @@ class NewBmePage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.bmeCategories.length || dispatch(getCategories({ type: 'Bme', tree: true }));
-    this.props.timingCategories.length || dispatch(getCategories({ type: 'timing' }));
-    this.props.enablings.list.length || dispatch(getEnablings());
+    this.props.bmeCategories.length || dispatch(getCategories({ type: 'Bme', tree: true, pageSize: 9999 }));
+    this.props.timingCategories.length || dispatch(getCategories({ type: 'timing', pageSize: 9999 }));
+    this.props.enablings.list.length || dispatch(getEnablings({ pageSize: 9999 }));
   }
 
   /* Methods */

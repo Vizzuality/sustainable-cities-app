@@ -75,7 +75,7 @@ class EnablingPage extends React.Component {
           items={this.props.enablings.list}
           itemCount={this.props.enablings.itemCount}
           fields={ENABLINGS_TABLE_FIELDS}
-          defaultSort={DEFAULT_SORT_FIELD}
+          defaultSortField={DEFAULT_SORT_FIELD}
           editUrl="/enabling-condition/edit"
           pagination={this.props.enablings.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
