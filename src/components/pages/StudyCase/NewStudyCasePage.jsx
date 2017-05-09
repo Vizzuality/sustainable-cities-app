@@ -58,15 +58,12 @@ export default class NewStudyCasePage extends React.Component {
   }
 
   @Autobind
-  onImageDrop(acceptedImg) {
+  onImageDrop(acceptedImg, rejectedFiles) {
     const parsedPhotos = [];
 
-    acceptedImg.forEach((file, i) => {
-      if (!file.type.startsWith('/image')) {
-        toastr.error(`The file ${file.name} is not a valid image`);
-        return;
-      }
+    rejectedFiles.forEach(file => toastr.error(`The file "${file.name}" is not a valid image`));
 
+    acceptedImg.forEach((file, i) => {
       toBase64(file, (parsedFile) => {
         parsedPhotos.push({
           name: file.name,
@@ -83,6 +80,13 @@ export default class NewStudyCasePage extends React.Component {
     });
   }
 
+  @Autobind
+  onDelete(index) {
+    const photos = this.state.photos.slice();
+    photos.splice(index, 1);
+    this.setState({ photos });
+  }
+
   render() {
     return (
       <Form onSubmit={this.onSubmit}>
@@ -96,7 +100,14 @@ export default class NewStudyCasePage extends React.Component {
         <Textarea validations={[]} onChange={this.onInputChange} label="Solution" name="solution" />
         <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
         <Creator title="BMEs" items={this.state.comments} onAdd={this.onBmeAdd} />
-        <DropZone title="images" images={this.state.photos} onDrop={this.onImageDrop} />
+        <div className="row expanded">
+          <div className="column small-6">
+            <DropZone title="Images" accept={'image/png, image/jpg, image/jpeg'} images={this.state.photos} onDrop={this.onImageDrop} onDelete={this.onDelete} />
+          </div>
+          <div className="column small-6">
+            <DropZone title="Files" />
+          </div>
+        </div>
       </Form>
     );
   }
