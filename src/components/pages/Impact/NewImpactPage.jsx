@@ -27,7 +27,7 @@ class NewImpactPage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.impactCategories.length || dispatch(getCategories({ type: 'Impact', tree: true }));
+    this.props.impactCategories.length || dispatch(getCategories({ type: 'Impact', tree: true, pageSize: 9999 }));
   }
 
   /* Methods */

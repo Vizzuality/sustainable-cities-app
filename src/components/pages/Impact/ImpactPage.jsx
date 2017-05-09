@@ -24,7 +24,7 @@ class EnablingPage extends React.Component {
 
   componentWillMount() {
     dispatch(getImpacts());
-    dispatch(getCategories({ type: 'impact', tree: false }));
+    dispatch(getCategories({ type: 'impact', tree: false, pageSize: 9999 }));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -99,7 +99,7 @@ class EnablingPage extends React.Component {
           items={impacts}
           itemCount={this.props.impacts.itemCount}
           fields={IMPACT_TABLE_FIELDS}
-          defaultSort={DEFAULT_SORT_FIELD}
+          defaultSortField={DEFAULT_SORT_FIELD}
           editUrl="/impact/edit"
           pagination={this.props.impacts.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}

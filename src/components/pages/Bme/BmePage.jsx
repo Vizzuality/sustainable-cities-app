@@ -78,7 +78,7 @@ class BmePage extends React.Component {
           items={this.props.bmes.list}
           itemCount={this.props.bmes.itemCount}
           fields={BME_TABLE_FIELDS}
-          defaultSort={DEFAULT_SORT_FIELD}
+          defaultSortField={DEFAULT_SORT_FIELD}
           editUrl="/business-model-element/edit"
           pagination={this.props.bmes.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}

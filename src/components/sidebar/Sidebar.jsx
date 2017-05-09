@@ -10,6 +10,10 @@ const links = [
     text: 'Business model element',
     href: '/business-model-element'
   },
+  {
+    text: 'Categories',
+    href: '/category'
+  },
   // {
   //   text: 'Solution',
   //   href: '/solution'

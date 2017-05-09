@@ -19,6 +19,8 @@ import EditBmePage from 'components/pages/Bme/EditBmePage';
 //    - Study case
 import StudyCasePage from 'components/pages/StudyCase/StudyCasesPage';
 import NewStudyCasePage from 'components/pages/StudyCase/NewStudyCasePage';
+//    - Category
+import CategoryPage from 'components/pages/Category/CategoryPage';
 //    - Impact
 import ImpactPage from 'components/pages/Impact/ImpactPage';
 import NewImpactPage from 'components/pages/Impact/NewImpactPage';
@@ -49,6 +51,9 @@ const Routes = ({ history }) => (
         <IndexRoute components={{ main: BmePage, nav: Sidebar }} />
         <Route path="new" components={{ main: NewBmePage, nav: Sidebar }} />
         <Route path="edit/:id" components={{ main: EditBmePage, nav: Sidebar }} onEnter={onEnterEditBmePage} />
+      </Route>
+      <Route path="category">
+        <IndexRoute components={{ main: CategoryPage, nav: Sidebar }} />
       </Route>
       <Route path="impact">
         <IndexRoute components={{ main: ImpactPage, nav: Sidebar }} />

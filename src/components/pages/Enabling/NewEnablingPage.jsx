@@ -27,8 +27,8 @@ class NewEnablingPage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.enablings.categories.length || dispatch(getCategories({ type: 'enablings', tree: false }));
-    dispatch(getBmes());
+    this.props.enablings.categories.length || dispatch(getCategories({ type: 'enablings', tree: false, pageSize: 9999, sort: 'name' }));
+    dispatch(getBmes({ pageSize: 9999 }));
     dispatch(getEnablings());
   }
 
