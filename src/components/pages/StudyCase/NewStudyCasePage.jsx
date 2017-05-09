@@ -110,6 +110,7 @@ export default class NewStudyCasePage extends React.Component {
   @Autobind
   onDeleteImage(index) {
     const photos = this.state.photos.slice();
+    window.URL.revokeObjectURL(photos[index].attachment);
     photos.splice(index, 1);
     this.setState({ photos });
   }
@@ -117,6 +118,7 @@ export default class NewStudyCasePage extends React.Component {
   @Autobind
   onDeleteFile(index) {
     const files = this.state.files.slice();
+    window.URL.revokeObjectURL(files[index].attachment);
     files.splice(index, 1);
     this.setState({ files });
   }
