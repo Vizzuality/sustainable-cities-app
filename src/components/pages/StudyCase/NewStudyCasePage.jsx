@@ -62,6 +62,11 @@ export default class NewStudyCasePage extends React.Component {
     const parsedPhotos = [];
 
     acceptedImg.forEach((file, i) => {
+      if (!file.type.startsWith('/image')) {
+        toastr.error(`The file ${file.name} is not a valid image`);
+        return;
+      }
+
       toBase64(file, (parsedFile) => {
         parsedPhotos.push({
           name: file.name,
