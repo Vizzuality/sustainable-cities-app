@@ -202,7 +202,6 @@ class EditBmePage extends React.Component {
 
   setCategories({ bmesDetail }) {
     let newState = {};
-    console.log(bmesDetail)
     Object.keys(this.categoryGroups).forEach((key) => {
       let nephewCategory;
 
@@ -234,7 +233,8 @@ class EditBmePage extends React.Component {
 
 
       newState = {
-        ...this.state.categories,
+        ...newState,
+        ...newState.categories,
         ...{ [key]: {
           parent: parentCategory ? parentCategory.id : null,
           children: childrenCategoryId,

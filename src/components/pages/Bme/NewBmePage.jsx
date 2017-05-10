@@ -72,9 +72,12 @@ class NewBmePage extends React.Component {
 
     const data = {
       ...this.form,
-      category_ids: [...this.state.timing, ...[this.state.categories.bme.nephew]],
-      enabling_ids: this.state.enablings,
-      solution_id: [this.state.categories.solution.nephew]
+      category_ids: [
+        ...this.state.timing,
+        ...[this.state.categories.bme.nephew],
+        ...[this.state.categories.solution.nephew]
+      ],
+      enabling_ids: this.state.enablings
     };
 
     // Create Bme
