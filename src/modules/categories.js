@@ -8,10 +8,10 @@ const SET_CATEGORIES_LOADING = 'SET_CATEGORIES_LOADING';
 /* Initial state */
 const initialState = {
   loading: false,
-  Bme: [],
+  bme: [],
   enablings: [],
-  Impact: [],
-  Solution: [],
+  impact: [],
+  solution: [],
   timing: []
 };
 

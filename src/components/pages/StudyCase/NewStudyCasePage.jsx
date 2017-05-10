@@ -1,16 +1,22 @@
 import React from 'react';
-import { Input, Form, Button, Textarea } from 'components/form/Form';
+import { AsyncSelect, Select, Input, Form, Button, Textarea } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import { Link } from 'react-router';
 import { Autobind } from 'es-decorators';
 import { validation } from 'utils/validation';
 import { createStudyCase } from 'modules/study-cases';
+import { getCategories } from 'modules/categories';
 import { dispatch } from 'main';
+import { connect } from 'react-redux';
 import { toastr } from 'react-redux-toastr';
 import { push } from 'react-router-redux';
+import { get } from 'utils/request';
 import Creator from 'components/creator/Creator';
 import DropZone from 'components/dropzone/DropZone';
+import PropTypes from 'prop-types';
+import debounce from 'lodash/debounce'
 
+/* Utils */
 function toBase64(file, cb) {
   const reader = new FileReader();
   reader.onload = (event) => {
@@ -19,11 +25,28 @@ function toBase64(file, cb) {
   reader.readAsDataURL(file);
 }
 
-export default class NewStudyCasePage extends React.Component {
+function getCities(input, cb) {
+  if (!input.length) {
+    cb();
+    return;
+  }
+
+  get({
+    url: `${config.API_URL}/cities?page[number]=1&&page[size]=50sort=name&search=${input.toLowerCase()}`,
+    onSuccess({ data }) {
+      const options = data.map(c => ({ value: c.id, label: `${c.attributes.name} (${c.attributes.iso})` }));
+      cb(null, { options });
+    }
+  });
+}
+
+class NewStudyCasePage extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
+      category_id: null,
+      city_ids: [],
       comments: [],
       photos: [],
       files: []
@@ -31,16 +54,24 @@ export default class NewStudyCasePage extends React.Component {
     this.form = {};
   }
 
+  /* Lifecycle */
+  componentWillMount() {
+    this.props.categories.solution.length || dispatch(getCategories({ type: 'solution' }));
+  }
+
+  /* Event handlers */
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
-    const { photos, files } = this.state;
+    const { city_ids, photos, files, category_id } = this.state;
 
     dispatch(createStudyCase({
       data: {
         ...this.form,
+        category_id,
         photos,
-        files
+        files,
+        city_ids: city_ids.map(c => c.id)
       },
       onSuccess() {
         dispatch(push('/study-cases'));
@@ -123,6 +154,7 @@ export default class NewStudyCasePage extends React.Component {
     this.setState({ files });
   }
 
+  /* Render */
   render() {
     return (
       <Form onSubmit={this.onSubmit}>
@@ -133,6 +165,24 @@ export default class NewStudyCasePage extends React.Component {
         </BtnGroup>
         {/* Name */}
         <Input type="text" value="" name="name" onChange={this.onInputChange} label="Study case title" validations={['required']} />
+        <Select
+          name="category_id"
+          label="Category"
+          validations={['required']}
+          value={this.state.category_id}
+          onChange={item => this.setState({ category_id: item.value })}
+          options={this.props.categories.solution.map(cat => ({ value: cat.id, label: cat.name }))}
+        />
+        <AsyncSelect
+          multi
+          name="city_ids"
+          label="Cities"
+          validations={['required']}
+          value={this.state.city_ids}
+          onChange={items => this.setState({ city_ids: items })}
+          loadOptions={debounce(getCities, 300)}
+          noResultsText="Sorry, there's no city that matches that name"
+        />
         <Textarea validations={[]} onChange={this.onInputChange} label="Solution" name="solution" />
         <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
         <Creator title="BMEs" items={this.state.comments} onAdd={this.onBmeAdd} />
@@ -161,3 +211,16 @@ export default class NewStudyCasePage extends React.Component {
     );
   }
 }
+
+// Map state to props
+const mapStateToProps = ({ categories }) => ({
+  categories: {
+    solution: categories.solution
+  }
+});
+
+// NewStudyCasePage.propTypes = {
+//   categories: PropTypes.array
+// };
+
+export default connect(mapStateToProps, null)(NewStudyCasePage);

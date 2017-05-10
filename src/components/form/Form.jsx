@@ -21,5 +21,6 @@ const Button = Validation.components.Button;
 const Input = withWrapper(Validation.components.Input);
 const Textarea = withWrapper(Validation.components.Textarea);
 const Select = withWrapper(ReactSelect);
+const AsyncSelect = withWrapper(ReactSelect.Async);
 
-export { Input, Button, Form, Textarea, Select };
+export { Input, Button, Form, Textarea, Select, AsyncSelect };
