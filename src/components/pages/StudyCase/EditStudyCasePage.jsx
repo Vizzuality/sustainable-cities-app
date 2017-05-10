@@ -17,7 +17,7 @@ class EditStudyCasePage extends React.Component {
   constructor(props) {
     super(props);
     this.form = {
-      is_active: true
+      project_type: 'StudyCase'
     };
   }
 

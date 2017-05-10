@@ -32,10 +32,12 @@ class NewStudyCasePage extends React.Component {
       category_id: null,
       city_ids: [],
       comments: [],
-      photos: [],
-      files: []
+      photos_attributes: [],
+      documents_attributes: []
     };
-    this.form = {};
+    this.form = {
+      project_type: 'StudyCase'
+    };
   }
 
   /* Lifecycle */
@@ -47,14 +49,14 @@ class NewStudyCasePage extends React.Component {
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
-    const { city_ids, photos, files, category_id } = this.state;
+    const { city_ids, photos_attributes, documents_attributes, category_id } = this.state;
 
     dispatch(createStudyCase({
       data: {
         ...this.form,
         category_id,
-        photos,
-        files,
+        photos_attributes,
+        documents_attributes,
         city_ids: city_ids.map(c => c.id)
       },
       onSuccess() {
@@ -91,9 +93,9 @@ class NewStudyCasePage extends React.Component {
         });
 
         if (i === (acceptedImgs.length - 1)) {
-          let photos = this.state.photos.slice();
-          photos = [...photos, ...parsedPhotos];
-          this.setState({ photos });
+          let photos_attributes = this.state.photos_attributes.slice();
+          photos_attributes = [...photos_attributes, ...parsedPhotos];
+          this.setState({ photos_attributes });
         }
       });
     });
@@ -114,9 +116,9 @@ class NewStudyCasePage extends React.Component {
         });
 
         if (i === (acceptedFiles.length - 1)) {
-          let files = this.state.files.slice();
-          files = [...files, ...parsedFiles];
-          this.setState({ files });
+          let documents_attributes = this.state.documents_attributes.slice();
+          documents_attributes = [...documents_attributes, ...parsedFiles];
+          this.setState({ documents_attributes });
         }
       });
     });
@@ -124,18 +126,18 @@ class NewStudyCasePage extends React.Component {
 
   @Autobind
   onDeleteImage(index) {
-    const photos = this.state.photos.slice();
-    window.URL.revokeObjectURL(photos[index].attachment);
-    photos.splice(index, 1);
-    this.setState({ photos });
+    const photos_attributes = this.state.photos_attributes.slice();
+    window.URL.revokeObjectURL(photos_attributes[index].attachment);
+    photos_attributes.splice(index, 1);
+    this.setState({ photos_attributes });
   }
 
   @Autobind
   onDeleteFile(index) {
-    const files = this.state.files.slice();
-    window.URL.revokeObjectURL(files[index].attachment);
-    files.splice(index, 1);
-    this.setState({ files });
+    const documents_attributes = this.state.documents_attributes.slice();
+    window.URL.revokeObjectURL(documents_attributes[index].attachment);
+    documents_attributes.splice(index, 1);
+    this.setState({ documents_attributes });
   }
 
   /* Render */
@@ -173,7 +175,7 @@ class NewStudyCasePage extends React.Component {
             <DropZone
               title="Images"
               accept={'image/png, image/jpg, image/jpeg'}
-              files={this.state.photos}
+              files={this.state.photos_attributes}
               onDrop={this.onImageDrop}
               onDelete={this.onDeleteImage}
               withImage
@@ -182,7 +184,7 @@ class NewStudyCasePage extends React.Component {
           <div className="column small-6">
             <DropZone
               title="Files"
-              files={this.state.files}
+              files={this.state.documents_attributes}
               accept={'application/pdf, application/json, application/msword, application/excel'}
               onDrop={this.onFileDrop}
               onDelete={this.onDeleteFile}
