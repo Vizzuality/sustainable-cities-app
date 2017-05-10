@@ -21,6 +21,7 @@ import StudyCasePage from 'components/pages/StudyCase/StudyCasesPage';
 import NewStudyCasePage from 'components/pages/StudyCase/NewStudyCasePage';
 //    - Category
 import CategoryPage from 'components/pages/Category/CategoryPage';
+import NewCategoryPage from 'components/pages/Category/NewCategoryPage';
 //    - Impact
 import ImpactPage from 'components/pages/Impact/ImpactPage';
 import NewImpactPage from 'components/pages/Impact/NewImpactPage';
@@ -54,6 +55,7 @@ const Routes = ({ history }) => (
       </Route>
       <Route path="category">
         <IndexRoute components={{ main: CategoryPage, nav: Sidebar }} />
+        <Route path="new" components={{ main: NewCategoryPage, nav: Sidebar }} />
       </Route>
       <Route path="impact">
         <IndexRoute components={{ main: ImpactPage, nav: Sidebar }} />
