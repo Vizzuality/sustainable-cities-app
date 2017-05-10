@@ -11,13 +11,22 @@ export default class Table extends React.Component {
   constructor(props) {
     super(props);
 
-    /* Initial state */
     this.state = {
-      sortDirection: 1
+      sort: {
+        direction: props.defaultSortDirection || this.defaultSortDirection,
+        field: props.defaultSortField || null
+      }
     };
 
     // initializes maxPagination value
     this.maxPagination = Math.ceil(this.props.itemCount / this.props.pagination.pageSize);
+  }
+
+  componentDidMount() {
+    if (this.state.sort.field) {
+      const { field, direction } = this.state.sort;
+      this.props.onUpdateFilters('sort', direction === 1 ? field : `-${field}`);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -44,12 +53,17 @@ export default class Table extends React.Component {
   }
 
   onSort(field) {
-    const sortDirection = -(this.state.sortDirection);
+    const direction = -(this.state.sort.direction);
+    const newSort = {
+      direction,
+      field
+    };
+
     this.setState({
-      sortDirection
+      sort: newSort
     });
 
-    this.props.onUpdateFilters('sort', sortDirection === 1 ? field : `-${field}`);
+    this.props.onUpdateFilters('sort', direction === 1 ? field : `-${field}`);
   }
 
   /* Partial renders */
@@ -59,8 +73,12 @@ export default class Table extends React.Component {
         {this.props.fields.map((field, i) => {
           return (
             <th key={i}>{field.sortable ?
-              <a onClick={() => this.onSort(field.value)} >
-                <Icon className="table-btn-icon -small" name={this.state.sortDirection === 1 ? 'icon-arrow-up-2' : 'icon-arrow-down-2'} />{capitalize(field.label)}
+              <a onClick={() => this.onSort(field.value)}>
+                {this.state.sort.field === field.value && <Icon
+                  className="table-btn-icon -small"
+                  name={this.state.sort.direction === 1 ? 'icon-arrow-up-2' : 'icon-arrow-down-2'}
+                />}
+                {capitalize(field.label)}
               </a> : capitalize(field.label)}
             </th>
           );
@@ -119,6 +137,8 @@ export default class Table extends React.Component {
 }
 
 Table.propTypes = {
+  defaultSortField: PropTypes.string,
+  defaultSortDirection: PropTypes.number,
   items: PropTypes.array,
   itemCount: PropTypes.number,
   fields: PropTypes.array,
@@ -131,5 +151,6 @@ Table.propTypes = {
 };
 
 Table.defaultProps = {
-  items: []
+  items: [],
+  defaultSortDirection: 1 // ASC
 };

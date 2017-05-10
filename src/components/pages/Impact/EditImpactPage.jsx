@@ -25,7 +25,7 @@ class EditImpactPage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.impactCategories.length || dispatch(getCategories({ type: 'Impact', tree: true }));
+    this.props.impactCategories.length || dispatch(getCategories({ type: 'Impact', tree: true, pageSize: 9999 }));
 
     if (!this.props.impactDetail) {
       dispatch(getImpacts({ id: this.props.impacts.detailId }));
