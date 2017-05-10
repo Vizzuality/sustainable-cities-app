@@ -188,7 +188,7 @@ function updateStudyCase({ id, data, onSuccess }) {
   return (dispatch) => {
     dispatch(setStudyCasesLoading(true));
     patch({
-      url: `${config.API_URL}/study-cases/${id}`,
+      url: `${config.API_URL}/projects/${id}`,
       body: {
         project: data
       },

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AsyncSelect, Select, Input, Form, Button, Textarea } from 'components/form/Form';
+import { Select, Input, Form, Button, Textarea } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import { Link } from 'react-router';
 import { Autobind } from 'es-decorators';
@@ -10,11 +10,10 @@ import { dispatch } from 'main';
 import { connect } from 'react-redux';
 import { toastr } from 'react-redux-toastr';
 import { push } from 'react-router-redux';
-import { get } from 'utils/request';
 import Creator from 'components/creator/Creator';
 import DropZone from 'components/dropzone/DropZone';
 import PropTypes from 'prop-types';
-import debounce from 'lodash/debounce'
+import CitySearch from 'components/cities/CitySearch';
 
 /* Utils */
 function toBase64(file, cb) {
@@ -23,21 +22,6 @@ function toBase64(file, cb) {
     cb && cb(event.target.result);
   };
   reader.readAsDataURL(file);
-}
-
-function getCities(input, cb) {
-  if (!input.length) {
-    cb();
-    return;
-  }
-
-  get({
-    url: `${config.API_URL}/cities?page[number]=1&&page[size]=50sort=name&search=${input.toLowerCase()}`,
-    onSuccess({ data }) {
-      const options = data.map(c => ({ value: c.id, label: `${c.attributes.name} (${c.attributes.iso})` }));
-      cb(null, { options });
-    }
-  });
 }
 
 class NewStudyCasePage extends React.Component {
@@ -173,15 +157,13 @@ class NewStudyCasePage extends React.Component {
           onChange={item => this.setState({ category_id: item.value })}
           options={this.props.categories.solution.map(cat => ({ value: cat.id, label: cat.name }))}
         />
-        <AsyncSelect
+        <CitySearch
           multi
           name="city_ids"
           label="Cities"
           validations={['required']}
           value={this.state.city_ids}
           onChange={items => this.setState({ city_ids: items })}
-          loadOptions={debounce(getCities, 300)}
-          noResultsText="Sorry, there's no city that matches that name"
         />
         <Textarea validations={[]} onChange={this.onInputChange} label="Solution" name="solution" />
         <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
