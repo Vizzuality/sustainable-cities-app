@@ -2,11 +2,18 @@ import { dispatch } from 'main';
 import { setBmesDetail } from 'modules/bmes';
 import { setImpactDetail } from 'modules/impacts';
 import { setEnablingDetail } from 'modules/enablings'
+import { setCategoryDetail } from 'modules/categories';
 
 
 function onEnterEditBmePage({ params }, replaceUrl, done) {
   const { id } = params;
   dispatch(setBmesDetail(+id));
+  done();
+}
+
+function onEnterEditCategoryPage({ params }, replaceUrl, done) {
+  const { id } = params;
+  dispatch(setCategoryDetail(+id));
   done();
 }
 
@@ -22,4 +29,4 @@ function onEnterEditImpactPage({ params }, replaceUrl, done) {
   done();
 }
 
-export { onEnterEditBmePage, onEnterEditEnablingPage, onEnterEditImpactPage };
+export { onEnterEditBmePage, onEnterEditCategoryPage, onEnterEditEnablingPage, onEnterEditImpactPage };

@@ -193,7 +193,7 @@ EditImpactPage.propTypes = {
 // Map state to props
 const mapStateToProps = state => ({
   impacts: state.impacts,
-  impactCategories: state.categories.Impact,
+  impactCategories: state.categories.impact,
   impactDetail: getImpactDetail(state)
 });
 
