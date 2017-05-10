@@ -19,6 +19,7 @@ import EditBmePage from 'components/pages/Bme/EditBmePage';
 //    - Study case
 import StudyCasePage from 'components/pages/StudyCase/StudyCasesPage';
 import NewStudyCasePage from 'components/pages/StudyCase/NewStudyCasePage';
+import EditStudyCasePage from 'components/pages/StudyCase/EditStudyCasePage';
 //    - Category
 import CategoryPage from 'components/pages/Category/CategoryPage';
 //    - Impact
@@ -31,7 +32,12 @@ import NewEnablingPage from 'components/pages/Enabling/NewEnablingPage';
 import EditEnablingPage from 'components/pages/Enabling/EditEnablingPage';
 
 // Url hooks
-import { onEnterEditBmePage, onEnterEditEnablingPage, onEnterEditImpactPage } from 'modules/url';
+import {
+  onEnterEditBmePage,
+  onEnterEditEnablingPage,
+  onEnterEditImpactPage,
+  onEnterEditStudyCase
+} from 'modules/url';
 
 const Routes = ({ history }) => (
   <Router history={history}>
@@ -46,6 +52,11 @@ const Routes = ({ history }) => (
       <Route path="study-cases">
         <IndexRoute components={{ main: StudyCasePage, nav: Sidebar }} />
         <Route path="new" components={{ main: NewStudyCasePage, nav: Sidebar }} />
+        <Route
+          path="edit/:id"
+          onEnter={onEnterEditStudyCase}
+          components={{ main: EditStudyCasePage, nav: Sidebar }}
+        />
       </Route>
       <Route path="business-model-element">
         <IndexRoute components={{ main: BmePage, nav: Sidebar }} />

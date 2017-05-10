@@ -204,7 +204,7 @@ function deleteStudyCase({ id, onSuccess }) {
   return (dispatch) => {
     dispatch(setStudyCasesLoading(true));
     _delete({
-      url: `${config.API_URL}/study-cases/${id}`,
+      url: `${config.API_URL}/projects/${id}`,
       onSuccess() {
         dispatch(setStudyCasesLoading(false));
         onSuccess && onSuccess(id);
