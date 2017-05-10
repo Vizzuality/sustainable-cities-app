@@ -19,11 +19,11 @@ const initialState = {
   },
   search: '',
   /* category types */
+  bme: [],
   all: [],
-  Bme: [],
   enablings: [],
-  Impact: [],
-  Solution: [],
+  impact: [],
+  solution: [],
   timing: []
 };
 
@@ -125,7 +125,7 @@ function getCategories({ type, tree, pageSize, pageNumber, sort, search }) {
         };
 
         dispatch(setCategoriesLoading(false));
-        dispatch(setCategories(categoryData, type));
+        dispatch(setCategories(categoryData, type.toLowerCase()));
       }
     });
   };

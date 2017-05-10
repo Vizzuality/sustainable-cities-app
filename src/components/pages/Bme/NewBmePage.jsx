@@ -305,8 +305,8 @@ NewBmePage.propTypes = {
 // Map state to props
 const mapStateToProps = ({ enablings, categories }) => ({
   enablings,
-  bmeCategories: categories.Bme,
-  solutionCategories: categories.Solution,
+  bmeCategories: categories.bme,
+  solutionCategories: categories.solution,
   timingCategories: categories.timing
 });
 
