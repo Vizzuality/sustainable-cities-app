@@ -1,4 +1,4 @@
-import { get, _delete } from 'utils/request';
+import { get, post, _delete } from 'utils/request';
 import { deserialize } from 'utils/json-api';
 import * as queryString from 'query-string';
 
@@ -96,6 +96,25 @@ function setCategoriesLoading(loading) {
 }
 
 /* Redux-thunk async actions */
+function createCategory({ data, onSuccess }) {
+  return (dispatch) => {
+    dispatch(setCategoriesLoading(true));
+    post({
+      url: `${config.API_URL}/categories`,
+      body: {
+        category: data
+      },
+      headers: {
+        Authorization: `Bearer ${localStorage.token}`
+      },
+      onSuccess() {
+        dispatch(setCategoriesLoading(false));
+        onSuccess && onSuccess();
+      }
+    });
+  };
+}
+
 function getCategories({ type, tree, pageSize, pageNumber, sort, search }) {
   const endPoints = {
     all: 'categories?',
@@ -144,4 +163,4 @@ function deleteCategory({ id, onSuccess }) {
   };
 }
 
-export { categoriesReducer, deleteCategory, getCategories, setCategoriesSearch, setFilters };
+export { categoriesReducer, createCategory, deleteCategory, getCategories, setCategoriesSearch, setFilters };
