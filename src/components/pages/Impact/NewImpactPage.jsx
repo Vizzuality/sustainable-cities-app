@@ -162,7 +162,7 @@ NewImpactPage.propTypes = {
 
 // Map state to props
 const mapStateToProps = ({ categories }) => ({
-  impactCategories: categories.Impact
+  impactCategories: categories.impact
 });
 
 export default connect(mapStateToProps, null)(NewImpactPage);

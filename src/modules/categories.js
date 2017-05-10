@@ -125,7 +125,7 @@ function getCategories({ type, tree, pageSize, pageNumber, sort, search }) {
         };
 
         dispatch(setCategoriesLoading(false));
-        dispatch(setCategories(categoryData, type));
+        dispatch(setCategories(categoryData, type.toLowerCase()));
       }
     });
   };
