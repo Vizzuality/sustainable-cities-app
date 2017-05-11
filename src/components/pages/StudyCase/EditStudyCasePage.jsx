@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 import getStudyCaseDetail from 'selectors/studyCaseDetail';
 import { dispatch } from 'main';
 import { getStudyCases, updateStudyCase, deleteStudyCase } from 'modules/study-cases';
+import { getCategories } from 'modules/categories';
 import PropTypes from 'prop-types';
-import { Form, Button, Input, Textarea } from 'components/form/Form';
+import { Form, Button, Input, Select, Textarea } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import { Link } from 'react-router';
 import { Autobind } from 'es-decorators';
@@ -25,11 +26,13 @@ class EditStudyCasePage extends React.Component {
     };
 
     this.state = {
+      category_id: null,
       cities: []
     };
   }
 
   componentWillMount() {
+    dispatch(getCategories({ type: 'solution', pageSize: 9999, sort: 'name' }))
     dispatch(getStudyCases({ id: this.props.studyCases.detailId }));
   }
 
@@ -38,6 +41,7 @@ class EditStudyCasePage extends React.Component {
     // Includes arrived! So, we can populate sub-entities
     if ((!this.props.studyCases.included || !this.props.studyCases.included.length) && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
       this.setState({
+        category_id: nextProps.studyCaseDetail.category_id.toString(),
         cities: nextProps.studyCases.included.filter(sc => sc.type === 'cities').map(c => ({ label: c.name, value: c.id }))
       });
     }
@@ -59,6 +63,7 @@ class EditStudyCasePage extends React.Component {
       id: this.props.studyCaseDetail.id,
       data: {
         ...this.form,
+        category_id: this.state.category_id,
         city_ids: cities.map(c => c.value)
       },
       onSuccess() {
@@ -101,6 +106,18 @@ class EditStudyCasePage extends React.Component {
             <Link to="/study-cases" className="button">Cancel</Link>
           </BtnGroup>
           <Input type="text" name="name" value={name} label="Study case title" validations={['required']} onChange={this.onInputChange} />
+          <div className="row expanded">
+            <div className="small-12 columns">
+              <Select
+                name="category_id"
+                label="Category"
+                validations={['required']}
+                value={this.state.category_id}
+                onChange={item => this.setState({ category_id: item.value })}
+                options={this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }))}
+              />
+            </div>
+          </div>
           <CitySearch
             multi
             name="city_ids"
@@ -119,6 +136,7 @@ class EditStudyCasePage extends React.Component {
 /* PropTypes */
 EditStudyCasePage.propTypes = {
   // State
+  solutionCategories: PropTypes.array,
   studyCases: PropTypes.object,
   // Reselect
   studyCaseDetail: PropTypes.object
@@ -126,6 +144,7 @@ EditStudyCasePage.propTypes = {
 
 /* Map state to props */
 const mapStateToProps = state => ({
+  solutionCategories: state.categories.solution,
   studyCases: state.studyCases,
   studyCaseDetail: getStudyCaseDetail(state)
 });
