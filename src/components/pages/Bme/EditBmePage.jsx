@@ -405,8 +405,8 @@ EditBmePage.propTypes = {
 // Map state to props
 const mapStateToProps = state => ({
   bmes: state.bmes,
-  bmeCategories: state.categories.Bme,
-  solutionCategories: state.categories.Solution,
+  bmeCategories: state.categories.bme,
+  solutionCategories: state.categories.solution,
   timingCategories: state.categories.timing,
   enablings: state.enablings,
   bmesDetail: getBmeDetail(state)
