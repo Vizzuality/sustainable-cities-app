@@ -23,7 +23,7 @@ export default class ImpactForm extends React.Component {
 
   render() {
     const { values, text } = this.props;
-    const { name, impactValue, impactUnit } = values;
+    const { name, impact_value, impact_unit } = values;
     return (
       <div className="c-impact-form">
         <Form onSubmit={this.onSubmit}>
@@ -44,7 +44,7 @@ export default class ImpactForm extends React.Component {
               <Input
                 type="text"
                 label="Value"
-                defaultValue={impactValue}
+                defaultValue={impact_value}
                 name="impact_value"
                 validations={[]}
                 onChange={this.onInputChange}
@@ -54,7 +54,7 @@ export default class ImpactForm extends React.Component {
               <Input
                 type="text"
                 label="Unit"
-                defaultValue={impactUnit}
+                defaultValue={impact_unit}
                 name="impact_unit"
                 validations={[]}
                 onChange={this.onInputChange}
