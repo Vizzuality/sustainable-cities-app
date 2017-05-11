@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { dispatch } from 'main';
 import { createBme } from 'modules/bmes';
 import { getEnablings } from 'modules/enablings';
@@ -11,24 +12,52 @@ import { Link } from 'react-router';
 import { toastr } from 'react-redux-toastr';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
+import isEqual from 'lodash/isEqual';
 
 class NewBmePage extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.form = {};
     this.state = {
       enablings: [],
       timing: [],
-      categories: {}
+      categories: {
+        bme: {},
+        solution: {}
+      }
+    };
+
+    this.categoryGroups = {
+      bme: props.bmeCategories,
+      solution: props.solutionCategories
     };
   }
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.bmeCategories.length || dispatch(getCategories({ type: 'Bme', tree: true }));
-    this.props.timingCategories.length || dispatch(getCategories({ type: 'timing' }));
-    this.props.enablings.list.length || dispatch(getEnablings());
+    this.props.bmeCategories.length || dispatch(getCategories({ type: 'Bme', tree: true, pageSize: 9999 }));
+    this.props.solutionCategories.length || dispatch(getCategories({ type: 'Solution', tree: true, pageSize: 9999, sort: 'name' }));
+    this.props.timingCategories.length || dispatch(getCategories({ type: 'timing', pageSize: 9999 }));
+    this.props.enablings.list.length || dispatch(getEnablings({ pageSize: 9999 }));
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { bmeCategories, solutionCategories } = this.props;
+    if (!isEqual(bmeCategories, nextProps.bmeCategories)) {
+      this.categoryGroups = {
+        ...this.categoryGroups,
+        ...{ bme: nextProps.bmeCategories }
+      };
+    }
+
+    if (!isEqual(solutionCategories, nextProps.solutionCategories)) {
+      this.categoryGroups = {
+        ...this.categoryGroups,
+        ...{ solution: nextProps.solutionCategories }
+      };
+    }
   }
 
   /* Methods */
@@ -43,7 +72,11 @@ class NewBmePage extends React.Component {
 
     const data = {
       ...this.form,
-      category_ids: [...this.state.timing, ...[this.state.categories.nephew]],
+      category_ids: [
+        ...this.state.timing,
+        ...[this.state.categories.bme.nephew],
+        ...this.state.categories.solution.nephew
+      ],
       enabling_ids: this.state.enablings
     };
 
@@ -64,21 +97,21 @@ class NewBmePage extends React.Component {
     });
   }
 
-  onCategoryChange(level, val) {
+  onCategoryChange(group, level, val) {
     if (val) {
       val = Array.isArray(val) ?
         val.map(i => i.value) : val.value;
     }
 
     const categories = {
-      ...this.state.categories,
+      ...this.state.categories[group],
       [level]: val
     };
 
     if (level === 'parent') {
       let options = {};
       if (val) {
-        options = this.getFirstSelectOption(val, 'parent');
+        options = this.getFirstSelectOption(val, 'parent', group);
       }
       categories.children = val ? options.children : {};
       categories.nephew = val ? options.nephew : {};
@@ -87,23 +120,30 @@ class NewBmePage extends React.Component {
     if (level === 'children') {
       let options = {};
       if (val) {
-        options = this.getFirstSelectOption(val, 'children');
+        options = this.getFirstSelectOption(val, 'children', group);
       }
       categories.nephew = val ? options.nephew : {};
     }
 
-    this.setState({ categories });
+    const newState = {
+      ...this.state.categories,
+      ...{ [group]: categories }
+    };
+
+    this.setState({ categories: newState });
   }
 
-  getFirstSelectOption(value, source) {
+  getFirstSelectOption(value, source, categoryGroupId) {
     const options = {
       children: {},
       nephew: {}
     };
 
+    if (!this.categoryGroups[categoryGroupId]) return {};
+
     if (source === 'parent') {
       // populates children selector based on parent selection
-      const parentCategory = this.props.bmeCategories.find(cat => cat.id === value);
+      const parentCategory = this.categoryGroups[categoryGroupId].find(cat => cat.id === value);
       if (parentCategory.children && parentCategory.children.length) {
         options.children = parentCategory.children[0].id;
       }
@@ -117,8 +157,8 @@ class NewBmePage extends React.Component {
 
     if (source === 'children') {
       // populates nephew selector based on children selection
-      const parentId = this.state.categories.parent;
-      const parentCategory = this.props.bmeCategories.find(cat => cat.id === parentId);
+      const parentId = this.state.categories[categoryGroupId].parent;
+      const parentCategory = this.categoryGroups[categoryGroupId].find(cat => cat.id === parentId);
       const childrenCategory = parentCategory.children.find(child => child.id === value);
       if (childrenCategory.children && childrenCategory.children.length) {
         options.nephew = childrenCategory.children[0].id;
@@ -128,24 +168,31 @@ class NewBmePage extends React.Component {
     return options;
   }
 
-  render() {
-    const { parent, children } = this.state.categories;
+  loadMultiSelectOptions(categoryState, categoryGroupId) {
+    const options = {
+      children: [],
+      nephew: []
+    };
+    const { parent, children } = categoryState;
 
-    const parentOptions = this.props.bmeCategories.map(cat => ({ value: cat.id, label: cat.name }));
-    let childrenOptions = [];
-    let nephewOptions = [];
-    let parentCategory = null;
-    let childrenCategory = null;
+    if (!this.categoryGroups[categoryGroupId]) return {};
 
     if (parent) {
-      parentCategory = this.props.bmeCategories.find(cat => cat.id === this.state.categories.parent);
-      childrenOptions = parentCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
+      const parentCategory = this.categoryGroups[categoryGroupId].find(cat => cat.id === parent);
+      options.children = parentCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
 
       if (children) {
-        childrenCategory = parentCategory.children.find(child => child.id === this.state.categories.children);
-        nephewOptions = childrenCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
+        const childrenCategory = parentCategory.children.find(child => child.id === children);
+        options.nephew = childrenCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
       }
     }
+
+    return options;
+  }
+
+  render() {
+    const bmeSelectOptions = this.loadMultiSelectOptions(this.state.categories.bme, 'bme');
+    const solutionSelectOptions = this.loadMultiSelectOptions(this.state.categories.solution, 'solution');
 
     return (
       <section className="c-form">
@@ -156,33 +203,33 @@ class NewBmePage extends React.Component {
           </BtnGroup>
           {/* Name */}
           <Input type="text" onChange={this.onInputChange} name="name" value="" label="Business model element name" validations={['required']} />
-          {/* Categories */}
+          {/* BME categories */}
           <div className="row expanded">
             <div className="small-4 columns">
               <Select
                 name="categories"
-                value={this.state.categories.parent}
-                onChange={val => this.onCategoryChange('parent', val)}
+                value={this.state.categories.bme.parent}
+                onChange={val => this.onCategoryChange('bme', 'parent', val)}
                 label="Category"
-                options={parentOptions}
+                options={this.props.bmeCategories.map(cat => ({ value: cat.id, label: cat.name }))}
               />
             </div>
             <div className="small-4 columns">
               <Select
                 name="categories"
-                value={this.state.categories.children}
-                onChange={val => this.onCategoryChange('children', val)}
+                value={this.state.categories.bme.children}
+                onChange={val => this.onCategoryChange('bme', 'children', val)}
                 label="Sub-category"
-                options={childrenOptions}
+                options={bmeSelectOptions.children}
               />
             </div>
             <div className="small-4 columns">
               <Select
                 name="categories"
-                value={this.state.categories.nephew}
-                onChange={val => this.onCategoryChange('nephew', val)}
+                value={this.state.categories.bme.nephew}
+                onChange={val => this.onCategoryChange('bme', 'nephew', val)}
                 label="Sub-sub-category"
-                options={nephewOptions}
+                options={bmeSelectOptions.nephew}
               />
             </div>
           </div>
@@ -205,6 +252,37 @@ class NewBmePage extends React.Component {
             label="Timing"
             options={this.props.timingCategories.map(en => ({ value: en.id, label: en.name }))}
           />
+          {/* Solution categories */}
+          <div className="row expanded">
+            <div className="small-4 columns">
+              <Select
+                name="categories"
+                value={this.state.categories.solution.parent}
+                onChange={val => this.onCategoryChange('solution', 'parent', val)}
+                label="Solution group"
+                options={this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }))}
+              />
+            </div>
+            <div className="small-4 columns">
+              <Select
+                name="categories"
+                value={this.state.categories.solution.children}
+                onChange={val => this.onCategoryChange('solution', 'children', val)}
+                label="Solution category"
+                options={solutionSelectOptions.children}
+              />
+            </div>
+            <div className="small-4 columns">
+              <Select
+                name="categories"
+                multi
+                value={this.state.categories.solution.nephew}
+                onChange={val => this.onCategoryChange('solution', 'nephew', val)}
+                label="Solution sub-category"
+                options={solutionSelectOptions.nephew}
+              />
+            </div>
+          </div>
           <Textarea
             validations={[]}
             onChange={this.onInputChange}
@@ -219,17 +297,17 @@ class NewBmePage extends React.Component {
 }
 
 NewBmePage.propTypes = {
-  // State
-  enablings: React.PropTypes.object,
-  bmeCategories: React.PropTypes.array,
-  timingCategories: React.PropTypes.array
+  enablings: PropTypes.object,
+  bmeCategories: PropTypes.array,
+  solutionCategories: PropTypes.array,
+  timingCategories: PropTypes.array
 };
 
 // Map state to props
-const mapStateToProps = ({ user, enablings, categories }) => ({
-  user,
+const mapStateToProps = ({ enablings, categories }) => ({
   enablings,
-  bmeCategories: categories.Bme,
+  bmeCategories: categories.bme,
+  solutionCategories: categories.solution,
   timingCategories: categories.timing
 });
 

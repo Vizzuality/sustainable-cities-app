@@ -27,7 +27,7 @@ class NewImpactPage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.impactCategories.length || dispatch(getCategories({ type: 'Impact', tree: true }));
+    this.props.impactCategories.length || dispatch(getCategories({ type: 'Impact', tree: true, pageSize: 9999 }));
   }
 
   /* Methods */
@@ -162,7 +162,7 @@ NewImpactPage.propTypes = {
 
 // Map state to props
 const mapStateToProps = ({ categories }) => ({
-  impactCategories: categories.Impact
+  impactCategories: categories.impact
 });
 
 export default connect(mapStateToProps, null)(NewImpactPage);

@@ -32,7 +32,7 @@ class EditBmePage extends React.Component {
   /* Lifecycle */
   componentWillMount() {
     dispatch(getBmes({ pageSize: 9999 }));
-    dispatch(getCategories({ type: 'enablings', tree: false }));
+    dispatch(getCategories({ type: 'enablings', tree: false, pageSize: 9999, sort: 'name' }));
     if (!this.props.enablingDetail) {
       dispatch(getEnablings({ id: this.props.enablings.detailId }));
     } else {
