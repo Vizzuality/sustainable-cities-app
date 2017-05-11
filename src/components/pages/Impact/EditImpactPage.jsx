@@ -25,7 +25,7 @@ class EditImpactPage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.impactCategories.length || dispatch(getCategories({ type: 'Impact', tree: true }));
+    this.props.impactCategories.length || dispatch(getCategories({ type: 'Impact', tree: true, pageSize: 9999 }));
 
     if (!this.props.impactDetail) {
       dispatch(getImpacts({ id: this.props.impacts.detailId }));
@@ -193,7 +193,7 @@ EditImpactPage.propTypes = {
 // Map state to props
 const mapStateToProps = state => ({
   impacts: state.impacts,
-  impactCategories: state.categories.Impact,
+  impactCategories: state.categories.impact,
   impactDetail: getImpactDetail(state)
 });
 

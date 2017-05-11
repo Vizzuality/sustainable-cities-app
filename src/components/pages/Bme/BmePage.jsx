@@ -69,16 +69,33 @@ class BmePage extends React.Component {
     }));
   }
 
+  setCategory() {
+    return this.props.bmes.list.map((bme) => {
+      if (!bme.categories.length) return { bme };
+      const category = bme.categories.find(cat => cat.category_type === 'Bme');
+      return {
+        ...bme,
+        ...{ category: category ? category.name : '-' }
+      };
+    });
+  }
+
   render() {
+    let bmes = [];
+
+    if (this.props.bmes.list.length) {
+      bmes = this.setCategory();
+    }
+
     return (
       <div className="c-page">
         <Link className="button" to="/business-model-element/new">New Business Model Element</Link>
         <Search onChange={this.search} />
         <Table
-          items={this.props.bmes.list}
+          items={bmes}
           itemCount={this.props.bmes.itemCount}
           fields={BME_TABLE_FIELDS}
-          defaultSort={DEFAULT_SORT_FIELD}
+          defaultSortField={DEFAULT_SORT_FIELD}
           editUrl="/business-model-element/edit"
           pagination={this.props.bmes.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
