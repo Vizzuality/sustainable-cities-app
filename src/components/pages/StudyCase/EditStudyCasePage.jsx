@@ -120,15 +120,8 @@ class EditStudyCasePage extends React.Component {
   @Autobind
   onDeleteImage(index) {
     const photos_attributes = this.state.photos_attributes.slice();
-    const { id } = this.state.photos_attributes[index];
     window.URL.revokeObjectURL(photos_attributes[index].attachment);
     photos_attributes.splice(index, 1);
-    dispatch(updateStudyCase({
-      id: this.props.studyCaseDetail.id,
-      data: {
-        photos_attributes: { id: +id, destroy: true }
-      }
-    }));
     this.setState({ photos_attributes });
   }
 
@@ -172,7 +165,6 @@ class EditStudyCasePage extends React.Component {
 
     const { category_id, cities, documents_attributes, photos_attributes } = this.state;
 
-    console.log('submit')
     dispatch(updateStudyCase({
       id: this.props.studyCaseDetail.id,
       data: {
