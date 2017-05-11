@@ -6,6 +6,7 @@ import { Autobind } from 'es-decorators';
 import { validation } from 'utils/validation';
 import { createStudyCase } from 'modules/study-cases';
 import { getCategories } from 'modules/categories';
+import { getBmes } from 'modules/bmes';
 import { dispatch } from 'main';
 import { connect } from 'react-redux';
 import { toastr } from 'react-redux-toastr';
@@ -49,6 +50,10 @@ class NewStudyCasePage extends React.Component {
   /* Lifecycle */
   componentWillMount() {
     this.props.categories.solution.length || dispatch(getCategories({ type: 'solution' }));
+    dispatch(getBmes({
+      pageSize: 9999,
+      pageNumber: 1
+    }));
   }
 
   /* Event handlers */
@@ -227,7 +232,7 @@ class NewStudyCasePage extends React.Component {
         />
         <Textarea validations={[]} onChange={this.onInputChange} label="Solution" name="solution" />
         <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
-        <Creator title="BMEs" options={[{ label: 'One', value: 1 }, { label: 'Two', value: 2 }]} items={this.state.bmes} onAdd={this.addBme} onEdit={(...args) => this.editBme(...args)} />
+        <Creator title="BMEs" options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))} items={this.state.bmes} onAdd={this.addBme} onEdit={(...args) => this.editBme(...args)} />
         {/* Impacts */}
         <div>
           <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
@@ -269,11 +274,16 @@ class NewStudyCasePage extends React.Component {
 }
 
 // Map state to props
-const mapStateToProps = ({ categories }) => ({
+const mapStateToProps = ({ categories, bmes }) => ({
   categories: {
     solution: categories.solution
-  }
+  },
+  bmes: bmes.list
 });
+
+NewStudyCasePage.defaultProps = {
+  bmes: []
+};
 
 // NewStudyCasePage.propTypes = {
 //   categories: PropTypes.array
