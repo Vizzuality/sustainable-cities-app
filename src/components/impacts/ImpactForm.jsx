@@ -24,10 +24,11 @@ class ImpactForm extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.values && nextProps.values.categories) {
+      const { parent, children } = nextProps.values.categories;
       this.setState({
         categories: {
-          parent: nextProps.values.categories.parent,
-          children: nextProps.values.categories.children
+          parent,
+          children
         }
       });
     }
@@ -36,11 +37,12 @@ class ImpactForm extends React.Component {
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
+    const { parent, children } = this.state.categories;
     this.props.onSubmit && this.props.onSubmit({
       ...this.form,
       ...{ categories: {
-        parent: this.state.categories.parent,
-        children: this.state.categories.children
+        parent,
+        children
       } }
     });
   }
