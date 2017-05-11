@@ -1,4 +1,4 @@
-import { get, _delete } from 'utils/request';
+import { get, post, patch, _delete } from 'utils/request';
 import { deserialize } from 'utils/json-api';
 import * as queryString from 'query-string';
 
@@ -6,6 +6,7 @@ import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/ta
 
 const SET_CATEGORIES = 'SET_CATEGORIES';
 const SET_CATEGORIES_FILTER = 'SET_CATEGORIES_FILTER';
+const SET_CATEGORIES_DETAIL = 'SET_CATEGORIES_DETAIL';
 const SET_CATEGORIES_SEARCH = 'SET_CATEGORIES_SEARCH';
 const SET_CATEGORIES_LOADING = 'SET_CATEGORIES_LOADING';
 
@@ -13,6 +14,7 @@ const SET_CATEGORIES_LOADING = 'SET_CATEGORIES_LOADING';
 const initialState = {
   loading: false,
   filters: {},
+  detailId: null,
   pagination: {
     pageSize: DEFAULT_PAGINATION_SIZE,
     pageNumber: DEFAULT_PAGINATION_NUMBER
@@ -40,6 +42,12 @@ function categoriesReducer(state = initialState, action) {
       return {
         ...state,
         ...action.payload
+      };
+    }
+    case SET_CATEGORIES_DETAIL: {
+      return {
+        ...state,
+        detailId: action.payload
       };
     }
     case SET_CATEGORIES_SEARCH: {
@@ -81,6 +89,13 @@ function setFilters(field, value) {
   };
 }
 
+function setCategoryDetail(id) {
+  return {
+    type: SET_CATEGORIES_DETAIL,
+    payload: id
+  };
+}
+
 function setCategoriesSearch(term) {
   return {
     type: SET_CATEGORIES_SEARCH,
@@ -96,8 +111,28 @@ function setCategoriesLoading(loading) {
 }
 
 /* Redux-thunk async actions */
-function getCategories({ type, tree, pageSize, pageNumber, sort, search }) {
+function createCategory({ data, onSuccess }) {
+  return (dispatch) => {
+    dispatch(setCategoriesLoading(true));
+    post({
+      url: `${config.API_URL}/categories`,
+      body: {
+        category: data
+      },
+      headers: {
+        Authorization: `Bearer ${localStorage.token}`
+      },
+      onSuccess() {
+        dispatch(setCategoriesLoading(false));
+        onSuccess && onSuccess();
+      }
+    });
+  };
+}
+
+function getCategories({ type, id, tree, pageSize, pageNumber, sort, search }) {
   const endPoints = {
+    detail: 'categories/',
     all: 'categories?',
     bme: 'business-model-element-categories?',
     enablings: 'enabling-categories?',
@@ -107,18 +142,24 @@ function getCategories({ type, tree, pageSize, pageNumber, sort, search }) {
   };
 
   const endPoint = tree ? `categories-tree?type=${type}` : endPoints[type];
-  const queryS = queryString.stringify({
+  const queryS = id || `&${queryString.stringify({
     'page[size]': pageSize || DEFAULT_PAGINATION_SIZE,
     'page[number]': pageNumber || DEFAULT_PAGINATION_NUMBER,
     sort,
     search
-  });
+  })}`;
+
 
   return (dispatch) => {
     dispatch(setCategoriesLoading(true));
     get({
-      url: `${config.API_URL}/${endPoint}&${queryS}`,
+      url: `${config.API_URL}/${endPoint}${queryS}`,
       onSuccess({ data, meta }) {
+        // Parse data to json api format
+        if (!Array.isArray(data)) {
+          data = [data];
+        }
+
         const categoryData = {
           list: deserialize(data),
           itemCount: meta.total_items
@@ -126,6 +167,22 @@ function getCategories({ type, tree, pageSize, pageNumber, sort, search }) {
 
         dispatch(setCategoriesLoading(false));
         dispatch(setCategories(categoryData, type.toLowerCase()));
+      }
+    });
+  };
+}
+
+function updateCategory({ id, data, onSuccess }) {
+  return (dispatch) => {
+    dispatch(setCategoriesLoading(true));
+    patch({
+      url: `${config.API_URL}/categories/${id}`,
+      body: {
+        category: data
+      },
+      onSuccess() {
+        dispatch(setCategoriesLoading(false));
+        onSuccess && onSuccess(id);
       }
     });
   };
@@ -144,4 +201,4 @@ function deleteCategory({ id, onSuccess }) {
   };
 }
 
-export { categoriesReducer, deleteCategory, getCategories, setCategoriesSearch, setFilters };
+export { categoriesReducer, createCategory, deleteCategory, getCategories, setCategoryDetail, setCategoriesSearch, setFilters, updateCategory };

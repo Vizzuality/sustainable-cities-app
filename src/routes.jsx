@@ -22,6 +22,8 @@ import NewStudyCasePage from 'components/pages/StudyCase/NewStudyCasePage';
 import EditStudyCasePage from 'components/pages/StudyCase/EditStudyCasePage';
 //    - Category
 import CategoryPage from 'components/pages/Category/CategoryPage';
+import NewCategoryPage from 'components/pages/Category/NewCategoryPage';
+import EditCategoryPage from 'components/pages/Category/EditCategoryPage';
 //    - Impact
 import ImpactPage from 'components/pages/Impact/ImpactPage';
 import NewImpactPage from 'components/pages/Impact/NewImpactPage';
@@ -36,7 +38,8 @@ import {
   onEnterEditBmePage,
   onEnterEditEnablingPage,
   onEnterEditImpactPage,
-  onEnterEditStudyCase
+  onEnterEditStudyCase,
+  onEnterEditCategoryPage
 } from 'modules/url';
 
 const Routes = ({ history }) => (
@@ -65,6 +68,12 @@ const Routes = ({ history }) => (
       </Route>
       <Route path="category">
         <IndexRoute components={{ main: CategoryPage, nav: Sidebar }} />
+        <Route path="new" components={{ main: NewCategoryPage, nav: Sidebar }} />
+        <Route
+          path="edit/:id"
+          components={{ main: EditCategoryPage, nav: Sidebar }}
+          onEnter={onEnterEditCategoryPage}
+        />
       </Route>
       <Route path="impact">
         <IndexRoute components={{ main: ImpactPage, nav: Sidebar }} />
