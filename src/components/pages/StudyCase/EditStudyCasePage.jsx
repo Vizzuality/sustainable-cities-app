@@ -49,9 +49,15 @@ class EditStudyCasePage extends React.Component {
   @Autobind
   submit(evt) {
     evt.preventDefault();
+
+    const { cities } = this.state;
+
     dispatch(updateStudyCase({
       id: this.props.studyCaseDetail.id,
-      data: this.form,
+      data: {
+        ...this.form,
+        city_ids: cities.map(c => c.value)
+      },
       onSuccess() {
         toastr.success('The study case has been edited');
       }
@@ -79,6 +85,7 @@ class EditStudyCasePage extends React.Component {
             name="city_ids"
             label="Cities"
             value={this.state.cities}
+            onChange={items => this.setState({ cities: items })}
           />
           <Textarea name="solution" value={solution} label="Solution" validations={[]} onChange={this.onInputChange} />
           <Textarea name="situation" value={situation} label="situation" validations={[]} onChange={this.onInputChange} />
