@@ -16,6 +16,7 @@ import PropTypes from 'prop-types';
 import CitySearch from 'components/cities/CitySearch';
 import ImpactForm from 'components/impacts/ImpactForm';
 import { toggleModal } from 'modules/modal';
+import debounce from 'lodash/debounce';
 
 /* Utils */
 function toBase64(file, cb) {
@@ -33,14 +34,16 @@ class NewStudyCasePage extends React.Component {
     this.state = {
       category_id: null,
       city_ids: [],
-      comments: [],
+      bmes: [],
       photos_attributes: [],
       documents_attributes: [],
-      impact_attributes: []
+      impacts_attributes: []
     };
     this.form = {
       project_type: 'StudyCase'
     };
+
+    this.editBme = debounce(this.editBme, 300);
   }
 
   /* Lifecycle */
@@ -52,7 +55,7 @@ class NewStudyCasePage extends React.Component {
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
-    const { city_ids, photos_attributes, documents_attributes, category_id, impact_attributes } = this.state;
+    const { city_ids, photos_attributes, documents_attributes, category_id, impacts_attributes } = this.state;
 
     dispatch(createStudyCase({
       data: {
@@ -60,7 +63,7 @@ class NewStudyCasePage extends React.Component {
         category_id,
         photos_attributes,
         documents_attributes,
-        impact_attributes,
+        impacts_attributes,
         city_ids: city_ids.map(c => c.value)
       },
       onSuccess() {
@@ -73,13 +76,6 @@ class NewStudyCasePage extends React.Component {
   @Autobind
   onInputChange(evt) {
     this.form[evt.target.name] = evt.target.value;
-  }
-
-  @Autobind
-  onBmeAdd(comment) {
-    const comments = this.state.comments.slice();
-    comments.push(comment);
-    this.setState({ comments });
   }
 
   @Autobind
@@ -151,7 +147,7 @@ class NewStudyCasePage extends React.Component {
     let action = this.onImpactCreate;
 
     if (opts.edit) {
-      values = this.state.impact_attributes[opts.index];
+      values = this.state.impacts_attributes[opts.index];
       action = this.onImpactEdit;
     }
 
@@ -161,27 +157,45 @@ class NewStudyCasePage extends React.Component {
   @Autobind
   onImpactCreate(form) {
     this.setState({
-      impact_attributes: [...this.state.impact_attributes, form]
+      impacts_attributes: [...this.state.impacts_attributes, form]
     });
     dispatch(toggleModal(false));
   }
 
   @Autobind
   onImpactEdit(form, index) {
-    const impact_attributes = this.state.impact_attributes.slice();
-    impact_attributes[index] = {
-      ...impact_attributes[index],
+    const impacts_attributes = this.state.impacts_attributes.slice();
+    impacts_attributes[index] = {
+      ...impacts_attributes[index],
       ...form
     };
-    this.setState({ impact_attributes });
+    this.setState({ impacts_attributes });
     dispatch(toggleModal(false));
   }
 
   @Autobind
   deleteImpact(index) {
-    const { impact_attributes } = this.state;
-    impact_attributes.splice(index, 1);
-    this.setState({ impact_attributes });
+    const { impacts_attributes } = this.state;
+    impacts_attributes.splice(index, 1);
+    this.setState({ impacts_attributes });
+  }
+
+  @Autobind
+  addBme(bme) {
+    const bmes = [
+      ...this.state.bmes,
+      bme
+    ];
+    this.setState({ bmes });
+  }
+
+  editBme(data, index) {
+    const bmes = this.state.bmes.slice();
+    bmes[index] = [
+      ...bmes[index],
+      ...data
+    ];
+    this.setState({ bmes });
   }
 
   /* Render */
@@ -213,12 +227,12 @@ class NewStudyCasePage extends React.Component {
         />
         <Textarea validations={[]} onChange={this.onInputChange} label="Solution" name="solution" />
         <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
-        {/* <Creator title="BMEs" items={this.state.comments} onAdd={this.onBmeAdd} /> */}
+        <Creator title="BMEs" options={[{ label: 'One', value: 1 }, { label: 'Two', value: 2 }]} items={this.state.bmes} onAdd={this.addBme} onEdit={(...args) => this.editBme(...args)} />
         {/* Impacts */}
         <div>
           <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
           <ul>
-            {this.state.impact_attributes.map((impact, i) => {
+            {this.state.impacts_attributes.map((impact, i) => {
               return (
                 <li key={i}>
                   <span onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>{impact.name}</span>
