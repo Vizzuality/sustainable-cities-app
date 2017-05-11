@@ -99,6 +99,8 @@ class NewStudyCasePage extends React.Component {
         if (i === (acceptedImgs.length - 1)) {
           let photos_attributes = this.state.photos_attributes.slice();
           photos_attributes = [...photos_attributes, ...parsedPhotos];
+
+          console.log(photos_attributes);
           this.setState({ photos_attributes });
         }
       });

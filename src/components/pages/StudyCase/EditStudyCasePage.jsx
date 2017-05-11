@@ -11,9 +11,21 @@ import { Link } from 'react-router';
 import { Autobind } from 'es-decorators';
 import { toastr } from 'react-redux-toastr';
 import CitySearch from 'components/cities/CitySearch';
+
 import { toggleModal } from 'modules/modal';
 import Confirm from 'components/confirm/Confirm';
 import { push } from 'react-router-redux';
+
+import DropZone from 'components/dropzone/DropZone';
+
+function toBase64(file, cb) {
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    cb && cb(event.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
 
 class EditStudyCasePage extends React.Component {
 
@@ -27,7 +39,9 @@ class EditStudyCasePage extends React.Component {
 
     this.state = {
       category_id: null,
-      cities: []
+      cities: [],
+      documents_attributes: [],
+      photos_attributes: []
     };
   }
 
@@ -40,9 +54,12 @@ class EditStudyCasePage extends React.Component {
   componentWillReceiveProps(nextProps) {
     // Includes arrived! So, we can populate sub-entities
     if ((!this.props.studyCases.included || !this.props.studyCases.included.length) && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
+
       this.setState({
         category_id: nextProps.studyCaseDetail.category_id.toString(),
-        cities: nextProps.studyCases.included.filter(sc => sc.type === 'cities').map(c => ({ label: c.name, value: c.id }))
+        cities: nextProps.studyCases.included.filter(sc => sc.type === 'cities').map(c => ({ label: c.name, value: c.id })),
+        documents_attributes: this.setFiles(nextProps.studyCaseDetail, 'documents'),
+        photos_attributes: this.setFiles(nextProps.studyCaseDetail, 'photos')
       });
     }
   }
@@ -52,19 +69,118 @@ class EditStudyCasePage extends React.Component {
     this.form[evt.target.name] = evt.target.value;
   }
 
+  @Autobind
+  onImageDrop(acceptedImgs, rejectedImgs) {
+    const parsedPhotos = [];
+
+    rejectedImgs.forEach(file => toastr.error(`The image "${file.name}" hast not a valid extension`));
+
+    acceptedImgs.forEach((file, i) => {
+      toBase64(file, (parsedFile) => {
+        parsedPhotos.push({
+          name: file.name,
+          is_active: true,
+          attachment: parsedFile
+        });
+
+        if (i === (acceptedImgs.length - 1)) {
+          let photos_attributes = this.state.photos_attributes.slice();
+          photos_attributes = [...photos_attributes, ...parsedPhotos];
+
+          console.log(photos_attributes);
+          this.setState({ photos_attributes });
+        }
+      });
+    });
+  }
+
+  @Autobind
+  onFileDrop(acceptedFiles, rejectedFiles) {
+    const parsedFiles = [];
+
+    rejectedFiles.forEach(file => toastr.error(`The file "${file.name}" has not a valid extension`));
+
+    acceptedFiles.forEach((file, i) => {
+      toBase64(file, (parsedFile) => {
+        parsedFiles.push({
+          name: file.name,
+          is_active: true,
+          attachment: parsedFile
+        });
+
+        if (i === (acceptedFiles.length - 1)) {
+          let documents_attributes = this.state.documents_attributes.slice();
+          documents_attributes = [...documents_attributes, ...parsedFiles];
+          this.setState({ documents_attributes });
+        }
+      });
+    });
+  }
+
+  @Autobind
+  onDeleteImage(index) {
+    const photos_attributes = this.state.photos_attributes.slice();
+    const { id } = this.state.photos_attributes[index];
+    window.URL.revokeObjectURL(photos_attributes[index].attachment);
+    photos_attributes.splice(index, 1);
+    dispatch(updateStudyCase({
+      id: this.props.studyCaseDetail.id,
+      data: {
+        photos_attributes: { id: +id, destroy: true }
+      }
+    }));
+    this.setState({ photos_attributes });
+  }
+
+  @Autobind
+  onDeleteFile(index) {
+    const documents_attributes = this.state.documents_attributes.slice();
+    window.URL.revokeObjectURL(documents_attributes[index].attachment);
+    documents_attributes.splice(index, 1);
+    this.setState({ documents_attributes });
+  }
+
+  setFiles(studyCaseDetail, type) {
+    const filesMetadata = [];
+
+    const filesIds = studyCaseDetail.relationships[type].data.length ?
+      studyCaseDetail.relationships[type].data.map(f => f.id) : [];
+
+    // obtains raw metadata
+    filesIds.forEach((fid) => {
+      const file = studyCaseDetail.included.find(inc => inc.type === type && inc.id === fid);
+      file && filesMetadata.push(file);
+    });
+
+    // parses metadata
+    filesMetadata.forEach((fm, i) => {
+      filesMetadata[i] = {
+        attachment: `${config.API_URL}${fm.attachment.thumbnail.url}`,
+        is_active: fm.is_active,
+        name: fm.name,
+        id: fm.id
+      };
+    });
+
+    return filesMetadata;
+  }
+
   /* Methods */
   @Autobind
   submit(evt) {
     evt.preventDefault();
 
-    const { cities } = this.state;
+    const { category_id, cities, documents_attributes, photos_attributes } = this.state;
 
+    console.log('submit')
     dispatch(updateStudyCase({
       id: this.props.studyCaseDetail.id,
       data: {
         ...this.form,
-        category_id: this.state.category_id,
-        city_ids: cities.map(c => c.value)
+        category_id,
+        city_ids: cities.map(c => c.value),
+        documents_attributes,
+        photos_attributes
       },
       onSuccess() {
         toastr.success('The study case has been edited');
@@ -92,7 +208,7 @@ class EditStudyCasePage extends React.Component {
   /* Render */
   render() {
     // Study case initial values
-    const { studyCaseDetail, studyCases } = this.props;
+    const { studyCaseDetail } = this.props;
     const name = studyCaseDetail ? studyCaseDetail.name : '';
     const solution = studyCaseDetail ? studyCaseDetail.solution : '';
     const situation = studyCaseDetail ? studyCaseDetail.situation : '';
@@ -127,6 +243,27 @@ class EditStudyCasePage extends React.Component {
           />
           <Textarea name="solution" value={solution} label="Solution" validations={[]} onChange={this.onInputChange} />
           <Textarea name="situation" value={situation} label="situation" validations={[]} onChange={this.onInputChange} />
+          <div className="row expanded">
+            <div className="column small-6">
+              <DropZone
+                title="Images"
+                accept={'image/png, image/jpg, image/jpeg'}
+                files={this.state.photos_attributes}
+                onDrop={this.onImageDrop}
+                onDelete={this.onDeleteImage}
+                withImage
+              />
+            </div>
+            <div className="column small-6">
+              <DropZone
+                title="Files"
+                files={this.state.documents_attributes}
+                accept={'application/pdf, application/json, application/msword, application/excel'}
+                onDrop={this.onFileDrop}
+                onDelete={this.onDeleteFile}
+              />
+            </div>
+          </div>
         </Form>
       </div>
     );
