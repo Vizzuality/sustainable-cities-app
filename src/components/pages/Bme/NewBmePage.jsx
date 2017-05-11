@@ -75,7 +75,7 @@ class NewBmePage extends React.Component {
       category_ids: [
         ...this.state.timing,
         ...[this.state.categories.bme.nephew],
-        ...[this.state.categories.solution.nephew]
+        ...this.state.categories.solution.nephew
       ],
       enabling_ids: this.state.enablings
     };
@@ -275,6 +275,7 @@ class NewBmePage extends React.Component {
             <div className="small-4 columns">
               <Select
                 name="categories"
+                multi
                 value={this.state.categories.solution.nephew}
                 onChange={val => this.onCategoryChange('solution', 'nephew', val)}
                 label="Solution sub-category"

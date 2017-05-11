@@ -94,9 +94,12 @@ class EditBmePage extends React.Component {
 
     const data = {
       ...this.form,
-      category_ids: [...this.state.timing, ...[this.state.categories.bme.nephew]],
-      enabling_ids: this.state.enablings,
-      solution_id: [this.state.categories.solution.nephew]
+      category_ids: [
+        ...this.state.timing,
+        ...[this.state.categories.bme.nephew],
+        ...this.state.categories.solution.nephew
+      ],
+      enabling_ids: this.state.enablings
     };
 
     // Update BME
@@ -126,7 +129,7 @@ class EditBmePage extends React.Component {
         options = this.getFirstSelectOption(val, 'parent', group);
       }
       categories.children = val ? options.children : {};
-      categories.nephew = val ? options.nephew : {};
+      categories.nephew = val ? options.nephew : [];
     }
 
     if (level === 'children') {
@@ -134,7 +137,7 @@ class EditBmePage extends React.Component {
       if (val) {
         options = this.getFirstSelectOption(val, 'children', group);
       }
-      categories.nephew = val ? options.nephew : {};
+      categories.nephew = val ? options.nephew : [];
     }
 
     const newState = {
@@ -169,7 +172,7 @@ class EditBmePage extends React.Component {
 
     if (source === 'children') {
       // populates nephew selector based on children selection
-      const parentId = this.state.categories.parent;
+      const parentId = this.state.categories[categoryGroupId].parent;
       const parentCategory = this.categoryGroups[categoryGroupId].find(cat => cat.id === parentId);
       const childrenCategory = parentCategory.children.find(child => child.id === value);
       if (childrenCategory.children && childrenCategory.children.length) {
@@ -210,7 +213,7 @@ class EditBmePage extends React.Component {
           nephewCategory = bmesDetail.categories.filter(cat => cat.category_type === 'Bme')[0];
           break;
         case 'solution':
-          nephewCategory = bmesDetail.categories.filter(cat => cat.category_type === 'Solution')[0];
+          nephewCategory = bmesDetail.categories.filter(cat => cat.category_type === 'Solution');
           break;
         default:
           break;
@@ -225,20 +228,33 @@ class EditBmePage extends React.Component {
         return;
       }
 
-      const childrenCategoryId = nephewCategory ? nephewCategory.relationships.parent.data.id : {};
+      let parentCategory = null;
+      let childrenCategoryId = null;
 
-      const parentCategory = childrenCategoryId ? this.categoryGroups[key].find((cat) => {
-        return cat.children.find(c => c.id === childrenCategoryId);
-      }) : {};
+      // if it has multiple answers...
+      if (Array.isArray(nephewCategory)) {
+        if (nephewCategory && nephewCategory.length) {
+          childrenCategoryId = nephewCategory.map(cat => cat.relationships.parent.data.id);
 
+          parentCategory = childrenCategoryId ? this.categoryGroups[key].find((cat) => {
+            return cat.children.find(c => c.id === childrenCategoryId[0]);
+          }) : {};
+        }
+      } else {
+        childrenCategoryId = nephewCategory ? nephewCategory.relationships.parent.data.id : {};
+
+        parentCategory = childrenCategoryId ? this.categoryGroups[key].find((cat) => {
+          return cat.children.find(c => c.id === childrenCategoryId);
+        }) : {};
+      }
 
       newState = {
         ...newState,
         ...newState.categories,
         ...{ [key]: {
           parent: parentCategory ? parentCategory.id : null,
-          children: childrenCategoryId,
-          nephew: nephewCategory.id
+          children: Array.isArray(childrenCategoryId) ? childrenCategoryId[0] : childrenCategoryId,
+          nephew: Array.isArray(nephewCategory) ? nephewCategory.map(cat => cat.id) : nephewCategory.id
         } }
       };
     });
@@ -370,8 +386,9 @@ class EditBmePage extends React.Component {
             <div className="small-4 columns">
               <Select
                 name="categories"
+                multi
                 value={this.state.categories.solution.nephew}
-                onChange={val => this.onCategoryChange('solution', 'nephew', val)}
+                onChange={val => this.onCategoryChange('solution', 'nephew', val, true)}
                 label="Solution sub-category"
                 options={solutionSelectOptions.nephew}
               />
