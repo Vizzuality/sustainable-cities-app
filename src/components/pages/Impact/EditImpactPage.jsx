@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { dispatch } from 'main';
 import { getImpacts, updateImpact } from 'modules/impacts';
-import { getCategories } from 'modules/categories';
+import { getCategories, resetCategoryByType } from 'modules/categories';
 import getImpactDetail from 'selectors/impactDetail';
 import { Input, Button, Form, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
@@ -25,12 +25,10 @@ class EditImpactPage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.impactCategories.length || dispatch(getCategories({ type: 'Impact', tree: true, pageSize: 9999 }));
+    dispatch(getCategories({ type: 'Impact', tree: true, pageSize: 9999 }));
 
     if (!this.props.impactDetail) {
       dispatch(getImpacts({ id: this.props.impacts.detailId }));
-    } else {
-      this.setCategories(this.props);
     }
   }
 
@@ -83,6 +81,7 @@ class EditImpactPage extends React.Component {
 
   setCategories({ impactDetail, impactCategories }) {
     const childrenCategoryId = impactDetail.category;
+
 
     if (!childrenCategoryId) return;
 
