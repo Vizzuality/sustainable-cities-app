@@ -155,7 +155,7 @@ class NewStudyCasePage extends React.Component {
       action = this.onImpactEdit;
     }
 
-    dispatch(toggleModal(true, <ImpactForm text="Add" values={values} onSubmit={action} />));
+    dispatch(toggleModal(true, <ImpactForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />));
   }
 
   @Autobind
@@ -167,8 +167,14 @@ class NewStudyCasePage extends React.Component {
   }
 
   @Autobind
-  onImpactEdit(form) {
-    console.log(form);
+  onImpactEdit(form, index) {
+    const impact_attributes = this.state.impact_attributes.slice();
+    impact_attributes[index] = {
+      ...impact_attributes[index],
+      ...form
+    };
+    this.setState({ impact_attributes });
+    dispatch(toggleModal(false));
   }
 
   @Autobind
@@ -208,14 +214,14 @@ class NewStudyCasePage extends React.Component {
         <Textarea validations={[]} onChange={this.onInputChange} label="Solution" name="solution" />
         <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
         {/* <Creator title="BMEs" items={this.state.comments} onAdd={this.onBmeAdd} /> */}
-        {/* Study cases */}
+        {/* Impacts */}
         <div>
           <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
           <ul>
             {this.state.impact_attributes.map((impact, i) => {
               return (
-                <li key={i} onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>
-                  <span>{impact.name}</span>
+                <li key={i}>
+                  <span onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>{impact.name}</span>
                   <button className="button" onClick={() => this.deleteImpact(i)}>Delete</button>
                 </li>
               );
