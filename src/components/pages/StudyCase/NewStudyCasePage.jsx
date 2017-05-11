@@ -57,7 +57,7 @@ class NewStudyCasePage extends React.Component {
         category_id,
         photos_attributes,
         documents_attributes,
-        city_ids: city_ids.map(c => c.id)
+        city_ids: city_ids.map(c => c.value)
       },
       onSuccess() {
         dispatch(push('/study-cases'));

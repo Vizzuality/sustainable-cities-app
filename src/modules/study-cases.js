@@ -28,13 +28,10 @@ const initialState = {
 /* Reducer */
 function studyCasesReducer(state = initialState, action) {
   switch (action.type) {
-    case SET_STUDY_CASES:
-      return {
-        ...state,
-        list: action.payload.list,
-        included: action.payload.included,
-        itemCount: action.payload.itemCount
-      };
+    case SET_STUDY_CASES: {
+      const { list, included, itemCount } = action.payload;
+      return { ...state, list, included, itemCount };
+    }
     case CONCAT_STUDY_CASES:
       return {
         ...state,
@@ -63,18 +60,16 @@ function studyCasesReducer(state = initialState, action) {
 
 /* Action creators */
 function setStudyCases(data) {
-  const { list, itemCount } = data;
   return {
     type: SET_STUDY_CASES,
-    payload: { list, itemCount }
+    payload: data
   };
 }
 
 function concatStudyCases(data) {
-  const { list, itemCount } = data;
   return {
     type: CONCAT_STUDY_CASES,
-    payload: { list, itemCount }
+    payload: data
   };
 }
 
@@ -138,7 +133,7 @@ function getStudyCases(paramsConfig = {}) {
         };
 
         if (included) {
-          studyCasesData.included = included.map(incl => deserialize([incl])[0]);
+          studyCasesData.included = deserialize(included);
         }
 
         const action = concat ? concatStudyCases : setStudyCases;

@@ -16,14 +16,28 @@ class EditStudyCasePage extends React.Component {
   /* Constructor */
   constructor(props) {
     super(props);
+
     this.form = {
       project_type: 'StudyCase'
     };
+
+    this.state = {
+      cities: []
+    };
+  }
+
+  componentWillMount() {
+    dispatch(getStudyCases({ id: this.props.studyCases.detailId }));
   }
 
   /* Component lifecycle */
-  componentWillMount() {
-    this.props.studyCaseDetail || dispatch(getStudyCases({ id: this.props.studyCases.detailId }));
+  componentWillReceiveProps(nextProps) {
+    // Includes arrived! So, we can populate sub-entities
+    if ((!this.props.studyCases.included || !this.props.studyCases.included.length) && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
+      this.setState({
+        cities: nextProps.studyCases.included.filter(sc => sc.type === 'cities').map(c => ({ label: c.name, value: c.id }))
+      });
+    }
   }
 
   @Autobind
@@ -47,12 +61,10 @@ class EditStudyCasePage extends React.Component {
   /* Render */
   render() {
     // Study case initial values
-    const { studyCaseDetail } = this.props;
+    const { studyCaseDetail, studyCases } = this.props;
     const name = studyCaseDetail ? studyCaseDetail.name : '';
     const solution = studyCaseDetail ? studyCaseDetail.solution : '';
     const situation = studyCaseDetail ? studyCaseDetail.situation : '';
-
-    console.log(studyCaseDetail);
 
     return (
       <div>
@@ -66,6 +78,7 @@ class EditStudyCasePage extends React.Component {
             multi
             name="city_ids"
             label="Cities"
+            value={this.state.cities}
           />
           <Textarea name="solution" value={solution} label="Solution" validations={[]} onChange={this.onInputChange} />
           <Textarea name="situation" value={situation} label="situation" validations={[]} onChange={this.onInputChange} />
