@@ -6,6 +6,7 @@ import { Autobind } from 'es-decorators';
 import { validation } from 'utils/validation';
 import { createStudyCase } from 'modules/study-cases';
 import { getCategories } from 'modules/categories';
+import { getBmes } from 'modules/bmes';
 import { dispatch } from 'main';
 import { connect } from 'react-redux';
 import { toastr } from 'react-redux-toastr';
@@ -14,6 +15,9 @@ import Creator from 'components/creator/Creator';
 import DropZone from 'components/dropzone/DropZone';
 import PropTypes from 'prop-types';
 import CitySearch from 'components/cities/CitySearch';
+import ImpactForm from 'components/impacts/ImpactForm';
+import { toggleModal } from 'modules/modal';
+import debounce from 'lodash/debounce';
 
 /* Utils */
 function toBase64(file, cb) {
@@ -31,25 +35,32 @@ class NewStudyCasePage extends React.Component {
     this.state = {
       category_id: null,
       city_ids: [],
-      comments: [],
+      bmes: [],
       photos_attributes: [],
-      documents_attributes: []
+      documents_attributes: [],
+      impacts_attributes: []
     };
     this.form = {
       project_type: 'StudyCase'
     };
+
+    this.editBme = debounce(this.editBme, 300);
   }
 
   /* Lifecycle */
   componentWillMount() {
     this.props.categories.solution.length || dispatch(getCategories({ type: 'solution' }));
+    dispatch(getBmes({
+      pageSize: 9999,
+      pageNumber: 1
+    }));
   }
 
   /* Event handlers */
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
-    const { city_ids, photos_attributes, documents_attributes, category_id } = this.state;
+    const { city_ids, photos_attributes, documents_attributes, category_id, impacts_attributes } = this.state;
 
     dispatch(createStudyCase({
       data: {
@@ -57,6 +68,7 @@ class NewStudyCasePage extends React.Component {
         category_id,
         photos_attributes,
         documents_attributes,
+        impacts_attributes,
         city_ids: city_ids.map(c => c.value)
       },
       onSuccess() {
@@ -69,13 +81,6 @@ class NewStudyCasePage extends React.Component {
   @Autobind
   onInputChange(evt) {
     this.form[evt.target.name] = evt.target.value;
-  }
-
-  @Autobind
-  onBmeAdd(comment) {
-    const comments = this.state.comments.slice();
-    comments.push(comment);
-    this.setState({ comments });
   }
 
   @Autobind
@@ -140,6 +145,64 @@ class NewStudyCasePage extends React.Component {
     this.setState({ documents_attributes });
   }
 
+  @Autobind
+  showImpactForm(evt, opts) {
+    evt.preventDefault();
+    let values = {};
+    let action = this.onImpactCreate;
+
+    if (opts.edit) {
+      values = this.state.impacts_attributes[opts.index];
+      action = this.onImpactEdit;
+    }
+
+    dispatch(toggleModal(true, <ImpactForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />));
+  }
+
+  @Autobind
+  onImpactCreate(form) {
+    this.setState({
+      impacts_attributes: [...this.state.impacts_attributes, form]
+    });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  onImpactEdit(form, index) {
+    const impacts_attributes = this.state.impacts_attributes.slice();
+    impacts_attributes[index] = {
+      ...impacts_attributes[index],
+      ...form
+    };
+    this.setState({ impacts_attributes });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  deleteImpact(index) {
+    const { impacts_attributes } = this.state;
+    impacts_attributes.splice(index, 1);
+    this.setState({ impacts_attributes });
+  }
+
+  @Autobind
+  addBme(bme) {
+    const bmes = [
+      ...this.state.bmes,
+      bme
+    ];
+    this.setState({ bmes });
+  }
+
+  editBme(data, index) {
+    const bmes = this.state.bmes.slice();
+    bmes[index] = [
+      ...bmes[index],
+      ...data
+    ];
+    this.setState({ bmes });
+  }
+
   /* Render */
   render() {
     return (
@@ -169,7 +232,21 @@ class NewStudyCasePage extends React.Component {
         />
         <Textarea validations={[]} onChange={this.onInputChange} label="Solution" name="solution" />
         <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
-        <Creator title="BMEs" items={this.state.comments} onAdd={this.onBmeAdd} />
+        <Creator title="BMEs" options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))} items={this.state.bmes} onAdd={this.addBme} onEdit={(...args) => this.editBme(...args)} />
+        {/* Impacts */}
+        <div>
+          <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
+          <ul>
+            {this.state.impacts_attributes.map((impact, i) => {
+              return (
+                <li key={i}>
+                  <span onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>{impact.name}</span>
+                  <button className="button" onClick={() => this.deleteImpact(i)}>Delete</button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
         <div className="row expanded">
           <div className="column small-6">
             <DropZone
@@ -197,11 +274,16 @@ class NewStudyCasePage extends React.Component {
 }
 
 // Map state to props
-const mapStateToProps = ({ categories }) => ({
+const mapStateToProps = ({ categories, bmes }) => ({
   categories: {
     solution: categories.solution
-  }
+  },
+  bmes: bmes.list
 });
+
+NewStudyCasePage.defaultProps = {
+  bmes: []
+};
 
 // NewStudyCasePage.propTypes = {
 //   categories: PropTypes.array
