@@ -14,6 +14,8 @@ import Creator from 'components/creator/Creator';
 import DropZone from 'components/dropzone/DropZone';
 import PropTypes from 'prop-types';
 import CitySearch from 'components/cities/CitySearch';
+import ImpactForm from 'components/impacts/ImpactForm';
+import { toggleModal } from 'modules/modal';
 
 /* Utils */
 function toBase64(file, cb) {
@@ -33,7 +35,8 @@ class NewStudyCasePage extends React.Component {
       city_ids: [],
       comments: [],
       photos_attributes: [],
-      documents_attributes: []
+      documents_attributes: [],
+      impact_attributes: []
     };
     this.form = {
       project_type: 'StudyCase'
@@ -49,7 +52,7 @@ class NewStudyCasePage extends React.Component {
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
-    const { city_ids, photos_attributes, documents_attributes, category_id } = this.state;
+    const { city_ids, photos_attributes, documents_attributes, category_id, impact_attributes } = this.state;
 
     dispatch(createStudyCase({
       data: {
@@ -57,6 +60,7 @@ class NewStudyCasePage extends React.Component {
         category_id,
         photos_attributes,
         documents_attributes,
+        impact_attributes,
         city_ids: city_ids.map(c => c.value)
       },
       onSuccess() {
@@ -140,6 +144,40 @@ class NewStudyCasePage extends React.Component {
     this.setState({ documents_attributes });
   }
 
+  @Autobind
+  showImpactForm(evt, opts) {
+    evt.preventDefault();
+    let values = {};
+    let action = this.onImpactCreate;
+
+    if (opts.edit) {
+      values = this.state.impact_attributes[opts.index];
+      action = this.onImpactEdit;
+    }
+
+    dispatch(toggleModal(true, <ImpactForm text="Add" values={values} onSubmit={action} />));
+  }
+
+  @Autobind
+  onImpactCreate(form) {
+    this.setState({
+      impact_attributes: [...this.state.impact_attributes, form]
+    });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  onImpactEdit(form) {
+    console.log(form);
+  }
+
+  @Autobind
+  deleteImpact(index) {
+    const { impact_attributes } = this.state;
+    impact_attributes.splice(index, 1);
+    this.setState({ impact_attributes });
+  }
+
   /* Render */
   render() {
     return (
@@ -169,7 +207,21 @@ class NewStudyCasePage extends React.Component {
         />
         <Textarea validations={[]} onChange={this.onInputChange} label="Solution" name="solution" />
         <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
-        <Creator title="BMEs" items={this.state.comments} onAdd={this.onBmeAdd} />
+        {/* <Creator title="BMEs" items={this.state.comments} onAdd={this.onBmeAdd} /> */}
+        {/* Study cases */}
+        <div>
+          <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
+          <ul>
+            {this.state.impact_attributes.map((impact, i) => {
+              return (
+                <li key={i} onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>
+                  <span>{impact.name}</span>
+                  <button className="button" onClick={() => this.deleteImpact(i)}>Delete</button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
         <div className="row expanded">
           <div className="column small-6">
             <DropZone
