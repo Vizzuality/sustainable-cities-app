@@ -15,5 +15,3 @@
 # ENV variables
 .env
 
-# Compiled assets
-/dist
