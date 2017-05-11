@@ -2,25 +2,28 @@ import React from 'react';
 import CreatorItem from 'components/creator/CreatorItem';
 import PropTypes from 'prop-types';
 
-export default function Creator({ title, items, onAdd }) {
+export default class Creator extends React.Component {
 
-  function _onAdd(evt) {
-    evt.preventDefault();
-    onAdd && onAdd(1);
+  render() {
+    const { title, items, onAdd, onEdit, options } = this.props;
+    return (
+      <section className="c-creator">
+        <h1 className="creator-title">{title}</h1>
+        <div className="row expanded">
+          <div className="column small-6">Bme</div>
+          <div className="column small-6">Description</div>
+        </div>
+        {items.map((item, i) => <CreatorItem key={i} index={i} onEdit={onEdit} options={options} selected={item.id} description={item.description} />)}
+        <CreatorItem options={options} onAdd={(...args) => onAdd(...args)} />
+      </section>
+    );
   }
-
-  return (
-    <section className="c-creator">
-      <h1 className="creator-title">{title}</h1>
-      <CreatorItem />
-      {items.map((item, index) => <CreatorItem key={index} />)}
-      <button onClick={_onAdd} className="button">Add new</button>
-    </section>
-  );
 }
 
 Creator.propTypes = {
   title: PropTypes.string,
   items: PropTypes.array,
-  onAdd: PropTypes.func
+  onAdd: PropTypes.func,
+  onEdit: PropTypes.func,
+  options: PropTypes.array
 };
