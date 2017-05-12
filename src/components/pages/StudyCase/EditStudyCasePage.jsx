@@ -3,8 +3,10 @@ import { connect } from 'react-redux';
 import getStudyCaseDetail from 'selectors/studyCaseDetail';
 import { dispatch } from 'main';
 import { getStudyCases, updateStudyCase, deleteStudyCase } from 'modules/study-cases';
+import { getCategories } from 'modules/categories';
+import { getBmes } from 'modules/bmes';
 import PropTypes from 'prop-types';
-import { Form, Button, Input, Textarea } from 'components/form/Form';
+import { Form, Select, Button, Input, Textarea } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import { Link } from 'react-router';
 import { Autobind } from 'es-decorators';
@@ -13,6 +15,8 @@ import CitySearch from 'components/cities/CitySearch';
 import { toggleModal } from 'modules/modal';
 import Confirm from 'components/confirm/Confirm';
 import { push } from 'react-router-redux';
+import Creator from 'components/creator/Creator';
+import ImpactForm from 'components/impacts/ImpactForm';
 
 class EditStudyCasePage extends React.Component {
 
@@ -25,13 +29,20 @@ class EditStudyCasePage extends React.Component {
     };
 
     this.state = {
+      category_id: null,
       cities: [],
-      bmes: []
+      bmes: [],
+      impacts_attributes: []
     };
   }
 
   componentWillMount() {
     dispatch(getStudyCases({ id: this.props.studyCases.detailId }));
+    dispatch(getCategories({ type: 'solution' }));
+    dispatch(getBmes({
+      pageSize: 9999,
+      pageNumber: 1
+    }));
   }
 
   /* Component lifecycle */
@@ -39,8 +50,15 @@ class EditStudyCasePage extends React.Component {
     // Includes arrived! So, we can populate sub-entities
     if ((!this.props.studyCases.included || !this.props.studyCases.included.length) && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
       this.setState({
-        cities: nextProps.studyCases.included.filter(sc => sc.type === 'cities').map(c => ({ label: c.name, value: c.id }))
+        cities: nextProps.studyCases.included.filter(sc => sc.type === 'cities').map(city => ({ label: city.name, value: city.id })),
+        bmes: nextProps.studyCases.included.filter(sc => sc.type === 'project_bmes').map(bme => ({ id: bme.relationships.bme.data.id, description: bme.description })),
+        impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts')
       });
+    }
+
+    if (this.props.studyCaseDetail !== nextProps.studyCaseDetail) {
+      const category_id = nextProps.studyCaseDetail.category_id + '';
+      this.setState({ category_id });
     }
   }
 
@@ -54,13 +72,15 @@ class EditStudyCasePage extends React.Component {
   submit(evt) {
     evt.preventDefault();
 
-    const { cities } = this.state;
+    const { cities, category_id, impacts_attributes } = this.state;
 
     dispatch(updateStudyCase({
       id: this.props.studyCaseDetail.id,
       data: {
         ...this.form,
-        city_ids: cities.map(c => c.value)
+        city_ids: cities.map(c => c.value),
+        category_id,
+        impacts_attributes
       },
       onSuccess() {
         toastr.success('The study case has been edited');
@@ -83,6 +103,47 @@ class EditStudyCasePage extends React.Component {
         dispatch(push('/study-cases'));
       }
     }));
+  }
+
+  /* Impact methods */
+  @Autobind
+  showImpactForm(evt, opts) {
+    evt.preventDefault();
+    let values = {};
+    let action = this.onImpactCreate;
+
+    if (opts.edit) {
+      values = this.state.impacts_attributes[opts.index];
+      action = this.onImpactEdit;
+    }
+
+    dispatch(toggleModal(true, <ImpactForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />));
+  }
+
+  @Autobind
+  onImpactCreate(form) {
+    this.setState({
+      impacts_attributes: [...this.state.impacts_attributes, form]
+    });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  deleteImpact(index) {
+    const { impacts_attributes } = this.state;
+    impacts_attributes.splice(index, 1);
+    this.setState({ impacts_attributes });
+  }
+
+  @Autobind
+  onImpactEdit(form, index) {
+    const impacts_attributes = this.state.impacts_attributes.slice();
+    impacts_attributes[index] = {
+      ...impacts_attributes[index],
+      ...form
+    };
+    this.setState({ impacts_attributes });
+    dispatch(toggleModal(false));
   }
 
   /* Render */
@@ -109,8 +170,32 @@ class EditStudyCasePage extends React.Component {
             value={this.state.cities}
             onChange={items => this.setState({ cities: items })}
           />
+          <Select
+            name="category_id"
+            clearable={false}
+            label="Category"
+            validations={['required']}
+            value={this.state.category_id}
+            onChange={item => this.setState({ category_id: item.value })}
+            options={this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }))}
+          />
           <Textarea name="solution" value={solution} label="Solution" validations={[]} onChange={this.onInputChange} />
           <Textarea name="situation" value={situation} label="situation" validations={[]} onChange={this.onInputChange} />
+          {/* <Creator title="BMEs" options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))} items={this.state.bmes} /> */ }
+          {/* Impacts */}
+          {/* <div>
+            <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
+             <ul>
+              {this.state.impacts_attributes.map((impact, i) => {
+                return (
+                  <li key={i}>
+                    <span onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>{impact.name}</span>
+                    <button type="button" className="button" onClick={() => this.deleteImpact(i)}>Delete</button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div> */}
         </Form>
       </div>
     );
@@ -121,6 +206,8 @@ class EditStudyCasePage extends React.Component {
 EditStudyCasePage.propTypes = {
   // State
   studyCases: PropTypes.object,
+  bmes: PropTypes.array,
+  solutionCategories: PropTypes.array,
   // Reselect
   studyCaseDetail: PropTypes.object
 };
@@ -128,7 +215,9 @@ EditStudyCasePage.propTypes = {
 /* Map state to props */
 const mapStateToProps = state => ({
   studyCases: state.studyCases,
-  studyCaseDetail: getStudyCaseDetail(state)
+  studyCaseDetail: getStudyCaseDetail(state),
+  bmes: state.bmes.list,
+  solutionCategories: state.categories.solution
 });
 
 export default connect(mapStateToProps, null)(EditStudyCasePage);
