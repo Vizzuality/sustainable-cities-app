@@ -147,7 +147,7 @@ class NewStudyCasePage extends React.Component {
   }
 
   @Autobind
-  showImpactForm(evt, opts) {
+  showImpactForm(evt, opts = {}) {
     evt.preventDefault();
     let values = {};
     let action = this.onImpactCreate;
