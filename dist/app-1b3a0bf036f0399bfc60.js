@@ -33054,6 +33054,11 @@ var SolutionSelector = (_class = function (_React$Component) {
       var _this3 = this;
 
       var selectOptions = this.loadMultiSelectOptions();
+      var _state$categories2 = this.state.categories,
+          parent = _state$categories2.parent,
+          children = _state$categories2.children,
+          nephew = _state$categories2.nephew;
+
 
       return _react2.default.createElement(
         'div',
@@ -33066,7 +33071,7 @@ var SolutionSelector = (_class = function (_React$Component) {
             { className: 'small-4 columns' },
             _react2.default.createElement(_form.Select, {
               name: 'categories',
-              value: this.state.categories.parent,
+              value: parent,
               onChange: function onChange(val) {
                 return _this3.onCategoryChange('parent', val);
               },
@@ -33081,7 +33086,7 @@ var SolutionSelector = (_class = function (_React$Component) {
             { className: 'small-4 columns' },
             _react2.default.createElement(_form.Select, {
               name: 'categories',
-              value: this.state.categories.children,
+              value: children,
               onChange: function onChange(val) {
                 return _this3.onCategoryChange('children', val);
               },
@@ -33094,7 +33099,7 @@ var SolutionSelector = (_class = function (_React$Component) {
             { className: 'small-4 columns' },
             _react2.default.createElement(_form.Select, {
               name: 'categories',
-              value: this.state.categories.nephew,
+              value: nephew && nephew.id ? nephew.id : nephew,
               onChange: function onChange(val) {
                 return _this3.onCategoryChange('nephew', val);
               },
@@ -42227,8 +42232,6 @@ var _SolutionSelector2 = _interopRequireDefault(_SolutionSelector);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -42298,36 +42301,6 @@ var SolutionForm = (_class = function (_React$Component) {
         });
       }
     }
-  }, {
-    key: 'onCategoryChange',
-    value: function onCategoryChange(level, val) {
-      if (val) {
-        val = Array.isArray(val) ? val.map(function (i) {
-          return i.value;
-        }) : val.value;
-      }
-
-      var categories = _extends({}, this.state.categories, _defineProperty({}, level, val));
-
-      if (level === 'parent') {
-        var options = {};
-        if (val) {
-          options = this.getFirstSelectOption(val, 'parent');
-        }
-        categories.children = val ? options.children : {};
-        categories.nephew = val ? options.nephew : {};
-      }
-
-      if (level === 'children') {
-        var _options = {};
-        if (val) {
-          _options = this.getFirstSelectOption(val, 'children');
-        }
-        categories.nephew = val ? _options.nephew : {};
-      }
-
-      this.setState({ categories: categories });
-    }
 
     /* this is probably a temporary patch */
 
@@ -42370,48 +42343,6 @@ var SolutionForm = (_class = function (_React$Component) {
             name: nephewName
           }
         } }));
-    }
-  }, {
-    key: 'getFirstSelectOption',
-    value: function getFirstSelectOption(value, source) {
-      var options = {
-        children: {},
-        nephew: {}
-      };
-
-      if (source === 'parent') {
-        // populates children selector based on parent selection
-        var parentCategory = this.props.solutionCategories.find(function (cat) {
-          return cat.id === value;
-        });
-        if (parentCategory.children && parentCategory.children.length) {
-          options.children = parentCategory.children[0].id;
-        }
-
-        // populates nephew selector based on children selection
-        var childrenCategory = parentCategory.children.find(function (child) {
-          return child.id === options.children;
-        });
-        if (childrenCategory.children && childrenCategory.children.length) {
-          options.nephew = childrenCategory.children[0].id;
-        }
-      }
-
-      if (source === 'children') {
-        // populates nephew selector based on children selection
-        var parentId = this.state.categories.parent;
-        var _parentCategory = this.props.solutionCategories.find(function (cat) {
-          return cat.id === parentId;
-        });
-        var _childrenCategory = _parentCategory.children.find(function (child) {
-          return child.id === value;
-        });
-        if (_childrenCategory.children && _childrenCategory.children.length) {
-          options.nephew = _childrenCategory.children[0].id;
-        }
-      }
-
-      return options;
     }
   }, {
     key: 'loadMultiSelectOptions',
