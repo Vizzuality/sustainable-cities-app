@@ -6,6 +6,8 @@ git merge --no-ff develop
 
 echo "Rebuilding code..."
 rm -rf dist
+git add .
+git commit -m 'removing old version'
 yarn run build
 
 echo "Uploading..."
