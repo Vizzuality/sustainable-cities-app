@@ -41387,7 +41387,7 @@ var CreatorItem = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'small-6 column' },
-            _react2.default.createElement(_Form.Select, { value: selected, options: options, onChange: function onChange(item) {
+            _react2.default.createElement(_Form.Select, { value: selected, clearable: false, options: options, onChange: function onChange(item) {
                 return action({ id: item.value, description: _this2.input.value }, index);
               } })
           ),
@@ -41416,7 +41416,7 @@ CreatorItem.propTypes = {
   options: _propTypes2.default.array,
   onAdd: _propTypes2.default.func,
   onEdit: _propTypes2.default.func,
-  selected: _propTypes2.default.number,
+  selected: _propTypes2.default.string,
   index: _propTypes2.default.number,
   description: _propTypes2.default.string
 };
@@ -46173,7 +46173,8 @@ var EditStudyCasePage = (_class = function (_React$Component) {
     };
 
     _this.state = {
-      cities: []
+      cities: [],
+      bmes: []
     };
     return _this;
   }
@@ -46650,7 +46651,7 @@ var NewStudyCasePage = (_class = function (_React$Component) {
     key: 'editBme',
     value: function editBme(data, index) {
       var bmes = this.state.bmes.slice();
-      bmes[index] = [].concat(_toConsumableArray(bmes[index]), _toConsumableArray(data));
+      bmes[index] = _extends({}, bmes[index], data);
       this.setState({ bmes: bmes });
     }
 
