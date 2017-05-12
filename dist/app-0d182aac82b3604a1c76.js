@@ -43889,7 +43889,9 @@ var NewBmePage = (_class = function (_React$Component) {
     }
   }, {
     key: 'onAddSolution',
-    value: function onAddSolution(evt, opts) {
+    value: function onAddSolution(evt) {
+      var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
       evt.preventDefault();
       var values = {};
       var action = this.onCreateSolution;
