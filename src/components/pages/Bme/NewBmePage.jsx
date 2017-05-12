@@ -146,7 +146,7 @@ class NewBmePage extends React.Component {
   }
 
   @Autobind
-  onAddSolution(evt, opts) {
+  onAddSolution(evt, opts = {}) {
     evt.preventDefault();
     let values = {};
     let action = this.onCreateSolution;
