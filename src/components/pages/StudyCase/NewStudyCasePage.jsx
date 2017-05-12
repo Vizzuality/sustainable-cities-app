@@ -49,7 +49,7 @@ class NewStudyCasePage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.categories.solution.length || dispatch(getCategories({ type: 'solution' }));
+    dispatch(getCategories({ type: 'solution' }));
     dispatch(getBmes({
       pageSize: 9999,
       pageNumber: 1
@@ -69,6 +69,7 @@ class NewStudyCasePage extends React.Component {
         photos_attributes,
         documents_attributes,
         impacts_attributes,
+        project_bmes_attributes: this.state.bmes.map(bme => ({ bme_id: bme.id, description: bme.description })),
         city_ids: city_ids.map(c => c.value)
       },
       onSuccess() {
@@ -216,6 +217,7 @@ class NewStudyCasePage extends React.Component {
         <Input type="text" value="" name="name" onChange={this.onInputChange} label="Study case title" validations={['required']} />
         <Select
           name="category_id"
+          clearable={false}
           label="Category"
           validations={['required']}
           value={this.state.category_id}
