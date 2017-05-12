@@ -25,7 +25,8 @@ class EditStudyCasePage extends React.Component {
     };
 
     this.state = {
-      cities: []
+      cities: [],
+      bmes: []
     };
   }
 
