@@ -7,6 +7,7 @@ import { Autobind } from 'es-decorators';
 import { getCategories } from 'modules/categories';
 
 import { Button, Form, Select } from 'components/form/Form';
+import SolutionSelector from 'components/solution/SolutionSelector';
 
 class SolutionForm extends React.Component {
 
@@ -77,6 +78,11 @@ class SolutionForm extends React.Component {
 
 
     return categoryName;
+  }
+
+  @Autobind
+  onSelectSolution(state) {
+    this.setState({ categories: state.categories });
   }
 
   @Autobind
@@ -152,44 +158,17 @@ class SolutionForm extends React.Component {
 
 
   render() {
-    const solutionSelectOptions = this.loadMultiSelectOptions(this.state.categories);
-    const { text } = this.props;
-    const { parent, children, nephew } = this.state.categories;
-
     return (
       <div className="c-solution-form">
         <Form onSubmit={this.onSubmit}>
           <span>Solutions</span>
-          <div className="row expanded">
-            <div className="small-4 columns">
-              <Select
-                name="categories"
-                value={parent}
-                onChange={val => this.onCategoryChange('parent', val)}
-                label="Solution group"
-                options={this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }))}
-              />
-            </div>
-            <div className="small-4 columns">
-              <Select
-                name="categories"
-                value={children}
-                onChange={val => this.onCategoryChange('children', val)}
-                label="Solution category"
-                options={solutionSelectOptions.children}
-              />
-            </div>
-            <div className="small-4 columns">
-              <Select
-                name="categories"
-                value={nephew}
-                onChange={val => this.onCategoryChange('nephew', val)}
-                label="Solution sub-category"
-                options={solutionSelectOptions.nephew}
-              />
-            </div>
-          </div>
-          <Button className="button">{text}</Button>
+          <SolutionSelector
+            deletable={false}
+            state={this.state.categories}
+            solutionCategories={this.props.solutionCategories}
+            onChangeSelect={this.onSelectSolution}
+          />
+          <Button className="button">{this.props.text}</Button>
         </Form>
       </div>
     );

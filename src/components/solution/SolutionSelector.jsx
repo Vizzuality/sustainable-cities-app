@@ -146,9 +146,9 @@ export default class SolutionSelector extends React.Component {
               options={selectOptions.nephew}
             />
           </div>
-          <div className="small-12 columns">
+          {this.props.deletable && <div className="small-12 columns">
             <button type="button" className="button alert" onClick={this.onDeleteSelect}>Delete solution</button>
-          </div>
+          </div>}
         </div>
       </div>
     );
@@ -156,9 +156,14 @@ export default class SolutionSelector extends React.Component {
 }
 
 SolutionSelector.propTypes = {
+  deletable: PropTypes.bool,
   index: PropTypes.number,
   solutionCategories: PropTypes.array,
   state: PropTypes.object,
   onChangeSelect: PropTypes.func,
   onDeleteSelect: PropTypes.func
+};
+
+SolutionSelector.defaultProps = {
+  deletable: true
 };
