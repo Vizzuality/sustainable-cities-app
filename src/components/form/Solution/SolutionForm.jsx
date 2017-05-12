@@ -73,7 +73,8 @@ class SolutionForm extends React.Component {
     let categoryName;
 
     if (solutionSelectOptions.nephew) {
-      categoryName = solutionSelectOptions.nephew.filter(opt => opt.value === categoryId)[0].label;
+      categoryName = solutionSelectOptions.nephew.filter(opt => opt.value === categoryId);
+      categoryName = categoryName ? categoryName[0].label : '-';
     }
 
 
@@ -89,6 +90,7 @@ class SolutionForm extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
     const { parent, children, nephew } = this.state.categories;
+    if (!nephew) return;
     const nephewName = this.getCategoryName(nephew);
     this.props.onSubmit && this.props.onSubmit({
       ...this.form,
