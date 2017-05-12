@@ -6,7 +6,8 @@
   "scripts": {
     "build": "NODE_ENV=production ./node_modules/.bin/webpack --config ./config/webpack/production.js --progress --colors",
     "postinstall": "yarn run build",
-    "test": "./node_modules/.bin/eslint ."
+    "test": "./node_modules/.bin/eslint .",
+    "deploy": "sh ./scripts/deploy.sh"
   },
   "repository": {
     "type": "git",
