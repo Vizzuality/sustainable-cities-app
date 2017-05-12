@@ -1,6 +1,7 @@
 echo "Fetching code..."
+git checkout master
 git fetch --prune
-git pull origin staging
+git pull origin master
 git merge --no-ff develop
 
 echo "Rebuilding code..."
@@ -10,4 +11,4 @@ yarn run build
 echo "Uploading..."
 git add .
 git commit -m 'building new version'
-git push staging staging --force
+git push production master --force
