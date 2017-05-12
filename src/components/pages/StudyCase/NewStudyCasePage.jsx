@@ -1,290 +1,292 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { dispatch } from 'main';
-import {
-  MAX_BMES_PER_PAGE,
-  MAX_IMPACTS_PER_PAGE
-} from 'constants/study-case';
+import { Select, Input, Form, Button, Textarea } from 'components/form/Form';
+import BtnGroup from 'components/ui/BtnGroup';
+import { Link } from 'react-router';
+import { Autobind } from 'es-decorators';
+import { validation } from 'utils/validation';
 import { createStudyCase } from 'modules/study-cases';
 import { getCategories } from 'modules/categories';
-import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
-import BtnGroup from 'components/ui/BtnGroup';
-import EntityContainer from 'components/study-case/EntityContainer';
-import CreateImpactForm from 'components/form/Impact/CreateImpactForm';
-import AddImpactForm from 'components/form/Impact/AddImpactForm';
-import { validation } from 'utils/validation';
-import { Autobind } from 'es-decorators';
-import { Link } from 'react-router';
-import { toastr } from 'react-redux-toastr';
+import { getBmes } from 'modules/bmes';
+import { dispatch } from 'main';
 import { connect } from 'react-redux';
+import { toastr } from 'react-redux-toastr';
 import { push } from 'react-router-redux';
+import Creator from 'components/creator/Creator';
+import DropZone from 'components/dropzone/DropZone';
+import PropTypes from 'prop-types';
+import CitySearch from 'components/cities/CitySearch';
+import ImpactForm from 'components/impacts/ImpactForm';
+import { toggleModal } from 'modules/modal';
+import debounce from 'lodash/debounce';
+
+/* Utils */
+function toBase64(file, cb) {
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    cb && cb(event.target.result);
+  };
+  reader.readAsDataURL(file);
+}
 
 class NewStudyCasePage extends React.Component {
 
   constructor(props) {
     super(props);
-
-    this.form = {};
     this.state = {
-      // stores the bmes the user saves
+      category_id: null,
+      city_ids: [],
       bmes: [],
-      // stores the impacts the user saves
-      impacts: [AddImpactForm],
-      // stores the changes produced in solution categories selectors
-      solution_categories: {}
+      photos_attributes: [],
+      documents_attributes: [],
+      impacts_attributes: []
     };
+    this.form = {
+      project_type: 'StudyCase'
+    };
+
+    this.editBme = debounce(this.editBme, 300);
   }
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.solutionCategories.length || dispatch(getCategories({ type: 'Solution', tree: true }));
+    this.props.categories.solution.length || dispatch(getCategories({ type: 'solution' }));
+    dispatch(getBmes({
+      pageSize: 9999,
+      pageNumber: 1
+    }));
   }
 
-  /* Methods */
-  @Autobind
-  onInputChange(evt) {
-    this.form[evt.target.name] = evt.target.value;
-  }
-
+  /* Event handlers */
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
+    const { city_ids, photos_attributes, documents_attributes, category_id, impacts_attributes } = this.state;
 
-    // needs to be validated by an admin before it appears in the list
-    const data = {
-      ...this.form,
-      category_id: this.state.solution_categories.nephew,
-      project_type: 'StudyCase'
-    };
-
-    // Create study case
     dispatch(createStudyCase({
-      data,
+      data: {
+        ...this.form,
+        category_id,
+        photos_attributes,
+        documents_attributes,
+        impacts_attributes,
+        city_ids: city_ids.map(c => c.value)
+      },
       onSuccess() {
-        // Redirect to study cases list
         dispatch(push('/study-cases'));
         toastr.success('Study case created!');
       }
     }));
   }
 
-  onCategoryChange(type, level, val) {
-    if (val) {
-      val = Array.isArray(val) ?
-        val.map(i => i.value) : val.value;
+  @Autobind
+  onInputChange(evt) {
+    this.form[evt.target.name] = evt.target.value;
+  }
+
+  @Autobind
+  onImageDrop(acceptedImgs, rejectedImgs) {
+    const parsedPhotos = [];
+
+    rejectedImgs.forEach(file => toastr.error(`The image "${file.name}" hast not a valid extension`));
+
+    acceptedImgs.forEach((file, i) => {
+      toBase64(file, (parsedFile) => {
+        parsedPhotos.push({
+          name: file.name,
+          is_active: true,
+          attachment: parsedFile
+        });
+
+        if (i === (acceptedImgs.length - 1)) {
+          let photos_attributes = this.state.photos_attributes.slice();
+          photos_attributes = [...photos_attributes, ...parsedPhotos];
+          this.setState({ photos_attributes });
+        }
+      });
+    });
+  }
+
+  @Autobind
+  onFileDrop(acceptedFiles, rejectedFiles) {
+    const parsedFiles = [];
+
+    rejectedFiles.forEach(file => toastr.error(`The file "${file.name}" has not a valid extension`));
+
+    acceptedFiles.forEach((file, i) => {
+      toBase64(file, (parsedFile) => {
+        parsedFiles.push({
+          name: file.name,
+          is_active: true,
+          attachment: parsedFile
+        });
+
+        if (i === (acceptedFiles.length - 1)) {
+          let documents_attributes = this.state.documents_attributes.slice();
+          documents_attributes = [...documents_attributes, ...parsedFiles];
+          this.setState({ documents_attributes });
+        }
+      });
+    });
+  }
+
+  @Autobind
+  onDeleteImage(index) {
+    const photos_attributes = this.state.photos_attributes.slice();
+    window.URL.revokeObjectURL(photos_attributes[index].attachment);
+    photos_attributes.splice(index, 1);
+    this.setState({ photos_attributes });
+  }
+
+  @Autobind
+  onDeleteFile(index) {
+    const documents_attributes = this.state.documents_attributes.slice();
+    window.URL.revokeObjectURL(documents_attributes[index].attachment);
+    documents_attributes.splice(index, 1);
+    this.setState({ documents_attributes });
+  }
+
+  @Autobind
+  showImpactForm(evt, opts) {
+    evt.preventDefault();
+    let values = {};
+    let action = this.onImpactCreate;
+
+    if (opts.edit) {
+      values = this.state.impacts_attributes[opts.index];
+      action = this.onImpactEdit;
     }
 
-    const categories = {
-      ...this.state[type],
-      [level]: val
+    dispatch(toggleModal(true, <ImpactForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />));
+  }
+
+  @Autobind
+  onImpactCreate(form) {
+    this.setState({
+      impacts_attributes: [...this.state.impacts_attributes, form]
+    });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  onImpactEdit(form, index) {
+    const impacts_attributes = this.state.impacts_attributes.slice();
+    impacts_attributes[index] = {
+      ...impacts_attributes[index],
+      ...form
     };
-
-    if (level === 'parent') {
-      let options = {};
-      if (val) {
-        options = this.getFirstSelectOption(val, 'parent');
-      }
-      categories.children = val ? options.children : {};
-      categories.nephew = val ? options.nephew : {};
-    }
-
-    if (level === 'children') {
-      let options = {};
-      if (val) {
-        options = this.getFirstSelectOption(val, 'children');
-      }
-      categories.nephew = val ? options.nephew : {};
-    }
-
-    this.setState({ [type]: categories });
+    this.setState({ impacts_attributes });
+    dispatch(toggleModal(false));
   }
 
-  getFirstSelectOption(value, source) {
-    const options = {
-      children: {},
-      nephew: {}
+  @Autobind
+  deleteImpact(index) {
+    const { impacts_attributes } = this.state;
+    impacts_attributes.splice(index, 1);
+    this.setState({ impacts_attributes });
+  }
+
+  @Autobind
+  addBme(bme) {
+    const bmes = [
+      ...this.state.bmes,
+      bme
+    ];
+    this.setState({ bmes });
+  }
+
+  editBme(data, index) {
+    const bmes = this.state.bmes.slice();
+    bmes[index] = {
+      ...bmes[index],
+      ...data
     };
-
-    if (source === 'parent') {
-      // populates children selector based on parent selection
-      const parentCategory = this.props.solutionCategories.find(cat => cat.id === value);
-      if (parentCategory.children && parentCategory.children.length) {
-        options.children = parentCategory.children[0].id;
-      }
-
-      // populates nephew selector based on children selection
-      const childrenCategory = parentCategory.children.find(child => child.id === options.children);
-      if (childrenCategory.children && childrenCategory.children.length) {
-        options.nephew = childrenCategory.children[0].id;
-      }
-    }
-
-    if (source === 'children') {
-      // populates nephew selector based on children selection
-      const parentId = this.state.solution_categories.parent;
-      const parentCategory = this.props.solutionCategories.find(cat => cat.id === parentId);
-      const childrenCategory = parentCategory.children.find(child => child.id === value);
-      if (childrenCategory.children && childrenCategory.children.length) {
-        options.nephew = childrenCategory.children[0].id;
-      }
-    }
-
-    return options;
+    this.setState({ bmes });
   }
 
-  onAddImpact() {
-    const { impacts } = this.state;
-    impacts.push(AddImpactForm);
-
-    this.setState({ impacts });
-  }
-
+  /* Render */
   render() {
-    // solution categories
-    const solutionCategories = this.state.solution_categories;
-    let solutionChildrenOptions = [];
-    let solutionNephewOptions = [];
-
-    if (solutionCategories.parent) {
-      // retrieves solution options of the children selector
-      const parentSolutionCategory = this.props.solutionCategories.find(cat => cat.id === solutionCategories.parent);
-      if (parentSolutionCategory.children && parentSolutionCategory.children.length) {
-        solutionChildrenOptions = parentSolutionCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
-      }
-
-      if (solutionCategories.children) {
-        // retrieves solution options of the nephew selector
-        const childrenCategory = parentSolutionCategory.children.find(child => child.id === solutionCategories.children);
-        solutionNephewOptions = childrenCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
-      }
-    }
-
     return (
-      <section className="c-form">
-        <Form onSubmit={this.onSubmit}>
-          <BtnGroup>
-            <Link to="/business-model-element" className="button alert">Cancel</Link>
-            <Button type="submit" className="button success">Save</Button>
-          </BtnGroup>
-          {/* study case name */}
-          <div className="row expanded">
-            <div className="small-12 columns">
-              <Input
-                type="text"
-                onChange={this.onInputChange}
-                name="name"
-                value=""
-                label="Study case name"
-                validations={['required']}
-              />
-            </div>
+      <Form onSubmit={this.onSubmit}>
+        {/* Submit buttons */}
+        <BtnGroup>
+          <Button className="button success" type="submit">Save</Button>
+          <Link className="button alert" to="/study-cases">Cancel</Link>
+        </BtnGroup>
+        {/* Name */}
+        <Input type="text" value="" name="name" onChange={this.onInputChange} label="Study case title" validations={['required']} />
+        <Select
+          name="category_id"
+          label="Category"
+          validations={['required']}
+          value={this.state.category_id}
+          onChange={item => this.setState({ category_id: item.value })}
+          options={this.props.categories.solution.map(cat => ({ value: cat.id, label: cat.name }))}
+        />
+        <CitySearch
+          multi
+          name="city_ids"
+          label="Cities"
+          validations={['required']}
+          value={this.state.city_ids}
+          onChange={items => this.setState({ city_ids: items })}
+        />
+        <Textarea validations={[]} onChange={this.onInputChange} label="Solution" name="solution" />
+        <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
+        <Creator title="BMEs" options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))} items={this.state.bmes} onAdd={this.addBme} onEdit={(...args) => this.editBme(...args)} />
+        {/* Impacts */}
+        <div>
+          <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
+          <ul>
+            {this.state.impacts_attributes.map((impact, i) => {
+              return (
+                <li key={i}>
+                  <span onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>{impact.name}</span>
+                  <button className="button" onClick={() => this.deleteImpact(i)}>Delete</button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <div className="row expanded">
+          <div className="column small-6">
+            <DropZone
+              title="Images"
+              accept={'image/png, image/jpg, image/jpeg'}
+              files={this.state.photos_attributes}
+              onDrop={this.onImageDrop}
+              onDelete={this.onDeleteImage}
+              withImage
+            />
           </div>
-          {/* driver description */}
-          <div className="row expanded">
-            <div className="small-12 columns">
-              <Textarea
-                validations={[]}
-                onChange={this.onInputChange}
-                name="situation"
-                value=""
-                label="Driver description"
-              />
-            </div>
+          <div className="column small-6">
+            <DropZone
+              title="Files"
+              files={this.state.documents_attributes}
+              accept={'application/pdf, application/json, application/msword, application/excel'}
+              onDrop={this.onFileDrop}
+              onDelete={this.onDeleteFile}
+            />
           </div>
-          {/* solution description */}
-          <div className="row expanded">
-            <div className="small-12 columns">
-              <Textarea
-                validations={[]}
-                onChange={this.onInputChange}
-                name="solution"
-                value=""
-                label="Solution description"
-              />
-            </div>
-          </div>
-          {/* city & year */}
-          <div className="row expanded">
-            {/* city */}
-            <div className="small-6 columns">
-              <Input
-                type="text"
-                onChange={this.onInputChange}
-                name="city_ids"
-                value=""
-                label="City"
-                validations={['required']}
-              />
-            </div>
-            <div className="small-6 columns">
-              {/* year */}
-              <Input
-                type="number"
-                onChange={this.onInputChange}
-                name="operational_year"
-                value=""
-                label="Year"
-                validations={['required']}
-              />
-            </div>
-          </div>
-          {/* solution categories */}
-          <div className="row expanded">
-            {/* parent solution category */}
-            <div className="small-4 columns">
-              <Select
-                name="solution_categories"
-                value={this.state.solution_categories.parent}
-                onChange={val => this.onCategoryChange('solution_categories', 'parent', val)}
-                label="Solution category"
-                options={this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }))}
-              />
-            </div>
-            {/* children solution category */}
-            <div className="small-4 columns">
-              <Select
-                name="solution_categories"
-                value={this.state.solution_categories.children}
-                onChange={val => this.onCategoryChange('solution_categories', 'children', val)}
-                label="Solution sub-category"
-                options={solutionChildrenOptions}
-              />
-            </div>
-            {/* nephew solution category */}
-            <div className="small-4 columns">
-              <Select
-                name="solution_categories"
-                value={this.state.solution_categories.nephew}
-                onChange={val => this.onCategoryChange('solution_categories', 'nephew', val)}
-                label="Solution sub-sub-category"
-                options={solutionNephewOptions}
-              />
-            </div>
-          </div>
-
-          <div className="row expanded">
-            <fieldset>
-              <EntityContainer
-                items={this.state.impacts}
-                maxItems={MAX_IMPACTS_PER_PAGE}
-                onAdd={() => this.onAddImpact()}
-              />
-            </fieldset>
-          </div>
-
-        </Form>
-      </section>
+        </div>
+      </Form>
     );
   }
 }
 
-NewStudyCasePage.propTypes = {
-  solutionCategories: PropTypes.array
+// Map state to props
+const mapStateToProps = ({ categories, bmes }) => ({
+  categories: {
+    solution: categories.solution
+  },
+  bmes: bmes.list
+});
+
+NewStudyCasePage.defaultProps = {
+  bmes: []
 };
 
-// Map state to props
-const mapStateToProps = ({ categories }) => ({
-  solutionCategories: categories.Solution
-});
+// NewStudyCasePage.propTypes = {
+//   categories: PropTypes.array
+// };
 
 export default connect(mapStateToProps, null)(NewStudyCasePage);

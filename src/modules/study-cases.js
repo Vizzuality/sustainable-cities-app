@@ -28,13 +28,10 @@ const initialState = {
 /* Reducer */
 function studyCasesReducer(state = initialState, action) {
   switch (action.type) {
-    case SET_STUDY_CASES:
-      return {
-        ...state,
-        list: action.payload.list,
-        included: action.payload.included,
-        itemCount: action.payload.itemCount
-      };
+    case SET_STUDY_CASES: {
+      const { list, included, itemCount } = action.payload;
+      return { ...state, list, included, itemCount };
+    }
     case CONCAT_STUDY_CASES:
       return {
         ...state,
@@ -63,18 +60,16 @@ function studyCasesReducer(state = initialState, action) {
 
 /* Action creators */
 function setStudyCases(data) {
-  const { list, itemCount } = data;
   return {
     type: SET_STUDY_CASES,
-    payload: { list, itemCount }
+    payload: data
   };
 }
 
 function concatStudyCases(data) {
-  const { list, itemCount } = data;
   return {
     type: CONCAT_STUDY_CASES,
-    payload: { list, itemCount }
+    payload: data
   };
 }
 
@@ -138,7 +133,7 @@ function getStudyCases(paramsConfig = {}) {
         };
 
         if (included) {
-          studyCasesData.included = included.map(incl => deserialize([incl])[0]);
+          studyCasesData.included = deserialize(included);
         }
 
         const action = concat ? concatStudyCases : setStudyCases;
@@ -151,12 +146,18 @@ function getStudyCases(paramsConfig = {}) {
   };
 }
 
-function createStudyCase({ data, onSuccess }) {
+function createProject({ data, onSuccess, type }) {
   return (dispatch) => {
     dispatch(setStudyCasesLoading(true));
     post({
       url: `${config.API_URL}/projects`,
-      body: { project: data },
+      body: {
+        project: {
+          ...data,
+          is_active: true,
+          project_type: type
+        }
+      },
       headers: {
         Authorization: `Bearer ${localStorage.token}`
       },
@@ -168,11 +169,21 @@ function createStudyCase({ data, onSuccess }) {
   };
 }
 
+function createStudyCase({ data, onSuccess }) {
+  return (dispatch) => {
+    dispatch(createProject({
+      data,
+      onSuccess,
+      type: 'StudyCase'
+    }));
+  };
+}
+
 function updateStudyCase({ id, data, onSuccess }) {
   return (dispatch) => {
     dispatch(setStudyCasesLoading(true));
     patch({
-      url: `${config.API_URL}/study-cases/${id}`,
+      url: `${config.API_URL}/projects/${id}`,
       body: {
         project: data
       },
@@ -188,7 +199,7 @@ function deleteStudyCase({ id, onSuccess }) {
   return (dispatch) => {
     dispatch(setStudyCasesLoading(true));
     _delete({
-      url: `${config.API_URL}/study-cases/${id}`,
+      url: `${config.API_URL}/projects/${id}`,
       onSuccess() {
         dispatch(setStudyCasesLoading(false));
         onSuccess && onSuccess(id);

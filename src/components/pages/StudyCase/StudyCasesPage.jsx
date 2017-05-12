@@ -49,6 +49,10 @@ class StudyCasesPage extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    this.removeScrollListener();
+  }
+
   setScrollListener() {
     this._scrollListener = debounce(this.scrollListener, 100);
     window.addEventListener('scroll', this._scrollListener, { passive: true });

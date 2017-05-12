@@ -3,9 +3,17 @@
 }
 
 .c-sc {
+  display: block;
   padding-bottom: $space-1 * 4;
 
+  &:hover {
+    .sc-img {
+      transform: scale(1.05);
+    }
+  }
+
   .sc-img {
+    transition: all $animation-time linear;
     height: 170px;
     background-color: palette(gray, light);
     margin-bottom: $space-1;

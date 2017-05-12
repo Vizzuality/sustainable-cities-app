@@ -1,0 +1,41 @@
+.c-dropzone {
+  padding-top: $space-1;
+
+  .dropzone-title {
+    display: block;
+    margin-bottom: $space-1;
+  }
+
+  .dropzone-img-list {
+    max-width: 200px;
+    list-style-type: none;
+    padding: $space-1;
+    margin: 0;
+  }
+
+  .img-item {
+    margin-bottom: $space-1 / 2;
+    position: relative;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+
+  .img {
+    max-width: 100%;
+  }
+
+  .item-btn, svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .item-btn {
+    border: none;
+    background-color: transparent;
+    position: absolute;
+    top: 0; bottom: 0; right: -20px;
+    margin: auto;
+  }
+}

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { dispatch } from 'main';
 import { getImpacts, updateImpact } from 'modules/impacts';
-import { getCategories } from 'modules/categories';
+import { getCategories, resetCategoryByType } from 'modules/categories';
 import getImpactDetail from 'selectors/impactDetail';
 import { Input, Button, Form, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
@@ -25,12 +25,10 @@ class EditImpactPage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.impactCategories.length || dispatch(getCategories({ type: 'Impact', tree: true }));
+    dispatch(getCategories({ type: 'Impact', tree: true, pageSize: 9999 }));
 
     if (!this.props.impactDetail) {
       dispatch(getImpacts({ id: this.props.impacts.detailId }));
-    } else {
-      this.setCategories(this.props);
     }
   }
 
@@ -84,6 +82,7 @@ class EditImpactPage extends React.Component {
   setCategories({ impactDetail, impactCategories }) {
     const childrenCategoryId = impactDetail.category;
 
+
     if (!childrenCategoryId) return;
 
     const parentCategory = childrenCategoryId ? impactCategories.find((cat) => {
@@ -124,6 +123,16 @@ class EditImpactPage extends React.Component {
           </BtnGroup>
           {/* Categories */}
           <div className="row expanded">
+            <div className="small-12 columns">
+              {/* name */}
+              <Input
+                type="text"
+                onChange={this.onInputChange}
+                name="name" value={this.props.impactDetail ? this.props.impactDetail.name : ''}
+                label="Impact name"
+                validations={['required']}
+              />
+            </div>
             <div className="small-6 columns">
               {/* parent category */}
               <Select
@@ -142,16 +151,6 @@ class EditImpactPage extends React.Component {
                 onChange={val => this.onCategoryChange('children', val)}
                 label="Sub-category"
                 options={childrenOptions}
-              />
-            </div>
-            <div className="small-12 columns">
-              {/* name */}
-              <Input
-                type="text"
-                onChange={this.onInputChange}
-                name="name" value={this.props.impactDetail ? this.props.impactDetail.name : ''}
-                label="Impact name"
-                validations={['required']}
               />
             </div>
             <div className="small-6 columns">
@@ -193,7 +192,7 @@ EditImpactPage.propTypes = {
 // Map state to props
 const mapStateToProps = state => ({
   impacts: state.impacts,
-  impactCategories: state.categories.Impact,
+  impactCategories: state.categories.impact,
   impactDetail: getImpactDetail(state)
 });
 

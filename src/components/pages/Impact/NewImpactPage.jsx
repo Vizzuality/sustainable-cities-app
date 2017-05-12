@@ -27,7 +27,7 @@ class NewImpactPage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.impactCategories.length || dispatch(getCategories({ type: 'Impact', tree: true }));
+    this.props.impactCategories.length || dispatch(getCategories({ type: 'Impact', tree: true, pageSize: 9999 }));
   }
 
   /* Methods */
@@ -118,6 +118,10 @@ class NewImpactPage extends React.Component {
           </BtnGroup>
           {/* Categories */}
           <div className="row expanded">
+            <div className="small-12 columns">
+              {/* Name */}
+              <Input type="text" onChange={this.onInputChange} name="name" value="" label="Impact name" validations={['required']} />
+            </div>
             <div className="small-6 columns">
               <Select
                 name="categories"
@@ -135,10 +139,6 @@ class NewImpactPage extends React.Component {
                 label="Sub-category"
                 options={childrenOptions}
               />
-            </div>
-            <div className="small-12 columns">
-              {/* Name */}
-              <Input type="text" onChange={this.onInputChange} name="name" value="" label="Impact name" validations={['required']} />
             </div>
             <div className="small-6 columns">
               {/* Unit */}
@@ -162,7 +162,7 @@ NewImpactPage.propTypes = {
 
 // Map state to props
 const mapStateToProps = ({ categories }) => ({
-  impactCategories: categories.Impact
+  impactCategories: categories.impact
 });
 
 export default connect(mapStateToProps, null)(NewImpactPage);
