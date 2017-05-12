@@ -115,6 +115,7 @@ export default class SolutionSelector extends React.Component {
 
   render() {
     const selectOptions = this.loadMultiSelectOptions();
+    const { parent, children, nephew } = this.state.categories;
 
     return (
       <div className="c-solution-selector">
@@ -122,7 +123,7 @@ export default class SolutionSelector extends React.Component {
           <div className="small-4 columns">
             <Select
               name="categories"
-              value={this.state.categories.parent}
+              value={parent}
               onChange={val => this.onCategoryChange('parent', val)}
               label="Solution group"
               options={this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }))}
@@ -131,7 +132,7 @@ export default class SolutionSelector extends React.Component {
           <div className="small-4 columns">
             <Select
               name="categories"
-              value={this.state.categories.children}
+              value={children}
               onChange={val => this.onCategoryChange('children', val)}
               label="Solution category"
               options={selectOptions.children}
@@ -140,7 +141,7 @@ export default class SolutionSelector extends React.Component {
           <div className="small-4 columns">
             <Select
               name="categories"
-              value={this.state.categories.nephew}
+              value={nephew && nephew.id !== undefined ? nephew.id : nephew}
               onChange={val => this.onCategoryChange('nephew', val)}
               label="Solution sub-category"
               options={selectOptions.nephew}
