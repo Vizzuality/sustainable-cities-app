@@ -1,6 +1,7 @@
 echo "Fetching code..."
+git checkout master
 git fetch --prune
-git pull origin staging
+git pull origin master
 git merge --no-ff develop
 
 echo "Rebuilding code..."

@@ -1,4 +1,5 @@
 echo "Fetching code..."
+git checkout staging
 git fetch --prune
 git pull origin staging
 git merge --no-ff develop
