@@ -73,8 +73,6 @@ class NewCategoryPage extends React.Component {
   renderForm() {
     return (
       <div>
-        {/* name */}
-        <Input type="text" onChange={this.onInputChange} name="name" value="" label="Category name" validations={['required']} />
         <div className="row expanded">
           {/* category */}
           <div className="small-12 columns">
@@ -82,7 +80,7 @@ class NewCategoryPage extends React.Component {
               name="parent_id"
               value={this.state.parent_id}
               onChange={val => this.onSelectChange('parent_id', val)}
-              label="Category"
+              label="Parent category"
               options={this.props.categories[this.state.category_type].map(cat => ({ value: cat.id, label: cat.name }))}
             />
           </div>
@@ -111,6 +109,8 @@ class NewCategoryPage extends React.Component {
           </BtnGroup>
           <div className="row expanded">
             <div className="small-12 columns">
+              {/* name */}
+              <Input type="text" onChange={this.onInputChange} name="name" value="" label="Category name" validations={['required']} />
               <Select
                 name="category_type"
                 value={this.state.category_type}

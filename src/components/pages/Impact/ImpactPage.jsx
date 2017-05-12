@@ -7,7 +7,7 @@ import { toastr } from 'react-redux-toastr';
 import isEqual from 'lodash/isEqual';
 import { Autobind } from 'es-decorators';
 
-import { getImpacts, deleteImpact, setFilters, resetImpacts, setImpactSearch } from 'modules/impacts';
+import { getImpacts, deleteImpact, setFilters, setImpactSearch } from 'modules/impacts';
 import { getCategories } from 'modules/categories';
 import { toggleModal } from 'modules/modal';
 import { getIdRelations } from 'utils/relation';
@@ -20,11 +20,11 @@ import Search from 'components/search/Search';
 import { DEFAULT_SORT_FIELD, IMPACT_TABLE_FIELDS } from 'constants/impacts';
 import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
 
-class EnablingPage extends React.Component {
+class ImpactPage extends React.Component {
 
   componentWillMount() {
     dispatch(getImpacts());
-    dispatch(getCategories({ type: 'impact', tree: false, pageSize: 9999 }));
+    dispatch(getCategories({ type: 'impact', pageSize: 9999, sort: 'name' }));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -42,17 +42,13 @@ class EnablingPage extends React.Component {
     }
   }
 
-  componentWillUnmount() {
-    dispatch(resetImpacts());
-  }
-
   setCategory() {
     return this.props.impacts.list.map((imp) => {
       if (!imp.relationships.category.data) return {};
       const category = getIdRelations([imp.relationships.category.data], this.props.impactCategories, 'categories');
       return {
         ...imp,
-        ...{ category: category ? category[0].name : '-' }
+        ...{ category: category[0] ? category[0].name : '-' }
       };
     });
   }
@@ -114,7 +110,7 @@ class EnablingPage extends React.Component {
   }
 }
 
-EnablingPage.propTypes = {
+ImpactPage.propTypes = {
   impacts: PropTypes.object,
   impactCategories: PropTypes.array
 };
@@ -125,4 +121,4 @@ const mapStateToProps = ({ impacts, categories }) => ({
   impactCategories: categories.impact
 });
 
-export default connect(mapStateToProps, null)(EnablingPage);
+export default connect(mapStateToProps, null)(ImpactPage);

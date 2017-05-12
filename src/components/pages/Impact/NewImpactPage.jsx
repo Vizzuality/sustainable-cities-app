@@ -118,6 +118,10 @@ class NewImpactPage extends React.Component {
           </BtnGroup>
           {/* Categories */}
           <div className="row expanded">
+            <div className="small-12 columns">
+              {/* Name */}
+              <Input type="text" onChange={this.onInputChange} name="name" value="" label="Impact name" validations={['required']} />
+            </div>
             <div className="small-6 columns">
               <Select
                 name="categories"
@@ -135,10 +139,6 @@ class NewImpactPage extends React.Component {
                 label="Sub-category"
                 options={childrenOptions}
               />
-            </div>
-            <div className="small-12 columns">
-              {/* Name */}
-              <Input type="text" onChange={this.onInputChange} name="name" value="" label="Impact name" validations={['required']} />
             </div>
             <div className="small-6 columns">
               {/* Unit */}
