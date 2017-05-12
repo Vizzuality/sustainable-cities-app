@@ -21,7 +21,7 @@ export default class CreatorItem extends React.Component {
       <div className="c-creator-item">
         <div className="row expanded">
           <div className="small-6 column">
-            <Select value={selected} options={options} onChange={item => action({ id: item.value, description: this.input.value }, index)} />
+            <Select value={selected} clearable={false} options={options} onChange={item => action({ id: item.value, description: this.input.value }, index)} />
           </div>
           <div className="small-6 column">
             <input ref={node => this.input = node} defaultValue={description} type="text" onChange={evt => onEdit && onEdit({ description: evt.target.value }, index)} />
@@ -36,7 +36,7 @@ CreatorItem.propTypes = {
   options: PropTypes.array,
   onAdd: PropTypes.func,
   onEdit: PropTypes.func,
-  selected: PropTypes.number,
+  selected: PropTypes.string,
   index: PropTypes.number,
   description: PropTypes.string
 };

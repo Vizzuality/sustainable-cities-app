@@ -196,10 +196,10 @@ class NewStudyCasePage extends React.Component {
 
   editBme(data, index) {
     const bmes = this.state.bmes.slice();
-    bmes[index] = [
+    bmes[index] = {
       ...bmes[index],
       ...data
-    ];
+    };
     this.setState({ bmes });
   }
 
