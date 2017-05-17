@@ -80,10 +80,11 @@ class EditStudyCasePage extends React.Component {
         ...this.form,
         city_ids: cities.map(c => c.value),
         category_id,
-        impacts_attributes: impacts_attributes.filter(i => !i.id || i._destroy)
+        impacts_attributes: impacts_attributes.filter(i => !i.id || i._destroy || i.edited)
       },
-      onSuccess() {
+      onSuccess: () => {
         toastr.success('The study case has been edited');
+        dispatch(getStudyCases({ id: this.props.studyCases.detailId }));
       }
     }));
   }
@@ -154,11 +155,11 @@ class EditStudyCasePage extends React.Component {
 
   @Autobind
   onImpactEdit(data, index) {
-    debugger;
     const impacts_attributes = this.state.impacts_attributes.slice();
     impacts_attributes[index] = {
       ...impacts_attributes[index],
-      ...data
+      ...data,
+      edited: true
     };
     this.setState({ impacts_attributes });
     dispatch(toggleModal(false));
@@ -167,7 +168,7 @@ class EditStudyCasePage extends React.Component {
   /* Render */
   render() {
     // Study case initial values
-    const { studyCaseDetail, studyCases } = this.props;
+    const { studyCaseDetail } = this.props;
     const name = studyCaseDetail ? studyCaseDetail.name : '';
     const solution = studyCaseDetail ? studyCaseDetail.solution : '';
     const situation = studyCaseDetail ? studyCaseDetail.situation : '';
