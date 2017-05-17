@@ -204,6 +204,13 @@ class NewStudyCasePage extends React.Component {
     this.setState({ bmes });
   }
 
+  @Autobind
+  deleteBme(index) {
+    const bmes = this.state.bmes.slice();
+    bmes.splice(index, 1);
+    this.setState({ bmes });
+  }
+
   /* Render */
   render() {
     return (
@@ -234,7 +241,14 @@ class NewStudyCasePage extends React.Component {
         />
         <Textarea validations={[]} onChange={this.onInputChange} label="Solution" name="solution" />
         <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
-        <Creator title="BMEs" options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))} items={this.state.bmes} onAdd={this.addBme} onEdit={(...args) => this.editBme(...args)} />
+        <Creator
+          title="BMEs"
+          options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))}
+          items={this.state.bmes}
+          onAdd={this.addBme}
+          onEdit={(...args) => this.editBme(...args)}
+          onDelete={this.deleteBme}
+        />
         {/* Impacts */}
         <div>
           <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>

@@ -49,10 +49,12 @@ class EditStudyCasePage extends React.Component {
   componentWillReceiveProps(nextProps) {
     // Includes arrived! So, we can populate sub-entities
     if ((!this.props.studyCases.included || !this.props.studyCases.included.length) && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
+      const bmes = nextProps.studyCases.included.filter(sc => sc.type === 'project_bmes').map(bme => ({ id: bme.relationships.bme.data.id, description: bme.description }));
       this.setState({
         cities: nextProps.studyCases.included.filter(sc => sc.type === 'cities').map(city => ({ label: city.name, value: city.id })),
-        bmes: nextProps.studyCases.included.filter(sc => sc.type === 'project_bmes').map(bme => ({ id: bme.relationships.bme.data.id, description: bme.description })),
-        impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts')
+        bmes,
+        impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
+        originalBmes: bmes
       });
     }
 
@@ -72,7 +74,8 @@ class EditStudyCasePage extends React.Component {
   submit(evt) {
     evt.preventDefault();
 
-    const { cities, category_id, impacts_attributes } = this.state;
+    const { cities, category_id, impacts_attributes, bmes, originalBmes } = this.state;
+    const project_bmes_attributes = bmes.filter(bme => !originalBmes.some(i => i.id === bme.id));
 
     dispatch(updateStudyCase({
       id: this.props.studyCaseDetail.id,
@@ -80,6 +83,7 @@ class EditStudyCasePage extends React.Component {
         ...this.form,
         city_ids: cities.map(c => c.value),
         category_id,
+        project_bmes_attributes,
         impacts_attributes: impacts_attributes.filter(i => !i.id || i._destroy || i.edited)
       },
       onSuccess: () => {
@@ -165,6 +169,25 @@ class EditStudyCasePage extends React.Component {
     dispatch(toggleModal(false));
   }
 
+  @Autobind
+  addBme(bme) {
+    const bmes = [
+      ...this.state.bmes,
+      bme
+    ];
+    this.setState({ bmes });
+  }
+
+  @Autobind
+  editBme(data, index) {
+    const bmes = this.state.bmes.slice();
+    bmes[index] = {
+      ...bmes[index],
+      ...data
+    };
+    this.setState({ bmes });
+  }
+
   /* Render */
   render() {
     // Study case initial values
@@ -200,7 +223,13 @@ class EditStudyCasePage extends React.Component {
           />
           <Textarea name="solution" value={solution} label="Solution" validations={[]} onChange={this.onInputChange} />
           <Textarea name="situation" value={situation} label="situation" validations={[]} onChange={this.onInputChange} />
-          <Creator title="BMEs" options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))} items={this.state.bmes} />
+          <Creator
+            title="BMEs"
+            onAdd={this.addBme}
+            onEdit={this.editBme}
+            options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))}
+            items={this.state.bmes}
+          />
           {/* Impacts */}
           <div>
             <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>

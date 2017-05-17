@@ -9,7 +9,7 @@ export default class CreatorItem extends React.Component {
   }
 
   render() {
-    const { options, onAdd, onEdit, selected, description, index } = this.props;
+    const { options, onAdd, onEdit, onDelete, selected, description, index, deleteable } = this.props;
     const _onAdd = (...args) => {
       onAdd(...args);
       this.clearDescription();
@@ -25,6 +25,7 @@ export default class CreatorItem extends React.Component {
           </div>
           <div className="small-6 column">
             <input ref={node => this.input = node} defaultValue={description} type="text" onChange={evt => onEdit && onEdit({ description: evt.target.value }, index)} />
+            {deleteable && <button type="button" className="button" onClick={() => onDelete && onDelete(index)}>Delete</button>}
           </div>
           <div className="small-6 column" />
         </div>
@@ -36,9 +37,11 @@ CreatorItem.propTypes = {
   options: PropTypes.array,
   onAdd: PropTypes.func,
   onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
   selected: PropTypes.string,
   index: PropTypes.number,
-  description: PropTypes.string
+  description: PropTypes.string,
+  deleteable: PropTypes.bool
 };
 
 CreatorItem.defaultProps = {
