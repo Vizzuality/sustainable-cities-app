@@ -75,7 +75,7 @@ class EditStudyCasePage extends React.Component {
     evt.preventDefault();
 
     const { cities, category_id, impacts_attributes, bmes, originalBmes } = this.state;
-    const project_bmes_attributes = bmes.filter(bme => !originalBmes.some(i => i.id === bme.id));
+    const project_bmes_attributes = bmes.filter(bme => bme._destroy || !originalBmes.some(i => i.id === bme.id));
 
     dispatch(updateStudyCase({
       id: this.props.studyCaseDetail.id,
@@ -188,6 +188,32 @@ class EditStudyCasePage extends React.Component {
     this.setState({ bmes });
   }
 
+  @Autobind
+  deleteBme(index) {
+    debugger;
+    const { originalBmes } = this.state;
+    const bmes = this.state.bmes.slice();
+
+    const bmeToDelete = bmes[index];
+
+    const exists = originalBmes.find(bme => bme.id === bme.id);
+
+    if (!exists) {
+      // Bme still doesn't exist on database,
+      // just remove it from local array
+      bmes.splice(index, 1);
+    } else {
+      // Bme exists on database,
+      // we have to delete it from there
+      bmes[index] = {
+        id: bmeToDelete.id,
+        _destroy: true
+      };
+    }
+
+    this.setState({ bmes });
+  }
+
   /* Render */
   render() {
     // Study case initial values
@@ -229,6 +255,7 @@ class EditStudyCasePage extends React.Component {
             onEdit={this.editBme}
             options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))}
             items={this.state.bmes}
+            onDelete={this.deleteBme}
           />
           {/* Impacts */}
           <div>

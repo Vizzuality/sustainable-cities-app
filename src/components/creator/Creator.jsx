@@ -13,7 +13,7 @@ export default class Creator extends React.Component {
           <div className="column small-6">Bme</div>
           <div className="column small-6">Description</div>
         </div>
-        {items.map((item, i) => <CreatorItem key={i} deleteable index={i} onEdit={onEdit} onDelete={onDelete} options={options} selected={item.id} description={item.description} />)}
+        {items.map((item, i) => <CreatorItem key={i} deleteable index={i} onEdit={onEdit} onDelete={onDelete} options={options} hidden={!!item._destroy} selected={item.id} description={item.description} />)}
         <CreatorItem options={options} onAdd={(...args) => onAdd(...args)} />
       </section>
     );

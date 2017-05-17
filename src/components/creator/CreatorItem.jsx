@@ -1,6 +1,7 @@
 import React from 'react';
 import { Select } from 'components/form/Form';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
 export default class CreatorItem extends React.Component {
 
@@ -9,16 +10,31 @@ export default class CreatorItem extends React.Component {
   }
 
   render() {
-    const { options, onAdd, onEdit, onDelete, selected, description, index, deleteable } = this.props;
+    const {
+      options,
+      onAdd,
+      onEdit,
+      onDelete,
+      selected,
+      description,
+      index,
+      deleteable,
+      hidden
+    } = this.props;
+
     const _onAdd = (...args) => {
       onAdd(...args);
       this.clearDescription();
     };
-    const action = onEdit || _onAdd;
 
+    const action = onEdit || _onAdd;
+    const cNames = classNames('c-creator-item',
+      {
+        hidden: !!hidden
+      });
 
     return (
-      <div className="c-creator-item">
+      <div className={cNames}>
         <div className="row expanded">
           <div className="small-6 column">
             <Select value={selected} clearable={false} options={options} onChange={item => action({ id: item.value, description: this.input.value }, index)} />
@@ -41,7 +57,8 @@ CreatorItem.propTypes = {
   selected: PropTypes.string,
   index: PropTypes.number,
   description: PropTypes.string,
-  deleteable: PropTypes.bool
+  deleteable: PropTypes.bool,
+  hidden: PropTypes.bool
 };
 
 CreatorItem.defaultProps = {
