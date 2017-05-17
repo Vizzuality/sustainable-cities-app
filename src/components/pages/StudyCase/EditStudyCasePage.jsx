@@ -80,7 +80,7 @@ class EditStudyCasePage extends React.Component {
         ...this.form,
         city_ids: cities.map(c => c.value),
         category_id,
-        impacts_attributes
+        impacts_attributes: impacts_attributes.filter(i => !i.id || i._destroy)
       },
       onSuccess() {
         toastr.success('The study case has been edited');
@@ -130,17 +130,35 @@ class EditStudyCasePage extends React.Component {
 
   @Autobind
   deleteImpact(index) {
+    const impacts = this.props.studyCases.included.filter(sc => sc.type === 'impacts');
+    const impactToDelete = this.state.impacts_attributes[index];
+
+    const exists = impacts.find(i => i.id === impactToDelete.id);
     const { impacts_attributes } = this.state;
-    impacts_attributes.splice(index, 1);
+
+    if (!exists) {
+      // Impact still doesn't exist on database,
+      // just remove it from local array
+      impacts_attributes.splice(index, 1);
+    } else {
+      // Impact exists on database,
+      // we have to delete it from there
+      impacts_attributes[index] = {
+        id: impactToDelete.id,
+        _destroy: true
+      };
+    }
+
     this.setState({ impacts_attributes });
   }
 
   @Autobind
-  onImpactEdit(form, index) {
+  onImpactEdit(data, index) {
+    debugger;
     const impacts_attributes = this.state.impacts_attributes.slice();
     impacts_attributes[index] = {
       ...impacts_attributes[index],
-      ...form
+      ...data
     };
     this.setState({ impacts_attributes });
     dispatch(toggleModal(false));
@@ -181,21 +199,21 @@ class EditStudyCasePage extends React.Component {
           />
           <Textarea name="solution" value={solution} label="Solution" validations={[]} onChange={this.onInputChange} />
           <Textarea name="situation" value={situation} label="situation" validations={[]} onChange={this.onInputChange} />
-          {/* <Creator title="BMEs" options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))} items={this.state.bmes} /> */ }
+          <Creator title="BMEs" options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))} items={this.state.bmes} />
           {/* Impacts */}
-          {/* <div>
+          <div>
             <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
-             <ul>
+            <ul>
               {this.state.impacts_attributes.map((impact, i) => {
                 return (
-                  <li key={i}>
+                  <li key={i} className={`${impact._destroy ? 'hidden' : ''}`}>
                     <span onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>{impact.name}</span>
                     <button type="button" className="button" onClick={() => this.deleteImpact(i)}>Delete</button>
                   </li>
                 );
               })}
             </ul>
-          </div> */}
+          </div>
         </Form>
       </div>
     );
