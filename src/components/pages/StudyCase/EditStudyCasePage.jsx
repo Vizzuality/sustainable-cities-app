@@ -75,7 +75,13 @@ class EditStudyCasePage extends React.Component {
     evt.preventDefault();
 
     const { cities, category_id, impacts_attributes, bmes, originalBmes } = this.state;
-    const project_bmes_attributes = bmes.filter(bme => bme._destroy || !originalBmes.some(i => i.id === bme.id));
+
+    // TODO: Think a better way to do this
+    const projectBmes = this.props.studyCases.included.filter(sc => sc.type === 'project_bmes');
+    const projectBmesToDestroy = bmes.filter(bme => bme._destroy).map(bme => ({
+      ...bme,
+      id: projectBmes.find(pb => pb.relationships.bme.data.id === bme.id).id
+    }));
 
     dispatch(updateStudyCase({
       id: this.props.studyCaseDetail.id,
@@ -83,12 +89,12 @@ class EditStudyCasePage extends React.Component {
         ...this.form,
         city_ids: cities.map(c => c.value),
         category_id,
-        project_bmes_attributes,
+        project_bmes_attributes: projectBmesToDestroy,
         impacts_attributes: impacts_attributes.filter(i => !i.id || i._destroy || i.edited)
       },
       onSuccess: () => {
         toastr.success('The study case has been edited');
-        dispatch(getStudyCases({ id: this.props.studyCases.detailId }));
+        // dispatch(getStudyCases({ id: this.props.studyCases.detailId }));
       }
     }));
   }
@@ -190,7 +196,6 @@ class EditStudyCasePage extends React.Component {
 
   @Autobind
   deleteBme(index) {
-    debugger;
     const { originalBmes } = this.state;
     const bmes = this.state.bmes.slice();
 
