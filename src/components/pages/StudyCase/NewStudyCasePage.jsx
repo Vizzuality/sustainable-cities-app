@@ -16,6 +16,7 @@ import DropZone from 'components/dropzone/DropZone';
 import PropTypes from 'prop-types';
 import CitySearch from 'components/cities/CitySearch';
 import ImpactForm from 'components/impacts/ImpactForm';
+import ExternalSourceForm from 'components/form/External_sources/ExternalSourceForm';
 import { toggleModal } from 'modules/modal';
 import debounce from 'lodash/debounce';
 
@@ -38,7 +39,8 @@ class NewStudyCasePage extends React.Component {
       bmes: [],
       photos_attributes: [],
       documents_attributes: [],
-      impacts_attributes: []
+      impacts_attributes: [],
+      external_sources: []
     };
     this.form = {
       project_type: 'StudyCase'
@@ -60,7 +62,14 @@ class NewStudyCasePage extends React.Component {
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
-    const { city_ids, photos_attributes, documents_attributes, category_id, impacts_attributes } = this.state;
+    const {
+      city_ids,
+      photos_attributes,
+      documents_attributes,
+      category_id,
+      impacts_attributes,
+      external_sources
+    } = this.state;
 
     dispatch(createStudyCase({
       data: {
@@ -69,6 +78,7 @@ class NewStudyCasePage extends React.Component {
         photos_attributes,
         documents_attributes,
         impacts_attributes,
+        external_sources,
         project_bmes_attributes: this.state.bmes.map(bme => ({ bme_id: bme.id, description: bme.description })),
         city_ids: city_ids.map(c => c.value)
       },
@@ -144,6 +154,35 @@ class NewStudyCasePage extends React.Component {
     window.URL.revokeObjectURL(documents_attributes[index].attachment);
     documents_attributes.splice(index, 1);
     this.setState({ documents_attributes });
+  }
+
+  @Autobind
+  onCreateSource(formData) {
+    this.setState({
+      external_sources: [...this.state.external_sources, formData]
+    });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  deletetSource(index) {
+    const { external_sources } = this.state;
+    external_sources.splice(index, 1);
+    this.setState({ external_sources });
+  }
+
+  @Autobind
+  showExternalSourceForm(evt, opts = {}) {
+    evt.preventDefault();
+    let values = {};
+    let action = this.onCreateSource;
+
+    if (opts.edit) {
+      values = this.state.external_sources[opts.index];
+      action = this.onEditSource;
+    }
+
+    dispatch(toggleModal(true, <ExternalSourceForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />));
   }
 
   @Autobind
@@ -263,6 +302,20 @@ class NewStudyCasePage extends React.Component {
             })}
           </ul>
         </div>
+        {/* external sources */}
+        <div className="row expanded">
+          <button type="button" className="button" onClick={this.showExternalSourceForm}>Add external source</button>
+          <ul>
+            {this.state.external_sources.map((source, i) => {
+              return (
+                <li key={i}>
+                  <span onClick={evt => this.showExternalSourceForm(evt, { edit: true, index: i })}>{source.name}</span>
+                  <button className="button" onClick={() => this.deletetSource(i)}>Delete</button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
         <div className="row expanded">
           <div className="column small-6">
             <DropZone
@@ -301,8 +354,9 @@ NewStudyCasePage.defaultProps = {
   bmes: []
 };
 
-// NewStudyCasePage.propTypes = {
-//   categories: PropTypes.array
-// };
+NewStudyCasePage.propTypes = {
+  bmes: PropTypes.array,
+  categories: PropTypes.object
+};
 
 export default connect(mapStateToProps, null)(NewStudyCasePage);
