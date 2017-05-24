@@ -186,13 +186,17 @@ class EditStudyCasePage extends React.Component {
 
   @Autobind
   editProjectBme(data, index) {
-    const bmes = this.state.bmes.slice();
-    bmes[index] = {
-      ...bmes[index],
-      ...data,
-      edited: true
+    const project_bmes_attributes = this.state.project_bmes_attributes.slice();
+    project_bmes_attributes[index] = {
+      ...project_bmes_attributes[index],
+      ...data
     };
-    this.setState({ bmes });
+
+    if (project_bmes_attributes[index].id) {
+      project_bmes_attributes[index].edited = true;
+    }
+
+    this.setState({ project_bmes_attributes });
   }
 
   @Autobind
@@ -206,7 +210,7 @@ class EditStudyCasePage extends React.Component {
       project_bmes_attributes.splice(index, 1);
     } else {
       // Bme exists on database,
-      // we have to delete it from there
+      // we have to delete it from there using rails way (_destroy: true)
       project_bmes_attributes[index] = {
         id: bmeToDelete.id,
         _destroy: true
