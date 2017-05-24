@@ -76,8 +76,8 @@ class EditStudyCasePage extends React.Component {
 
     // Added, edited and deleted ProjectBmes
     const newProjectBmes = project_bmes_attributes.filter(pbme => !pbme.id);
-    const editedProjectBmes = [];
-    const deletedProjectBmes = [];
+    const editedProjectBmes = project_bmes_attributes.filter(pbme => pbme.edited);
+    const deletedProjectBmes = project_bmes_attributes.filter(pbme => pbme._destroy);
 
     dispatch(updateStudyCase({
       id: this.props.studyCaseDetail.id,
@@ -197,27 +197,23 @@ class EditStudyCasePage extends React.Component {
 
   @Autobind
   deleteProjectBme(index) {
-    const { originalBmes } = this.state;
-    const bmes = this.state.bmes.slice();
+    const project_bmes_attributes = this.state.project_bmes_attributes.slice();
+    const bmeToDelete = project_bmes_attributes[index];
 
-    const bmeToDelete = bmes[index];
-
-    const exists = originalBmes.find(bme => bme.id === bme.id);
-
-    if (!exists) {
+    if (!bmeToDelete.id) {
       // Bme still doesn't exist on database,
       // just remove it from local array
-      bmes.splice(index, 1);
+      project_bmes_attributes.splice(index, 1);
     } else {
       // Bme exists on database,
       // we have to delete it from there
-      bmes[index] = {
+      project_bmes_attributes[index] = {
         id: bmeToDelete.id,
         _destroy: true
       };
     }
 
-    this.setState({ bmes });
+    this.setState({ project_bmes_attributes });
   }
 
   /* Render */
