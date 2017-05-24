@@ -72,7 +72,12 @@ class EditStudyCasePage extends React.Component {
   submit(evt) {
     evt.preventDefault();
 
-    const { cities, category_id, impacts_attributes } = this.state;
+    const { cities, category_id, impacts_attributes, project_bmes_attributes } = this.state;
+
+    // Added, edited and deleted ProjectBmes
+    const newProjectBmes = project_bmes_attributes.filter(pbme => !pbme.id);
+    const editedProjectBmes = [];
+    const deletedProjectBmes = [];
 
     dispatch(updateStudyCase({
       id: this.props.studyCaseDetail.id,
@@ -80,7 +85,12 @@ class EditStudyCasePage extends React.Component {
         ...this.form,
         city_ids: cities.map(c => c.value),
         category_id,
-        impacts_attributes: impacts_attributes.filter(i => !i.id || i._destroy || i.edited)
+        impacts_attributes: impacts_attributes.filter(i => !i.id || i._destroy || i.edited),
+        project_bmes_attributes: [
+          ...newProjectBmes,
+          ...editedProjectBmes,
+          ...deletedProjectBmes
+        ]
       },
       onSuccess: () => {
         toastr.success('The study case has been edited');
@@ -166,16 +176,16 @@ class EditStudyCasePage extends React.Component {
   }
 
   @Autobind
-  addBme(bme) {
-    const bmes = [
-      ...this.state.bmes,
-      bme
+  addProjectBme(pbme) {
+    const project_bmes_attributes = [
+      ...this.state.project_bmes_attributes,
+      pbme
     ];
-    this.setState({ bmes });
+    this.setState({ project_bmes_attributes });
   }
 
   @Autobind
-  editBme(data, index) {
+  editProjectBme(data, index) {
     const bmes = this.state.bmes.slice();
     bmes[index] = {
       ...bmes[index],
@@ -186,7 +196,7 @@ class EditStudyCasePage extends React.Component {
   }
 
   @Autobind
-  deleteBme(index) {
+  deleteProjectBme(index) {
     const { originalBmes } = this.state;
     const bmes = this.state.bmes.slice();
 
@@ -247,11 +257,11 @@ class EditStudyCasePage extends React.Component {
           <Textarea name="situation" value={situation} label="situation" validations={[]} onChange={this.onInputChange} />
           <Creator
             title="BMEs"
-            onAdd={this.addBme}
-            onEdit={this.editBme}
+            onAdd={this.addProjectBme}
+            onEdit={this.editProjectBme}
             options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))}
             items={this.state.project_bmes_attributes}
-            onDelete={this.deleteBme}
+            onDelete={this.deleteProjectBme}
             selectedField="bme_id"
           />
           {/* Impacts */}

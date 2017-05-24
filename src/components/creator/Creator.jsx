@@ -14,6 +14,7 @@ export default class Creator extends React.Component {
           <div className="column small-6">Bme</div>
           <div className="column small-6">Description</div>
         </div>
+        {/* One CreatorItem per item filled with its data */}
         {items.map((item, i) => {
           return (
             <CreatorItem
@@ -30,6 +31,7 @@ export default class Creator extends React.Component {
             />
           );
         })}
+        {/* CreatorItem for adding new items */}
         <CreatorItem options={options} onAdd={(...args) => onAdd(...args)} selectedField={selectedField} />
       </section>
     );
