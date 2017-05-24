@@ -19,7 +19,8 @@ export default class CreatorItem extends React.Component {
       description,
       index,
       deleteable,
-      hidden
+      hidden,
+      selectedField
     } = this.props;
 
     const _onAdd = (...args) => {
@@ -55,6 +56,7 @@ CreatorItem.propTypes = {
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
   selected: PropTypes.string,
+  selectedField: PropTypes.string,
   index: PropTypes.number,
   description: PropTypes.string,
   deleteable: PropTypes.bool,

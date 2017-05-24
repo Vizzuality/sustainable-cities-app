@@ -31,7 +31,7 @@ class EditStudyCasePage extends React.Component {
     this.state = {
       category_id: null,
       cities: [],
-      bmes: [],
+      project_bmes_attributes: [],
       impacts_attributes: []
     };
   }
@@ -49,12 +49,10 @@ class EditStudyCasePage extends React.Component {
   componentWillReceiveProps(nextProps) {
     // Includes arrived! So, we can populate sub-entities
     if ((!this.props.studyCases.included || !this.props.studyCases.included.length) && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
-      const bmes = nextProps.studyCases.included.filter(sc => sc.type === 'project_bmes').map(bme => ({ id: bme.relationships.bme.data.id, description: bme.description }));
       this.setState({
         cities: nextProps.studyCases.included.filter(sc => sc.type === 'cities').map(city => ({ label: city.name, value: city.id })),
-        bmes,
-        impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
-        originalBmes: bmes
+        project_bmes_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'project_bmes').map(pBme => ({ id: pBme.id, bme_id: pBme.relationships.bme.data.id, description: pBme.description })),
+        impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts')
       });
     }
 
@@ -74,14 +72,7 @@ class EditStudyCasePage extends React.Component {
   submit(evt) {
     evt.preventDefault();
 
-    const { cities, category_id, impacts_attributes, bmes, originalBmes } = this.state;
-
-    // TODO: Think a better way to do this
-    const projectBmes = this.props.studyCases.included.filter(sc => sc.type === 'project_bmes');
-    const projectBmesToDestroy = bmes.filter(bme => bme._destroy).map(bme => ({
-      ...bme,
-      id: projectBmes.find(pb => pb.relationships.bme.data.id === bme.id).id
-    }));
+    const { cities, category_id, impacts_attributes } = this.state;
 
     dispatch(updateStudyCase({
       id: this.props.studyCaseDetail.id,
@@ -89,7 +80,6 @@ class EditStudyCasePage extends React.Component {
         ...this.form,
         city_ids: cities.map(c => c.value),
         category_id,
-        project_bmes_attributes: projectBmesToDestroy,
         impacts_attributes: impacts_attributes.filter(i => !i.id || i._destroy || i.edited)
       },
       onSuccess: () => {
@@ -189,7 +179,8 @@ class EditStudyCasePage extends React.Component {
     const bmes = this.state.bmes.slice();
     bmes[index] = {
       ...bmes[index],
-      ...data
+      ...data,
+      edited: true
     };
     this.setState({ bmes });
   }
@@ -259,8 +250,9 @@ class EditStudyCasePage extends React.Component {
             onAdd={this.addBme}
             onEdit={this.editBme}
             options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))}
-            items={this.state.bmes}
+            items={this.state.project_bmes_attributes}
             onDelete={this.deleteBme}
+            selectedField="bme_id"
           />
           {/* Impacts */}
           <div>

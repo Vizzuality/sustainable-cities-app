@@ -5,7 +5,8 @@ import PropTypes from 'prop-types';
 export default class Creator extends React.Component {
 
   render() {
-    const { title, items, onAdd, onEdit, onDelete, options } = this.props;
+    const { title, items, onAdd, onEdit, onDelete, options, selectedField } = this.props;
+
     return (
       <section className="c-creator">
         <h1 className="creator-title">{title}</h1>
@@ -13,8 +14,23 @@ export default class Creator extends React.Component {
           <div className="column small-6">Bme</div>
           <div className="column small-6">Description</div>
         </div>
-        {items.map((item, i) => <CreatorItem key={i} deleteable index={i} onEdit={onEdit} onDelete={onDelete} options={options} hidden={!!item._destroy} selected={item.id} description={item.description} />)}
-        <CreatorItem options={options} onAdd={(...args) => onAdd(...args)} />
+        {items.map((item, i) => {
+          return (
+            <CreatorItem
+              key={i}
+              deleteable
+              index={i}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              options={options}
+              hidden={!!item._destroy}
+              selected={item[selectedField]}
+              description={item.description}
+              selectedField={selectedField}
+            />
+          );
+        })}
+        <CreatorItem options={options} onAdd={(...args) => onAdd(...args)} selectedField={selectedField} />
       </section>
     );
   }
@@ -25,5 +41,11 @@ Creator.propTypes = {
   items: PropTypes.array,
   onAdd: PropTypes.func,
   onEdit: PropTypes.func,
-  options: PropTypes.array
+  onDelete: PropTypes.func,
+  options: PropTypes.array,
+  selectedField: PropTypes.string
+};
+
+Creator.defaultProps = {
+  selectedField: 'id'
 };
