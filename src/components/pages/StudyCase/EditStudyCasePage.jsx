@@ -117,6 +117,7 @@ class EditStudyCasePage extends React.Component {
   }
 
   /* Impact methods */
+
   @Autobind
   showImpactForm(evt, opts) {
     evt.preventDefault();
@@ -174,6 +175,8 @@ class EditStudyCasePage extends React.Component {
     this.setState({ impacts_attributes });
     dispatch(toggleModal(false));
   }
+
+  /* Project bmes methods */
 
   @Autobind
   addProjectBme(pbme) {
