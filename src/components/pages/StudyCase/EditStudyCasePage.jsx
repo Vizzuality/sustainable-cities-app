@@ -17,6 +17,7 @@ import Confirm from 'components/confirm/Confirm';
 import { push } from 'react-router-redux';
 import Creator from 'components/creator/Creator';
 import ImpactForm from 'components/impacts/ImpactForm';
+import SourceForm from 'components/sources/SourceForm';
 
 class EditStudyCasePage extends React.Component {
 
@@ -32,7 +33,8 @@ class EditStudyCasePage extends React.Component {
       category_id: null,
       cities: [],
       project_bmes_attributes: [],
-      impacts_attributes: []
+      impacts_attributes: [],
+      external_sources_attributes: []
     };
   }
 
@@ -52,7 +54,8 @@ class EditStudyCasePage extends React.Component {
       this.setState({
         cities: nextProps.studyCases.included.filter(sc => sc.type === 'cities').map(city => ({ label: city.name, value: city.id })),
         project_bmes_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'project_bmes').map(pBme => ({ id: pBme.id, bme_id: pBme.relationships.bme.data.id, description: pBme.description })),
-        impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts')
+        impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
+        external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources')
       });
     }
 
@@ -72,12 +75,13 @@ class EditStudyCasePage extends React.Component {
   submit(evt) {
     evt.preventDefault();
 
-    const { cities, category_id, impacts_attributes, project_bmes_attributes } = this.state;
-
-    // Added, edited and deleted ProjectBmes
-    const newProjectBmes = project_bmes_attributes.filter(pbme => !pbme.id);
-    const editedProjectBmes = project_bmes_attributes.filter(pbme => pbme.edited);
-    const deletedProjectBmes = project_bmes_attributes.filter(pbme => pbme._destroy);
+    const {
+      cities,
+      category_id,
+      impacts_attributes,
+      project_bmes_attributes,
+      external_sources_attributes
+    } = this.state;
 
     dispatch(updateStudyCase({
       id: this.props.studyCaseDetail.id,
@@ -86,11 +90,8 @@ class EditStudyCasePage extends React.Component {
         city_ids: cities.map(c => c.value),
         category_id,
         impacts_attributes: impacts_attributes.filter(i => !i.id || i._destroy || i.edited),
-        project_bmes_attributes: [
-          ...newProjectBmes,
-          ...editedProjectBmes,
-          ...deletedProjectBmes
-        ]
+        project_bmes_attributes: project_bmes_attributes.filter(pbme => !pbme.id || pbme.edited || pbme._destroy),
+        external_sources_attributes: external_sources_attributes.filter(es => !es.id || es.edited || es._destroy)
       },
       onSuccess: () => {
         toastr.success('The study case has been edited');
@@ -174,6 +175,66 @@ class EditStudyCasePage extends React.Component {
     };
     this.setState({ impacts_attributes });
     dispatch(toggleModal(false));
+  }
+
+  /* External sources methods */
+
+  @Autobind
+  showSourceForm(evt, opts) {
+    evt.preventDefault();
+    let values = {};
+    let action = this.createSource;
+
+    if (opts.edit) {
+      values = this.state.external_sources_attributes[opts.index];
+      action = this.editSource;
+    }
+
+    dispatch(toggleModal(true, <SourceForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />));
+  }
+
+  @Autobind
+  createSource(data) {
+    this.setState({
+      external_sources_attributes: [...this.state.external_sources_attributes, data]
+    });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  editSource(data, index) {
+    const external_sources_attributes = this.state.external_sources_attributes.slice();
+    external_sources_attributes[index] = {
+      ...external_sources_attributes[index],
+      ...data,
+      edited: true
+    };
+    this.setState({ external_sources_attributes });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  deleteSource(index) {
+    const externalSources = this.props.studyCases.included.filter(sc => sc.type === 'external_sources');
+    const sourceToDelete = this.state.external_sources_attributes[index];
+
+    const exists = externalSources.find(i => i.id === sourceToDelete.id);
+    const { external_sources_attributes } = this.state;
+
+    if (!exists) {
+      // Source still doesn't exist on database,
+      // just remove it from local array
+      external_sources_attributes.splice(index, 1);
+    } else {
+      // Source exists on database,
+      // we have to delete it from there
+      external_sources_attributes[index] = {
+        id: sourceToDelete.id,
+        _destroy: true
+      };
+    }
+
+    this.setState({ external_sources_attributes });
   }
 
   /* Project bmes methods */
@@ -276,6 +337,20 @@ class EditStudyCasePage extends React.Component {
                   <li key={i} className={`${impact._destroy ? 'hidden' : ''}`}>
                     <span onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>{impact.name}</span>
                     <button type="button" className="button" onClick={() => this.deleteImpact(i)}>Delete</button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+          {/* External sources */}
+          <div>
+            <button type="button" className="button" onClick={this.showSourceForm}>Add source</button>
+            <ul>
+              {this.state.external_sources_attributes.map((source, i) => {
+                return (
+                  <li key={i} className={`${source._destroy ? 'hidden' : ''}`}>
+                    <span onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</span>
+                    <button type="button" className="button" onClick={() => this.deleteSource(i)}>Delete</button>
                   </li>
                 );
               })}
