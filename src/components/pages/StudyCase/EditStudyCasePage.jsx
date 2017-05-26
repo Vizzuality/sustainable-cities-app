@@ -53,7 +53,7 @@ class EditStudyCasePage extends React.Component {
     if ((!this.props.studyCases.included || !this.props.studyCases.included.length) && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
       this.setState({
         cities: nextProps.studyCases.included.filter(sc => sc.type === 'cities').map(city => ({ label: city.name, value: city.id })),
-        project_bmes_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'project_bmes').map(pBme => ({ id: pBme.id, bme_id: pBme.relationships.bme.data.id, description: pBme.description })),
+        project_bmes_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'project_bmes').map(pBme => ({ id: pBme.id, bme_id: pBme.relationships.bme.data ? pBme.relationships.bme.data.id : null, description: pBme.description })),
         impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
         external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources')
       });
