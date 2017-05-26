@@ -4,8 +4,10 @@ import { dispatch } from 'main';
 import { createBme } from 'modules/bmes';
 import { getEnablings } from 'modules/enablings';
 import { getCategories } from 'modules/categories';
+import { toggleModal } from 'modules/modal';
 import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
+import SolutionForm from 'components/form/Solution/SolutionForm';
 import { validation } from 'utils/validation';
 import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
@@ -24,9 +26,9 @@ class NewBmePage extends React.Component {
       enablings: [],
       timing: [],
       categories: {
-        bme: {},
-        solution: {}
-      }
+        bme: {}
+      },
+      solutions: []
     };
 
     this.categoryGroups = {
@@ -37,10 +39,10 @@ class NewBmePage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.bmeCategories.length || dispatch(getCategories({ type: 'Bme', tree: true, pageSize: 9999 }));
-    this.props.solutionCategories.length || dispatch(getCategories({ type: 'Solution', tree: true, pageSize: 9999, sort: 'name' }));
-    this.props.timingCategories.length || dispatch(getCategories({ type: 'timing', pageSize: 9999 }));
-    this.props.enablings.list.length || dispatch(getEnablings({ pageSize: 9999 }));
+    dispatch(getCategories({ type: 'Bme', tree: true, pageSize: 9999 }));
+    dispatch(getCategories({ type: 'Solution', tree: true, pageSize: 9999, sort: 'name' }));
+    dispatch(getCategories({ type: 'timing', pageSize: 9999 }));
+    dispatch(getEnablings({ pageSize: 9999 }));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -70,12 +72,14 @@ class NewBmePage extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
 
+    const solutions = this.state.solutions.map(solution => solution.nephew.id);
+
     const data = {
       ...this.form,
       category_ids: [
         ...this.state.timing,
         ...[this.state.categories.bme.nephew],
-        ...this.state.categories.solution.nephew
+        ...solutions
       ],
       enabling_ids: this.state.enablings
     };
@@ -131,6 +135,40 @@ class NewBmePage extends React.Component {
     };
 
     this.setState({ categories: newState });
+  }
+
+  @Autobind
+  onCreateSolution(formParams) {
+    this.setState({
+      solutions: [...this.state.solutions, formParams.categories]
+    });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  onAddSolution(evt, opts = {}) {
+    evt.preventDefault();
+    let values = {};
+    let action = this.onCreateSolution;
+
+    if (opts.edit) {
+      values = this.state.solutions[opts.index];
+      action = this.onEditSolution;
+    }
+
+    dispatch(toggleModal(true, <SolutionForm text="Add Solution" values={values} onSubmit={(...args) => action(...args, opts.index)} />));
+  }
+
+  @Autobind
+  onEditSolution(form, index) {
+    const solutions = this.state.solutions.slice();
+    solutions[index] = {
+      ...solutions[index],
+      ...form.categories
+    };
+
+    this.setState({ solutions });
+    dispatch(toggleModal(false));
   }
 
   getFirstSelectOption(value, source, categoryGroupId) {
@@ -190,9 +228,15 @@ class NewBmePage extends React.Component {
     return options;
   }
 
+  @Autobind
+  deleteSolution(index) {
+    const { solutions } = this.state;
+    solutions.splice(index, 1);
+    this.setState({ solutions });
+  }
+
   render() {
     const bmeSelectOptions = this.loadMultiSelectOptions(this.state.categories.bme, 'bme');
-    const solutionSelectOptions = this.loadMultiSelectOptions(this.state.categories.solution, 'solution');
 
     return (
       <section className="c-form">
@@ -252,35 +296,21 @@ class NewBmePage extends React.Component {
             label="Timing"
             options={this.props.timingCategories.map(en => ({ value: en.id, label: en.name }))}
           />
-          {/* Solution categories */}
+          {/* Solutions */}
           <div className="row expanded">
-            <div className="small-4 columns">
-              <Select
-                name="categories"
-                value={this.state.categories.solution.parent}
-                onChange={val => this.onCategoryChange('solution', 'parent', val)}
-                label="Solution group"
-                options={this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }))}
-              />
-            </div>
-            <div className="small-4 columns">
-              <Select
-                name="categories"
-                value={this.state.categories.solution.children}
-                onChange={val => this.onCategoryChange('solution', 'children', val)}
-                label="Solution category"
-                options={solutionSelectOptions.children}
-              />
-            </div>
-            <div className="small-4 columns">
-              <Select
-                name="categories"
-                multi
-                value={this.state.categories.solution.nephew}
-                onChange={val => this.onCategoryChange('solution', 'nephew', val)}
-                label="Solution sub-category"
-                options={solutionSelectOptions.nephew}
-              />
+            <div className="small-12 column">
+              <label htmlFor="solutions">Solutions</label>
+              <button type="button" className="button" onClick={this.onAddSolution}>Add Solution</button>
+              <ul>
+                {this.state.solutions.map((solution, i) => {
+                  return (
+                    <li key={i}>
+                      <span onClick={evt => this.onAddSolution(evt, { edit: true, index: i })}>{`${solution.nephew.name} - ${solution.nephew.id}`}</span>
+                      <button className="button" onClick={() => this.deleteSolution(i)}>Delete solution</button>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           </div>
           <Textarea

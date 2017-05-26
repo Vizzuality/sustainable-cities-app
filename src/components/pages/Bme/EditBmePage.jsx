@@ -6,6 +6,7 @@ import { getCategories } from 'modules/categories';
 import { getEnablings } from 'modules/enablings';
 import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
+import SolutionSelector from 'components/solution/SolutionSelector';
 import getBmeDetail from 'selectors/bmeDetail';
 import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
@@ -22,6 +23,7 @@ class EditBmePage extends React.Component {
     this.state = {
       categories: {
         bme: {},
+        // contains data from selected solutions
         solution: {}
       },
       enablings: {},
@@ -32,20 +34,24 @@ class EditBmePage extends React.Component {
       bme: props.bmeCategories,
       solution: props.solutionCategories
     };
+
+    // contains ids from selected solutions
+    this.solutionIds = [];
   }
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.bmeCategories.length || dispatch(getCategories({ type: 'Bme', tree: true, pageSize: 9999 }));
-    this.props.solutionCategories.length || dispatch(getCategories({ type: 'Solution', tree: true, pageSize: 9999 }));
-    this.props.timingCategories.length || dispatch(getCategories({ type: 'timing', pageSize: 9999 }));
-    this.props.enablings.list.length || dispatch(getEnablings({ pageSize: 9999 }));
+    dispatch(getCategories({ type: 'Bme', tree: true, pageSize: 9999 }));
+    dispatch(getCategories({ type: 'Solution', tree: true, pageSize: 9999 }));
+    dispatch(getCategories({ type: 'timing', pageSize: 9999 }));
+    dispatch(getEnablings({ pageSize: 9999 }));
 
     if (!this.props.bmesDetail) {
       dispatch(getBmes({ id: this.props.bmes.detailId }));
     } else {
       this.fillFields(this.props);
       this.setCategories(this.props);
+      this.setDefaultSolutions(this.props);
     }
   }
 
@@ -67,6 +73,7 @@ class EditBmePage extends React.Component {
 
     if (!isEqual(bmesDetail, nextProps.bmesDetail)) {
       this.fillFields(nextProps);
+      this.setDefaultSolutions(nextProps);
     }
 
     // review this
@@ -97,7 +104,7 @@ class EditBmePage extends React.Component {
       category_ids: [
         ...this.state.timing,
         ...[this.state.categories.bme.nephew],
-        ...this.state.categories.solution.nephew
+        ...this.solutionIds
       ],
       enabling_ids: this.state.enablings
     };
@@ -146,6 +153,11 @@ class EditBmePage extends React.Component {
     };
 
     this.setState({ categories: newState });
+  }
+
+  setDefaultSolutions({ bmesDetail }) {
+    const solutionsIds = bmesDetail.categories.filter(cat => cat.category_type === 'Solution').map(c => c.id);
+    this.solutionIds = solutionsIds;
   }
 
   getFirstSelectOption(value, source, categoryGroupId) {
@@ -231,35 +243,50 @@ class EditBmePage extends React.Component {
       let parentCategory = null;
       let childrenCategoryId = null;
 
-      // if it has multiple answers...
-      if (Array.isArray(nephewCategory)) {
-        if (nephewCategory && nephewCategory.length) {
-          childrenCategoryId = nephewCategory.map(cat => cat.relationships.parent.data.id);
-
-          parentCategory = childrenCategoryId ? this.categoryGroups[key].find((cat) => {
-            return cat.children.find(c => c.id === childrenCategoryId[0]);
-          }) : {};
-        }
-      } else {
+      if (!Array.isArray(nephewCategory)) {
         childrenCategoryId = nephewCategory ? nephewCategory.relationships.parent.data.id : {};
 
         parentCategory = childrenCategoryId ? this.categoryGroups[key].find((cat) => {
           return cat.children.find(c => c.id === childrenCategoryId);
         }) : {};
-      }
 
-      newState = {
-        ...newState,
-        ...newState.categories,
-        ...{ [key]: {
-          parent: parentCategory ? parentCategory.id : null,
-          children: Array.isArray(childrenCategoryId) ? childrenCategoryId[0] : childrenCategoryId,
-          nephew: Array.isArray(nephewCategory) ? nephewCategory.map(cat => cat.id) : nephewCategory.id
-        } }
-      };
+        newState = {
+          ...newState,
+          ...newState.categories,
+          ...{ [key]: {
+            parent: parentCategory ? parentCategory.id : null,
+            children: childrenCategoryId,
+            nephew: nephewCategory.id
+          } }
+        };
+      } else {
+        const status = nephewCategory.map((cat) => {
+          childrenCategoryId = cat.relationships.parent.data.id || {};
+
+          parentCategory = childrenCategoryId ? this.categoryGroups[key].find((catChild) => {
+            return catChild.children.find(c => c.id === childrenCategoryId);
+          }) : {};
+
+          return {
+            parent: parentCategory ? parentCategory.id : null,
+            children: childrenCategoryId,
+            nephew: cat.id
+          };
+        });
+
+        newState = {
+          ...newState,
+          ...newState.categories,
+          ...{ [key]: status }
+        };
+      }
     });
 
     this.setState({ categories: newState });
+  }
+
+  componentWillUnMount() {
+    this.solutionIds = [];
   }
 
   fillFields({ bmesDetail }) {
@@ -290,9 +317,49 @@ class EditBmePage extends React.Component {
     return options;
   }
 
+  @Autobind
+  onAddSolution() {
+    const solutionState = this.state.categories.solution;
+    solutionState.push({});
+
+    const newState = {
+      ...this.state.categories,
+      ...{ solution: solutionState }
+    };
+
+    this.setState({ categories: newState });
+  }
+
+  @Autobind
+  onChangeSolution(state, index) {
+    this.solutionIds[index] = state.categories.nephew;
+    const solutionState = this.state.categories.solution;
+    solutionState[index] = state.categories;
+
+    const newState = {
+      ...this.state.categories,
+      ...{ solution: solutionState }
+    };
+
+    this.setState({ categories: newState });
+  }
+
+  @Autobind
+  onDeleteSolution(index) {
+    this.solutionIds.splice(index, 1);
+    const solutionState = this.state.categories.solution;
+    solutionState.splice(index, 1);
+
+    const newState = {
+      ...this.state.categories,
+      ...{ solution: solutionState }
+    };
+
+    this.setState({ categories: newState });
+  }
+
   render() {
     const bmeSelectOptions = this.loadMultiSelectOptions(this.state.categories.bme, 'bme');
-    const solutionSelectOptions = this.loadMultiSelectOptions(this.state.categories.solution, 'solution');
 
     return (
       <section className="c-form">
@@ -364,36 +431,18 @@ class EditBmePage extends React.Component {
             options={this.props.timingCategories.map(en => ({ value: en.id, label: en.name }))}
           />
           {/* Solution categories */}
-          <div className="row expanded">
-            <div className="small-4 columns">
-              <Select
-                name="categories"
-                value={this.state.categories.solution.parent}
-                onChange={val => this.onCategoryChange('solution', 'parent', val)}
-                label="Solution group"
-                options={this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }))}
-              />
-            </div>
-            <div className="small-4 columns">
-              <Select
-                name="categories"
-                value={this.state.categories.solution.children}
-                onChange={val => this.onCategoryChange('solution', 'children', val)}
-                label="Solution category"
-                options={solutionSelectOptions.children}
-              />
-            </div>
-            <div className="small-4 columns">
-              <Select
-                name="categories"
-                multi
-                value={this.state.categories.solution.nephew}
-                onChange={val => this.onCategoryChange('solution', 'nephew', val, true)}
-                label="Solution sub-category"
-                options={solutionSelectOptions.nephew}
-              />
-            </div>
-          </div>
+          <label htmlFor="solutions">Solutions</label>
+          {this.state.categories.solution.length
+            && this.state.categories.solution.map((sol, index) =>
+              <SolutionSelector
+                index={index}
+                key={index}
+                solutionCategories={this.props.solutionCategories}
+                state={sol}
+                onChangeSelect={this.onChangeSolution}
+                onDeleteSelect={this.onDeleteSolution}
+              />)}
+          <button type="button" className="button" onClick={this.onAddSolution}>Add Solution</button>
           {/* description */}
           <Textarea
             name="description"
