@@ -120,7 +120,7 @@ class EditStudyCasePage extends React.Component {
   /* Impact methods */
 
   @Autobind
-  showImpactForm(evt, opts) {
+  showImpactForm(evt, opts = {}) {
     evt.preventDefault();
     let values = {};
     let action = this.onImpactCreate;
@@ -180,7 +180,7 @@ class EditStudyCasePage extends React.Component {
   /* External sources methods */
 
   @Autobind
-  showSourceForm(evt, opts) {
+  showSourceForm(evt, opts = {}) {
     evt.preventDefault();
     let values = {};
     let action = this.createSource;
