@@ -335,7 +335,7 @@ class EditStudyCasePage extends React.Component {
               {this.state.impacts_attributes.map((impact, i) => {
                 return (
                   <li key={i} className={`${impact._destroy ? 'hidden' : ''}`}>
-                    <span onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>{impact.name}</span>
+                    <span onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>{impact.name || 'No name'}</span>
                     <button type="button" className="button" onClick={() => this.deleteImpact(i)}>Delete</button>
                   </li>
                 );
