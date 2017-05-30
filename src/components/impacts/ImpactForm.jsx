@@ -37,14 +37,12 @@ class ImpactForm extends React.Component {
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
-    const { parent, children } = this.state.categories;
-    this.props.onSubmit && this.props.onSubmit({
-      ...this.form,
-      ...{ categories: {
-        parent,
-        children
-      } }
-    });
+    const { children } = this.state.categories;
+    const data = { ...this.form };
+
+    if (children) data.category_id = children;
+
+    this.props.onSubmit && this.props.onSubmit(data);
   }
 
   @Autobind
