@@ -35,7 +35,7 @@ class NewStudyCasePage extends React.Component {
     super(props);
     this.state = {
       category_id: null,
-      city_ids: [],
+      city: {},
       bmes: [],
       photos_attributes: [],
       documents_attributes: [],
@@ -64,7 +64,7 @@ class NewStudyCasePage extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
     const {
-      city_ids,
+      city,
       photos_attributes,
       documents_attributes,
       category_id,
@@ -87,7 +87,7 @@ class NewStudyCasePage extends React.Component {
         project_bmes_attributes: this.state.bmes.map(bme => ({ bme_id: bme.id,
           description: bme.description })),
         external_sources_attributes,
-        city_ids: city_ids.map(c => c.value),
+        city_ids: [city.value],
         operational_year: operationalDate
       },
       onSuccess() {
@@ -298,12 +298,11 @@ class NewStudyCasePage extends React.Component {
           <div className="column small-6">
             {/* City */}
             <CitySearch
-              multi
-              name="city_ids"
-              label="Cities"
+              name="city"
+              label="City"
               validations={['required']}
-              value={this.state.city_ids}
-              onChange={items => this.setState({ city_ids: items })}
+              value={this.state.city}
+              onChange={city => this.setState({ city })}
             />
           </div>
           <div className="column small-6">

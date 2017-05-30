@@ -31,7 +31,7 @@ class EditStudyCasePage extends React.Component {
 
     this.state = {
       category_id: null,
-      cities: [],
+      city: {},
       project_bmes_attributes: [],
       impacts_attributes: [],
       external_sources_attributes: []
@@ -51,8 +51,9 @@ class EditStudyCasePage extends React.Component {
   componentWillReceiveProps(nextProps) {
     // Includes arrived! So, we can populate sub-entities
     if ((!this.props.studyCases.included || !this.props.studyCases.included.length) && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
+
       this.setState({
-        cities: nextProps.studyCases.included.filter(sc => sc.type === 'cities').map(city => ({ label: city.name, value: city.id })),
+        city: nextProps.studyCases.included.filter(sc => sc.type === 'cities').map(c => ({ label: c.name, value: c.id }))[0],
         project_bmes_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'project_bmes').filter(pBme => !!pBme.relationships.bme.data).map(pBme => ({ id: pBme.id, bme_id: pBme.relationships.bme.data.id, description: pBme.description })),
         impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
         external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources')
@@ -76,7 +77,7 @@ class EditStudyCasePage extends React.Component {
     evt.preventDefault();
 
     const {
-      cities,
+      city,
       category_id,
       impacts_attributes,
       project_bmes_attributes,
@@ -92,7 +93,7 @@ class EditStudyCasePage extends React.Component {
       id: this.props.studyCaseDetail.id,
       data: {
         ...this.form,
-        city_ids: cities.map(c => c.value),
+        city_ids: [city.value],
         category_id,
         impacts_attributes: impacts_attributes.filter(i => !i.id || i._destroy || i.edited),
         project_bmes_attributes: project_bmes_attributes.filter(pbme => !pbme.id || pbme.edited || pbme._destroy),
@@ -312,11 +313,10 @@ class EditStudyCasePage extends React.Component {
             <div className="column small-6">
               {/* City */}
               <CitySearch
-                multi
                 name="city_ids"
-                label="Cities"
-                value={this.state.cities}
-                onChange={items => this.setState({ cities: items })}
+                label="City"
+                value={this.state.city}
+                onChange={city => this.setState({ city })}
               />
             </div>
             <div className="column small-6">
