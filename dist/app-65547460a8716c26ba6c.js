@@ -1340,7 +1340,7 @@ function createCategory(_ref) {
   return function (dispatch) {
     dispatch(setCategoriesLoading(true));
     (0, _request.post)({
-      url: "http://localhost:3001" + '/categories',
+      url: "http://sustainable-cities-api.vizzuality.com" + '/categories',
       body: {
         category: data
       },
@@ -1385,7 +1385,7 @@ function getCategories(_ref2) {
   return function (dispatch) {
     dispatch(setCategoriesLoading(true));
     (0, _request.get)({
-      url: "http://localhost:3001" + '/' + endPoint + queryS,
+      url: "http://sustainable-cities-api.vizzuality.com" + '/' + endPoint + queryS,
       onSuccess: function onSuccess(_ref3) {
         var data = _ref3.data,
             meta = _ref3.meta;
@@ -1415,7 +1415,7 @@ function updateCategory(_ref4) {
   return function (dispatch) {
     dispatch(setCategoriesLoading(true));
     (0, _request.patch)({
-      url: "http://localhost:3001" + '/categories/' + id,
+      url: "http://sustainable-cities-api.vizzuality.com" + '/categories/' + id,
       body: {
         category: data
       },
@@ -1434,7 +1434,7 @@ function deleteCategory(_ref5) {
   return function (dispatch) {
     dispatch(setCategoriesLoading(true));
     (0, _request._delete)({
-      url: "http://localhost:3001" + '/categories/' + id,
+      url: "http://sustainable-cities-api.vizzuality.com" + '/categories/' + id,
       onSuccess: function onSuccess() {
         dispatch(setCategoriesLoading(false));
         _onSuccess3 && _onSuccess3(id);
@@ -2110,7 +2110,7 @@ function getBmes() {
       search: search
     });
 
-    var url = id ? "http://localhost:3001" + '/business-model-elements/' + id : "http://localhost:3001" + '/business-model-elements?' + queryS;
+    var url = id ? "http://sustainable-cities-api.vizzuality.com" + '/business-model-elements/' + id : "http://sustainable-cities-api.vizzuality.com" + '/business-model-elements?' + queryS;
 
     dispatch(setBmesLoading(true));
 
@@ -2166,7 +2166,7 @@ function createBme(_ref2) {
   return function (dispatch) {
     dispatch(setBmesLoading(true));
     (0, _request.post)({
-      url: "http://localhost:3001" + '/business-model-elements',
+      url: "http://sustainable-cities-api.vizzuality.com" + '/business-model-elements',
       body: { bme: data },
       headers: {
         Authorization: 'Bearer ' + localStorage.token
@@ -2187,7 +2187,7 @@ function updateBme(_ref3) {
   return function (dispatch) {
     dispatch(setBmesLoading(true));
     (0, _request.patch)({
-      url: "http://localhost:3001" + '/business-model-elements/' + id,
+      url: "http://sustainable-cities-api.vizzuality.com" + '/business-model-elements/' + id,
       body: {
         bme: data
       },
@@ -2206,7 +2206,7 @@ function deleteBme(_ref4) {
   return function (dispatch) {
     dispatch(setBmesLoading(true));
     (0, _request._delete)({
-      url: "http://localhost:3001" + '/business-model-elements/' + id,
+      url: "http://sustainable-cities-api.vizzuality.com" + '/business-model-elements/' + id,
       onSuccess: function onSuccess() {
         dispatch(setBmesLoading(false));
         _onSuccess4 && _onSuccess4(id);
@@ -3176,7 +3176,7 @@ function getEnablings() {
     search: search
   });
 
-  var url = id ? "http://localhost:3001" + '/enablings/' + id : "http://localhost:3001" + '/enablings?' + queryS;
+  var url = id ? "http://sustainable-cities-api.vizzuality.com" + '/enablings/' + id : "http://sustainable-cities-api.vizzuality.com" + '/enablings?' + queryS;
 
   return function (dispatch) {
     dispatch(setEnablingsLoading(true));
@@ -3230,7 +3230,7 @@ function deleteEnabling(_ref2) {
   return function (dispatch) {
     dispatch(setEnablingsLoading(true));
     (0, _request._delete)({
-      url: "http://localhost:3001" + '/enablings/' + id,
+      url: "http://sustainable-cities-api.vizzuality.com" + '/enablings/' + id,
       onSuccess: function onSuccess() {
         dispatch(setEnablingsLoading(false));
         _onSuccess2 && _onSuccess2(id);
@@ -3246,7 +3246,7 @@ function createEnabling(_ref3) {
   return function (dispatch) {
     dispatch(setEnablingsLoading(true));
     (0, _request.post)({
-      url: "http://localhost:3001" + '/enablings',
+      url: "http://sustainable-cities-api.vizzuality.com" + '/enablings',
       body: { enabling: data },
       headers: {
         Authorization: 'Bearer ' + localStorage.token
@@ -3267,7 +3267,7 @@ function updateEnabling(_ref4) {
   return function (dispatch) {
     dispatch(setEnablingsLoading(true));
     (0, _request.patch)({
-      url: "http://localhost:3001" + '/enablings/' + id,
+      url: "http://sustainable-cities-api.vizzuality.com" + '/enablings/' + id,
       body: {
         enabling: data
       },
@@ -3319,7 +3319,7 @@ function post(_ref) {
 
   var _headers = _extends({}, headers, {
     'Content-Type': 'application/json',
-    'SC-API-KEY': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo1fQ.7ElzxenermoUJABmTWI4OxHpLHPdDM5Mk---mcF7Wsc"
+    'SC-API-KEY': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo1fQ.6vqwiucXnGrj5a5ldvGdbRQUzPguDVps_AHJt6dXvD4"
   });
 
   Object.keys(_headers).forEach(function (h) {
@@ -3359,7 +3359,7 @@ function get(_ref2) {
 
   var _headers = _extends({}, headers, {
     'Content-Type': 'application/json',
-    'SC-API-KEY': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo1fQ.7ElzxenermoUJABmTWI4OxHpLHPdDM5Mk---mcF7Wsc",
+    'SC-API-KEY': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo1fQ.6vqwiucXnGrj5a5ldvGdbRQUzPguDVps_AHJt6dXvD4",
     Authorization: 'Bearer ' + localStorage.token
   });
 
@@ -3394,7 +3394,7 @@ function _delete(_ref3) {
 
   var _headers = _extends({}, headers, {
     'Content-Type': 'application/json',
-    'SC-API-KEY': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo1fQ.7ElzxenermoUJABmTWI4OxHpLHPdDM5Mk---mcF7Wsc",
+    'SC-API-KEY': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo1fQ.6vqwiucXnGrj5a5ldvGdbRQUzPguDVps_AHJt6dXvD4",
     Authorization: 'Bearer ' + localStorage.token
   });
 
@@ -3430,7 +3430,7 @@ function patch(_ref4) {
 
   var _headers = _extends({}, headers, {
     'Content-Type': 'application/json',
-    'SC-API-KEY': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo1fQ.7ElzxenermoUJABmTWI4OxHpLHPdDM5Mk---mcF7Wsc",
+    'SC-API-KEY': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo1fQ.6vqwiucXnGrj5a5ldvGdbRQUzPguDVps_AHJt6dXvD4",
     Authorization: 'Bearer ' + localStorage.token
   });
 
@@ -4109,7 +4109,7 @@ function setError(error) {
 function getUserData() {
   return function (dispatch) {
     (0, _request.get)({
-      url: "http://localhost:3001" + '/users/current-user',
+      url: "http://sustainable-cities-api.vizzuality.com" + '/users/current-user',
       onSuccess: function onSuccess(_ref) {
         var data = _ref.data;
 
@@ -4124,7 +4124,7 @@ function login(userData) {
     dispatch(setError(null));
     dispatch(setLoading(true));
     (0, _request.post)({
-      url: "http://localhost:3001" + '/login',
+      url: "http://sustainable-cities-api.vizzuality.com" + '/login',
       body: {
         auth: userData
       },
@@ -4165,7 +4165,7 @@ function register(_ref3, loginAfterRegister) {
     dispatch(setError(null));
     dispatch(setLoading(true));
     (0, _request.post)({
-      url: "http://localhost:3001" + '/register',
+      url: "http://sustainable-cities-api.vizzuality.com" + '/register',
       body: {
         user: {
           email: email,
@@ -6334,7 +6334,7 @@ function getImpacts() {
       search: search
     });
 
-    var url = id ? "http://localhost:3001" + '/impacts/' + id : "http://localhost:3001" + '/impacts?' + queryS;
+    var url = id ? "http://sustainable-cities-api.vizzuality.com" + '/impacts/' + id : "http://sustainable-cities-api.vizzuality.com" + '/impacts?' + queryS;
 
     dispatch(setImpactLoading(true));
 
@@ -6390,7 +6390,7 @@ function createImpact(_ref2) {
   return function (dispatch) {
     dispatch(setImpactLoading(true));
     (0, _request.post)({
-      url: "http://localhost:3001" + '/impacts',
+      url: "http://sustainable-cities-api.vizzuality.com" + '/impacts',
       body: { impact: data },
       headers: {
         Authorization: 'Bearer ' + localStorage.token
@@ -6411,7 +6411,7 @@ function updateImpact(_ref3) {
   return function (dispatch) {
     dispatch(setImpactLoading(true));
     (0, _request.patch)({
-      url: "http://localhost:3001" + '/impacts/' + id,
+      url: "http://sustainable-cities-api.vizzuality.com" + '/impacts/' + id,
       body: {
         impact: data
       },
@@ -6430,7 +6430,7 @@ function deleteImpact(_ref4) {
   return function (dispatch) {
     dispatch(setImpactLoading(true));
     (0, _request._delete)({
-      url: "http://localhost:3001" + '/impacts/' + id,
+      url: "http://sustainable-cities-api.vizzuality.com" + '/impacts/' + id,
       onSuccess: function onSuccess() {
         dispatch(setImpactLoading(false));
         _onSuccess4 && _onSuccess4(id);
@@ -6598,7 +6598,7 @@ function getStudyCases() {
       search: search
     });
 
-    var url = id ? "http://localhost:3001" + '/study-cases/' + id : "http://localhost:3001" + '/study-cases?' + queryS;
+    var url = id ? "http://sustainable-cities-api.vizzuality.com" + '/study-cases/' + id : "http://sustainable-cities-api.vizzuality.com" + '/study-cases?' + queryS;
 
     dispatch(setStudyCasesLoading(true));
 
@@ -6641,7 +6641,7 @@ function createProject(_ref2) {
   return function (dispatch) {
     dispatch(setStudyCasesLoading(true));
     (0, _request.post)({
-      url: "http://localhost:3001" + '/projects',
+      url: "http://sustainable-cities-api.vizzuality.com" + '/projects',
       body: {
         project: _extends({}, data, {
           is_active: true,
@@ -6680,7 +6680,7 @@ function updateStudyCase(_ref4) {
   return function (dispatch) {
     dispatch(setStudyCasesLoading(true));
     (0, _request.patch)({
-      url: "http://localhost:3001" + '/projects/' + id,
+      url: "http://sustainable-cities-api.vizzuality.com" + '/projects/' + id,
       body: {
         project: data
       },
@@ -6699,7 +6699,7 @@ function deleteStudyCase(_ref5) {
   return function (dispatch) {
     dispatch(setStudyCasesLoading(true));
     (0, _request._delete)({
-      url: "http://localhost:3001" + '/projects/' + id,
+      url: "http://sustainable-cities-api.vizzuality.com" + '/projects/' + id,
       onSuccess: function onSuccess() {
         dispatch(setStudyCasesLoading(false));
         _onSuccess4 && _onSuccess4(id);
@@ -32425,7 +32425,7 @@ function getCities(input, cb) {
   }
 
   (0, _request.get)({
-    url: "http://localhost:3001" + '/cities?page[number]=1&&page[size]=50sort=name&search=' + input.toLowerCase(),
+    url: "http://sustainable-cities-api.vizzuality.com" + '/cities?page[number]=1&&page[size]=50sort=name&search=' + input.toLowerCase(),
     onSuccess: function onSuccess(_ref) {
       var data = _ref.data;
 
