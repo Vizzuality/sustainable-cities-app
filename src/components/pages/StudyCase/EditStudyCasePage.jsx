@@ -83,6 +83,11 @@ class EditStudyCasePage extends React.Component {
       external_sources_attributes
     } = this.state;
 
+    const { operational_year } = this.form;
+    delete this.form.operational_year;
+    const operationalDate = new Date();
+    operationalDate.setYear(operational_year);
+
     dispatch(updateStudyCase({
       id: this.props.studyCaseDetail.id,
       data: {
@@ -91,7 +96,8 @@ class EditStudyCasePage extends React.Component {
         category_id,
         impacts_attributes: impacts_attributes.filter(i => !i.id || i._destroy || i.edited),
         project_bmes_attributes: project_bmes_attributes.filter(pbme => !pbme.id || pbme.edited || pbme._destroy),
-        external_sources_attributes: external_sources_attributes.filter(es => !es.id || es.edited || es._destroy)
+        external_sources_attributes: external_sources_attributes.filter(es => !es.id || es.edited || es._destroy),
+        operational_year: operationalDate
       },
       onSuccess: () => {
         toastr.success('The study case has been edited');
@@ -289,6 +295,7 @@ class EditStudyCasePage extends React.Component {
     // Study case initial values
     const { studyCaseDetail } = this.props;
     const name = studyCaseDetail ? studyCaseDetail.name : '';
+    const operationalYear = studyCaseDetail && studyCaseDetail.operational_year ? new Date(studyCaseDetail.operational_year).getFullYear() : '';
     const solution = studyCaseDetail ? studyCaseDetail.solution : '';
     const situation = studyCaseDetail ? studyCaseDetail.situation : '';
 
@@ -301,13 +308,29 @@ class EditStudyCasePage extends React.Component {
             <Link to="/study-cases" className="button">Cancel</Link>
           </BtnGroup>
           <Input type="text" name="name" value={name} label="Study case title" validations={['required']} onChange={this.onInputChange} />
-          <CitySearch
-            multi
-            name="city_ids"
-            label="Cities"
-            value={this.state.cities}
-            onChange={items => this.setState({ cities: items })}
-          />
+          <div className="row expanded">
+            <div className="column small-6">
+              {/* City */}
+              <CitySearch
+                multi
+                name="city_ids"
+                label="Cities"
+                value={this.state.cities}
+                onChange={items => this.setState({ cities: items })}
+              />
+            </div>
+            <div className="column small-6">
+              {/* Year */}
+              <Input
+                type="number"
+                value={operationalYear}
+                name="operational_year"
+                onChange={this.onInputChange}
+                label="Year"
+                validations={['required']}
+              />
+            </div>
+          </div>
           <Select
             name="category_id"
             clearable={false}
