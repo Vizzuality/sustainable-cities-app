@@ -13,6 +13,8 @@ import Table from 'components/ui/Table';
 import Search from 'components/search/Search';
 import { Autobind } from 'es-decorators';
 
+import { getIdRelations } from 'utils/relation';
+
 import { DEFAULT_SORT_FIELD, ENABLINGS_TABLE_FIELDS } from 'constants/enablings';
 import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
 
@@ -66,13 +68,32 @@ class EnablingPage extends React.Component {
     }));
   }
 
+  setCategory() {
+    console.log(this.props.enablings);
+    return this.props.enablings.list.map((enabling) => {
+      if (!enabling.relationships.category.data) return { enabling };
+      const category = getIdRelations([enabling.relationships.category.data], this.props.enablings.included, 'enablings');
+      debugger
+      return {
+        ...enabling,
+        ...{ category: category ? category.name : '-' }
+      };
+    });
+  }
+
   render() {
+    let enablings = [];
+
+    if (this.props.enablings.list.length) {
+      enablings = this.setCategory();
+    }
+
     return (
       <div className="c-page">
         <Link className="button" to="/enabling-condition/new">New Enabling Condition</Link>
         <Search onChange={this.search} />
         <Table
-          items={this.props.enablings.list}
+          items={enablings}
           itemCount={this.props.enablings.itemCount}
           fields={ENABLINGS_TABLE_FIELDS}
           defaultSortField={DEFAULT_SORT_FIELD}
