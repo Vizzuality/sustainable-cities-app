@@ -16,6 +16,7 @@ import DropZone from 'components/dropzone/DropZone';
 import PropTypes from 'prop-types';
 import CitySearch from 'components/cities/CitySearch';
 import ImpactForm from 'components/impacts/ImpactForm';
+import SourceForm from 'components/sources/SourceForm';
 import { toggleModal } from 'modules/modal';
 import debounce from 'lodash/debounce';
 
@@ -34,17 +35,19 @@ class NewStudyCasePage extends React.Component {
     super(props);
     this.state = {
       category_id: null,
-      city_ids: [],
+      city: {},
       bmes: [],
       photos_attributes: [],
       documents_attributes: [],
-      impacts_attributes: []
+      impacts_attributes: [],
+      external_sources_attributes: []
     };
+
     this.form = {
       project_type: 'StudyCase'
     };
 
-    this.editBme = debounce(this.editBme, 300);
+    this.editProjectBme = debounce(this.editProjectBme, 300);
   }
 
   /* Lifecycle */
@@ -60,7 +63,19 @@ class NewStudyCasePage extends React.Component {
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
-    const { city_ids, photos_attributes, documents_attributes, category_id, impacts_attributes } = this.state;
+    const {
+      city,
+      photos_attributes,
+      documents_attributes,
+      category_id,
+      impacts_attributes,
+      external_sources_attributes
+    } = this.state;
+
+    const { operational_year } = this.form;
+    delete this.form.operational_year;
+    const operationalDate = new Date();
+    operationalDate.setYear(operational_year);
 
     dispatch(createStudyCase({
       data: {
@@ -69,8 +84,11 @@ class NewStudyCasePage extends React.Component {
         photos_attributes,
         documents_attributes,
         impacts_attributes,
-        project_bmes_attributes: this.state.bmes.map(bme => ({ bme_id: bme.id, description: bme.description })),
-        city_ids: city_ids.map(c => c.value)
+        project_bmes_attributes: this.state.bmes.map(bme => ({ bme_id: bme.id,
+          description: bme.description })),
+        external_sources_attributes,
+        city_ids: [city.value],
+        operational_year: operationalDate
       },
       onSuccess() {
         dispatch(push('/study-cases'));
@@ -85,7 +103,8 @@ class NewStudyCasePage extends React.Component {
   }
 
   @Autobind
-  onImageDrop(acceptedImgs, rejectedImgs) {
+  onImageDrop(acceptedImgs,
+    rejectedImgs) {
     const parsedPhotos = [];
 
     rejectedImgs.forEach(file => toastr.error(`The image "${file.name}" hast not a valid extension`));
@@ -146,6 +165,48 @@ class NewStudyCasePage extends React.Component {
     this.setState({ documents_attributes });
   }
 
+  /* Sources methods */
+  @Autobind
+  showSourceForm(evt, opts = {}) {
+    evt.preventDefault();
+    let values = {};
+    let action = this.createSource;
+
+    if (opts.edit) {
+      values = this.state.external_sources_attributes[opts.index];
+      action = this.editSource;
+    }
+
+    dispatch(toggleModal(true, <SourceForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />));
+  }
+
+  @Autobind
+  createSource(form) {
+    this.setState({
+      external_sources_attributes: [...this.state.external_sources_attributes, form]
+    });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  editSource(form, index) {
+    const external_sources_attributes = this.state.external_sources_attributes.slice();
+    external_sources_attributes[index] = {
+      ...external_sources_attributes[index],
+      ...form
+    };
+    this.setState({ external_sources_attributes });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  deleteSource(index) {
+    const { external_sources_attributes } = this.state;
+    external_sources_attributes.splice(index, 1);
+    this.setState({ external_sources_attributes });
+  }
+
+  /* Impactc methods */
   @Autobind
   showImpactForm(evt, opts = {}) {
     evt.preventDefault();
@@ -186,8 +247,10 @@ class NewStudyCasePage extends React.Component {
     this.setState({ impacts_attributes });
   }
 
+  /* ProjectBmes methods */
+
   @Autobind
-  addBme(bme) {
+  addProjectBme(bme) {
     const bmes = [
       ...this.state.bmes,
       bme
@@ -195,12 +258,19 @@ class NewStudyCasePage extends React.Component {
     this.setState({ bmes });
   }
 
-  editBme(data, index) {
+  editProjectBme(data, index) {
     const bmes = this.state.bmes.slice();
     bmes[index] = {
       ...bmes[index],
       ...data
     };
+    this.setState({ bmes });
+  }
+
+  @Autobind
+  deleteProjectBme(index) {
+    const bmes = this.state.bmes.slice();
+    bmes.splice(index, 1);
     this.setState({ bmes });
   }
 
@@ -224,17 +294,39 @@ class NewStudyCasePage extends React.Component {
           onChange={item => this.setState({ category_id: item.value })}
           options={this.props.categories.solution.map(cat => ({ value: cat.id, label: cat.name }))}
         />
-        <CitySearch
-          multi
-          name="city_ids"
-          label="Cities"
-          validations={['required']}
-          value={this.state.city_ids}
-          onChange={items => this.setState({ city_ids: items })}
-        />
+        <div className="row expanded">
+          <div className="column small-6">
+            {/* City */}
+            <CitySearch
+              name="city"
+              label="City"
+              validations={['required']}
+              value={this.state.city}
+              onChange={city => this.setState({ city })}
+            />
+          </div>
+          <div className="column small-6">
+            {/* Year */}
+            <Input
+              type="number"
+              value=""
+              name="operational_year"
+              onChange={this.onInputChange}
+              label="Year"
+              validations={['required']}
+            />
+          </div>
+        </div>
         <Textarea validations={[]} onChange={this.onInputChange} label="Solution" name="solution" />
         <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
-        <Creator title="BMEs" options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))} items={this.state.bmes} onAdd={this.addBme} onEdit={(...args) => this.editBme(...args)} />
+        <Creator
+          title="BMEs"
+          options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))}
+          items={this.state.bmes}
+          onAdd={this.addProjectBme}
+          onEdit={(...args) => this.editProjectBme(...args)}
+          onDelete={this.deleteProjectBme}
+        />
         {/* Impacts */}
         <div>
           <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
@@ -248,6 +340,18 @@ class NewStudyCasePage extends React.Component {
               );
             })}
           </ul>
+        </div>
+        {/* Sources */}
+        <div>
+          <button type="button" className="button" onClick={this.showSourceForm}>Add Source</button>
+          {this.state.external_sources_attributes.map((source, i) => {
+            return (
+              <li key={i}>
+                <span onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</span>
+                <button className="button" onClick={() => this.deleteSource(i)}>Delete</button>
+              </li>
+            );
+          })}
         </div>
         <div className="row expanded">
           <div className="column small-6">
