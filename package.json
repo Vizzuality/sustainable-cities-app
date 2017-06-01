@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Vizzuality/aqueduct-water-risk.git"
+    "url": "git+https://github.com/Vizzuality/sustainable-cities-app.git"
   },
   "author": "Óscar Ferrándiz <oscar.ferrandiz@vizzuality.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Vizzuality/aqueduct-water-risk/issues"
+    "url": "https://github.com/Vizzuality/sustainable-cities-app/issues"
   },
-  "homepage": "https://github.com/Vizzuality/aqueduct-water-risk#readme",
+  "homepage": "https://github.com/Vizzuality/sustainable-cities-app#readme",
   "dependencies": {
     "babel-core": "^6.18.2",
     "babel-loader": "^6.2.7",
