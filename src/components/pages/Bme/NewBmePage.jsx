@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { validation } from 'utils/validation'; // eslint-disable-line no-unused-vars
 import { dispatch } from 'main';
 import { createBme } from 'modules/bmes';
 import { getEnablings } from 'modules/enablings';
@@ -8,7 +9,6 @@ import { toggleModal } from 'modules/modal';
 import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import SolutionForm from 'components/form/Solution/SolutionForm';
-import { validation } from 'utils/validation';
 import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
 import { toastr } from 'react-redux-toastr';
@@ -101,7 +101,9 @@ class NewBmePage extends React.Component {
     });
   }
 
-  onCategoryChange(group, level, val) {
+  onCategoryChange(group, level, initialVal) {
+    let val = initialVal;
+
     if (val) {
       val = Array.isArray(val) ?
         val.map(i => i.value) : val.value;
@@ -156,7 +158,10 @@ class NewBmePage extends React.Component {
       action = this.onEditSolution;
     }
 
-    dispatch(toggleModal(true, <SolutionForm text="Add Solution" values={values} onSubmit={(...args) => action(...args, opts.index)} />));
+    dispatch(toggleModal(
+      true,
+      <SolutionForm text="Add Solution" values={values} onSubmit={(...args) => action(...args, opts.index)} />
+    ));
   }
 
   @Autobind
@@ -246,7 +251,14 @@ class NewBmePage extends React.Component {
             <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
           {/* Name */}
-          <Input type="text" onChange={this.onInputChange} name="name" value="" label="Business model element name" validations={['required']} />
+          <Input
+            type="text"
+            onChange={this.onInputChange}
+            name="name"
+            value=""
+            label="Business model element name"
+            validations={['required']}
+          />
           {/* BME categories */}
           <div className="row expanded">
             <div className="small-4 columns">
@@ -304,8 +316,10 @@ class NewBmePage extends React.Component {
               <ul>
                 {this.state.solutions.map((solution, i) => {
                   return (
-                    <li key={i}>
-                      <span onClick={evt => this.onAddSolution(evt, { edit: true, index: i })}>{`${solution.nephew.name} - ${solution.nephew.id}`}</span>
+                    <li key={solution.nephew.id}>
+                      <button onClick={evt => this.onAddSolution(evt, { edit: true, index: i })}>
+                        {`${solution.nephew.name} - ${solution.nephew.id}`}
+                      </button>
                       <button className="button" onClick={() => this.deleteSolution(i)}>Delete solution</button>
                     </li>
                   );

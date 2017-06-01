@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 function HomePage(props) {
@@ -11,7 +12,7 @@ function HomePage(props) {
 
 HomePage.propTypes = {
   // State
-  user: React.PropTypes.object
+  user: PropTypes.object
 };
 
 // Map state to props

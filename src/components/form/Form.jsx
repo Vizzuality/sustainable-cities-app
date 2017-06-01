@@ -3,9 +3,9 @@ import Validation from 'react-validation';
 import ReactSelect from 'react-select';
 
 function withWrapper(Component) {
-  return class extends React.Component {
+  return class extends React.Component { // eslint-disable-line react/prefer-stateless-function
     render() {
-      const { label, ...props } = this.props;
+      const { label, ...props } = this.props; // eslint-disable-line react/prop-types
       return (
         <div className="form-control">
           {label && <label htmlFor={props.name} >{label}</label>}

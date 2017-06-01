@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 
 export default function StudyCaseItem({ data }) {
@@ -12,5 +13,5 @@ export default function StudyCaseItem({ data }) {
 }
 
 StudyCaseItem.propTypes = {
-  data: React.PropTypes.object
+  data: PropTypes.object
 };

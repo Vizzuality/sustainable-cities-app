@@ -100,7 +100,12 @@ class ImpactPage extends React.Component {
           pagination={this.props.impacts.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
           onDelete={(item) => {
-            const confirm = <Confirm text={`Impact "${item.name}" will be deleted. Are you sure?`} onAccept={() => this.deleteImpact(item)} />;
+            const confirm = (
+              <Confirm
+                text={`Impact "${item.name}" will be deleted. Are you sure?`}
+                onAccept={() => this.deleteImpact(item)}
+              />
+            );
             dispatch(toggleModal(true, confirm));
           }}
         />

@@ -124,7 +124,7 @@ function createCategory({ data, onSuccess }) {
       },
       onSuccess() {
         dispatch(setCategoriesLoading(false));
-        onSuccess && onSuccess();
+        if (onSuccess) onSuccess();
       }
     });
   };
@@ -155,13 +155,15 @@ function getCategories({ type, id, tree, pageSize, pageNumber, sort, search }) {
     get({
       url: `${config.API_URL}/${endPoint}${queryS}`,
       onSuccess({ data, meta }) {
+        let parsedData = data;
+
         // Parse data to json api format
-        if (!Array.isArray(data)) {
-          data = [data];
+        if (!Array.isArray(parsedData)) {
+          parsedData = [data];
         }
 
         const categoryData = {
-          list: deserialize(data),
+          list: deserialize(parsedData),
           itemCount: meta.total_items
         };
 
@@ -182,7 +184,7 @@ function updateCategory({ id, data, onSuccess }) {
       },
       onSuccess() {
         dispatch(setCategoriesLoading(false));
-        onSuccess && onSuccess(id);
+        if (onSuccess) onSuccess(id);
       }
     });
   };
@@ -195,10 +197,19 @@ function deleteCategory({ id, onSuccess }) {
       url: `${config.API_URL}/categories/${id}`,
       onSuccess() {
         dispatch(setCategoriesLoading(false));
-        onSuccess && onSuccess(id);
+        if (onSuccess) onSuccess(id);
       }
     });
   };
 }
 
-export { categoriesReducer, createCategory, deleteCategory, getCategories, setCategoryDetail, setCategoriesSearch, setFilters, updateCategory };
+export {
+  categoriesReducer,
+  createCategory,
+  deleteCategory,
+  getCategories,
+  setCategoryDetail,
+  setCategoriesSearch,
+  setFilters,
+  updateCategory
+};

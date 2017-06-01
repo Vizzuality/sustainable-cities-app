@@ -23,7 +23,10 @@
   "extends": "vizzuality",
   "rules": {
     "import/no-extraneous-dependencies": 0,
-    "react/void-dom-elements-no-children": 0
+    "react/void-dom-elements-no-children": 0,
+    "max-len": ["warn", 120],
+    "arrow-body-style": "off",
+    "class-methods-use-this": "off"
   },
   "settings": {
     "import/resolver": {

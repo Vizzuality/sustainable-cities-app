@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import StudyCaseItem from 'components/study-case/StudyCaseItem';
 import classnames from 'classnames';
 
@@ -16,5 +17,5 @@ export default function StudyCaseList({ data }) {
 }
 
 StudyCaseList.propTypes = {
-  data: React.PropTypes.array
+  data: PropTypes.array
 };

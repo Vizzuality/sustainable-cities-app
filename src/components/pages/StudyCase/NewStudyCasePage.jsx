@@ -1,9 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { validation } from 'utils/validation'; // eslint-disable-line no-unused-vars
 import { Select, Input, Form, Button, Textarea } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import { Link } from 'react-router';
 import { Autobind } from 'es-decorators';
-import { validation } from 'utils/validation';
 import { createStudyCase } from 'modules/study-cases';
 import { getCategories } from 'modules/categories';
 import { getBmes } from 'modules/bmes';
@@ -13,7 +14,6 @@ import { toastr } from 'react-redux-toastr';
 import { push } from 'react-router-redux';
 import Creator from 'components/creator/Creator';
 import DropZone from 'components/dropzone/DropZone';
-import PropTypes from 'prop-types';
 import CitySearch from 'components/cities/CitySearch';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
@@ -24,7 +24,7 @@ import debounce from 'lodash/debounce';
 function toBase64(file, cb) {
   const reader = new FileReader();
   reader.onload = (event) => {
-    cb && cb(event.target.result);
+    if (cb) cb(event.target.result);
   };
   reader.readAsDataURL(file);
 }
@@ -118,8 +118,10 @@ class NewStudyCasePage extends React.Component {
         });
 
         if (i === (acceptedImgs.length - 1)) {
+          /* eslint-disable camelcase */
           let photos_attributes = this.state.photos_attributes.slice();
           photos_attributes = [...photos_attributes, ...parsedPhotos];
+          /* eslint-enable camelcase */
           this.setState({ photos_attributes });
         }
       });
@@ -141,8 +143,10 @@ class NewStudyCasePage extends React.Component {
         });
 
         if (i === (acceptedFiles.length - 1)) {
+          /* eslint-disable camelcase */
           let documents_attributes = this.state.documents_attributes.slice();
           documents_attributes = [...documents_attributes, ...parsedFiles];
+          /* eslint-enable camelcase */
           this.setState({ documents_attributes });
         }
       });
@@ -151,6 +155,7 @@ class NewStudyCasePage extends React.Component {
 
   @Autobind
   onDeleteImage(index) {
+    // eslint-disable-next-line camelcase
     const photos_attributes = this.state.photos_attributes.slice();
     window.URL.revokeObjectURL(photos_attributes[index].attachment);
     photos_attributes.splice(index, 1);
@@ -159,10 +164,31 @@ class NewStudyCasePage extends React.Component {
 
   @Autobind
   onDeleteFile(index) {
+    // eslint-disable-next-line camelcase
     const documents_attributes = this.state.documents_attributes.slice();
     window.URL.revokeObjectURL(documents_attributes[index].attachment);
     documents_attributes.splice(index, 1);
     this.setState({ documents_attributes });
+  }
+
+  @Autobind
+  onImpactCreate(form) {
+    this.setState({
+      impacts_attributes: [...this.state.impacts_attributes, form]
+    });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  onImpactEdit(form, index) {
+    // eslint-disable-next-line camelcase
+    const impacts_attributes = this.state.impacts_attributes.slice();
+    impacts_attributes[index] = {
+      ...impacts_attributes[index],
+      ...form
+    };
+    this.setState({ impacts_attributes });
+    dispatch(toggleModal(false));
   }
 
   /* Sources methods */
@@ -177,7 +203,10 @@ class NewStudyCasePage extends React.Component {
       action = this.editSource;
     }
 
-    dispatch(toggleModal(true, <SourceForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />));
+    dispatch(toggleModal(
+      true,
+      <SourceForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />
+    ));
   }
 
   @Autobind
@@ -190,6 +219,7 @@ class NewStudyCasePage extends React.Component {
 
   @Autobind
   editSource(form, index) {
+    // eslint-disable-next-line camelcase
     const external_sources_attributes = this.state.external_sources_attributes.slice();
     external_sources_attributes[index] = {
       ...external_sources_attributes[index],
@@ -218,26 +248,10 @@ class NewStudyCasePage extends React.Component {
       action = this.onImpactEdit;
     }
 
-    dispatch(toggleModal(true, <ImpactForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />));
-  }
-
-  @Autobind
-  onImpactCreate(form) {
-    this.setState({
-      impacts_attributes: [...this.state.impacts_attributes, form]
-    });
-    dispatch(toggleModal(false));
-  }
-
-  @Autobind
-  onImpactEdit(form, index) {
-    const impacts_attributes = this.state.impacts_attributes.slice();
-    impacts_attributes[index] = {
-      ...impacts_attributes[index],
-      ...form
-    };
-    this.setState({ impacts_attributes });
-    dispatch(toggleModal(false));
+    dispatch(toggleModal(
+      true,
+      <ImpactForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />
+    ));
   }
 
   @Autobind
@@ -284,7 +298,14 @@ class NewStudyCasePage extends React.Component {
           <Link className="button alert" to="/study-cases">Cancel</Link>
         </BtnGroup>
         {/* Name */}
-        <Input type="text" value="" name="name" onChange={this.onInputChange} label="Study case title" validations={['required']} />
+        <Input
+          type="text"
+          value=""
+          name="name"
+          onChange={this.onInputChange}
+          label="Study case title"
+          validations={['required']}
+        />
         <Select
           name="category_id"
           clearable={false}
@@ -333,8 +354,8 @@ class NewStudyCasePage extends React.Component {
           <ul>
             {this.state.impacts_attributes.map((impact, i) => {
               return (
-                <li key={i}>
-                  <span onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>{impact.name}</span>
+                <li key={impact.name}>
+                  <button onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>{impact.name}</button>
                   <button className="button" onClick={() => this.deleteImpact(i)}>Delete</button>
                 </li>
               );
@@ -346,8 +367,8 @@ class NewStudyCasePage extends React.Component {
           <button type="button" className="button" onClick={this.showSourceForm}>Add Source</button>
           {this.state.external_sources_attributes.map((source, i) => {
             return (
-              <li key={i}>
-                <span onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</span>
+              <li key={source.name}>
+                <button onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</button>
                 <button className="button" onClick={() => this.deleteSource(i)}>Delete</button>
               </li>
             );
@@ -391,8 +412,9 @@ NewStudyCasePage.defaultProps = {
   bmes: []
 };
 
-// NewStudyCasePage.propTypes = {
-//   categories: PropTypes.array
-// };
+NewStudyCasePage.propTypes = {
+  categories: PropTypes.array,
+  bmes: PropTypes.array
+};
 
 export default connect(mapStateToProps, null)(NewStudyCasePage);
