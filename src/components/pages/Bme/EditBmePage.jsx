@@ -119,7 +119,9 @@ class EditBmePage extends React.Component {
     }));
   }
 
-  onCategoryChange(group, level, val) {
+  onCategoryChange(group, level, initialVal) {
+    let val = initialVal;
+
     if (val) {
       val = Array.isArray(val) ?
         val.map(i => i.value) : val.value;
@@ -150,6 +152,47 @@ class EditBmePage extends React.Component {
     const newState = {
       ...this.state.categories,
       ...{ [group]: categories }
+    };
+
+    this.setState({ categories: newState });
+  }
+
+  @Autobind
+  onAddSolution() {
+    const solutionState = this.state.categories.solution;
+    solutionState.push({});
+
+    const newState = {
+      ...this.state.categories,
+      ...{ solution: solutionState }
+    };
+
+    this.setState({ categories: newState });
+  }
+
+  @Autobind
+  onChangeSolution(state, index) {
+    this.solutionIds[index] = state.categories.nephew;
+    const solutionState = this.state.categories.solution;
+    solutionState[index] = state.categories;
+
+    const newState = {
+      ...this.state.categories,
+      ...{ solution: solutionState }
+    };
+
+    this.setState({ categories: newState });
+  }
+
+  @Autobind
+  onDeleteSolution(index) {
+    this.solutionIds.splice(index, 1);
+    const solutionState = this.state.categories.solution;
+    solutionState.splice(index, 1);
+
+    const newState = {
+      ...this.state.categories,
+      ...{ solution: solutionState }
     };
 
     this.setState({ categories: newState });
@@ -317,47 +360,6 @@ class EditBmePage extends React.Component {
     return options;
   }
 
-  @Autobind
-  onAddSolution() {
-    const solutionState = this.state.categories.solution;
-    solutionState.push({});
-
-    const newState = {
-      ...this.state.categories,
-      ...{ solution: solutionState }
-    };
-
-    this.setState({ categories: newState });
-  }
-
-  @Autobind
-  onChangeSolution(state, index) {
-    this.solutionIds[index] = state.categories.nephew;
-    const solutionState = this.state.categories.solution;
-    solutionState[index] = state.categories;
-
-    const newState = {
-      ...this.state.categories,
-      ...{ solution: solutionState }
-    };
-
-    this.setState({ categories: newState });
-  }
-
-  @Autobind
-  onDeleteSolution(index) {
-    this.solutionIds.splice(index, 1);
-    const solutionState = this.state.categories.solution;
-    solutionState.splice(index, 1);
-
-    const newState = {
-      ...this.state.categories,
-      ...{ solution: solutionState }
-    };
-
-    this.setState({ categories: newState });
-  }
-
   render() {
     const bmeSelectOptions = this.loadMultiSelectOptions(this.state.categories.bme, 'bme');
 
@@ -433,15 +435,16 @@ class EditBmePage extends React.Component {
           {/* Solution categories */}
           <label htmlFor="solutions">Solutions</label>
           {this.state.categories.solution.length
-            && this.state.categories.solution.map((sol, index) =>
+            && this.state.categories.solution.map((sol, index) => (
               <SolutionSelector
                 index={index}
-                key={index}
+                key={sol}
                 solutionCategories={this.props.solutionCategories}
                 state={sol}
                 onChangeSelect={this.onChangeSolution}
                 onDeleteSelect={this.onDeleteSolution}
-              />)}
+              />
+          ))}
           <button type="button" className="button" onClick={this.onAddSolution}>Add Solution</button>
           {/* description */}
           <Textarea

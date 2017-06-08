@@ -57,8 +57,7 @@ const config = {
     extensions: ['.js', '.jsx', '.json', '.css', '.scss'],
     modules: [
       path.join(rootPath, 'src'),
-      path.resolve('src'),
-      path.join(rootPath, 'node_modules')
+      'node_modules'
     ]
   },
 

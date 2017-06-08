@@ -122,13 +122,15 @@ function getStudyCases(paramsConfig = {}) {
     get({
       url,
       onSuccess({ data, meta, included }) {
+        let parsedData = data;
+
         // Parse data to json api format
-        if (!Array.isArray(data)) {
-          data = [data];
+        if (!Array.isArray(parsedData)) {
+          parsedData = [data];
         }
 
         const studyCasesData = {
-          list: deserialize(data),
+          list: deserialize(parsedData),
           itemCount: meta.total_items
         };
 
@@ -140,7 +142,7 @@ function getStudyCases(paramsConfig = {}) {
 
         dispatch(setStudyCasesLoading(false));
         dispatch(action(studyCasesData));
-        onSuccess && onSuccess();
+        if (onSuccess) onSuccess();
       }
     });
   };
@@ -163,7 +165,7 @@ function createProject({ data, onSuccess, type }) {
       },
       onSuccess() {
         dispatch(setStudyCasesLoading(false));
-        onSuccess && onSuccess();
+        if (onSuccess) onSuccess();
       }
     });
   };
@@ -189,7 +191,7 @@ function updateStudyCase({ id, data, onSuccess }) {
       },
       onSuccess() {
         dispatch(setStudyCasesLoading(false));
-        onSuccess && onSuccess(id);
+        if (onSuccess) onSuccess(id);
       }
     });
   };
@@ -202,10 +204,18 @@ function deleteStudyCase({ id, onSuccess }) {
       url: `${config.API_URL}/projects/${id}`,
       onSuccess() {
         dispatch(setStudyCasesLoading(false));
-        onSuccess && onSuccess(id);
+        if (onSuccess) onSuccess(id);
       }
     });
   };
 }
 
-export { studyCasesReducer, getStudyCases, createStudyCase, deleteStudyCase, setStudyCaseDetail, updateStudyCase, setFilters };
+export {
+  studyCasesReducer,
+  getStudyCases,
+  createStudyCase,
+  deleteStudyCase,
+  setStudyCaseDetail,
+  updateStudyCase,
+  setFilters
+};

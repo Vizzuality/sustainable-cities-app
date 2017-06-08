@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Autobind } from 'es-decorators';
 
-import { Select } from 'components/Form/form';
+import { Select } from 'components/form/Form';
 
 export default class SolutionSelector extends React.Component {
 
@@ -21,7 +21,8 @@ export default class SolutionSelector extends React.Component {
     });
   }
 
-  onCategoryChange(level, val) {
+  onCategoryChange(level, initialVal) {
+    let val = initialVal;
     if (val) {
       val = Array.isArray(val) ?
         val.map(i => i.value) : val.value;
@@ -50,13 +51,17 @@ export default class SolutionSelector extends React.Component {
     }
 
     this.setState({ categories }, () => {
-      this.props.onChangeSelect && this.props.onChangeSelect(this.state, this.props.index);
+      if (this.props.onChangeSelect) {
+        this.props.onChangeSelect(this.state, this.props.index);
+      }
     });
   }
 
   @Autobind
   onDeleteSelect() {
-    this.props.onDeleteSelect && this.props.onDeleteSelect(this.props.index);
+    if (this.props.onDeleteSelect) {
+      this.props.onDeleteSelect(this.props.index);
+    }
   }
 
   getFirstSelectOption(value, source) {

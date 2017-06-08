@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Nav from 'components/ui/Nav';
 import { links } from 'constants/links';
 import { Link } from 'react-router';
@@ -24,5 +25,5 @@ export default function Header(props) {
 }
 
 Header.propTypes = {
-  user: React.PropTypes.object
+  user: PropTypes.object
 };

@@ -1,8 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { dispatch } from 'main';
 import { getUserData } from 'modules/user';
 import Header from 'components/header/HeaderContainer';
-import ReduxToastr from 'react-redux-toastr'
+import ReduxToastr from 'react-redux-toastr';
 import Modal from 'components/ui/Modal';
 
 export default class App extends React.Component {
@@ -38,8 +39,8 @@ export default class App extends React.Component {
 }
 
 App.propTypes = {
-  user: React.PropTypes.object,
-  main: React.PropTypes.element,
-  footer: React.PropTypes.element,
-  nav: React.PropTypes.element
+  user: PropTypes.object,
+  main: PropTypes.element,
+  footer: PropTypes.element,
+  nav: PropTypes.element
 };

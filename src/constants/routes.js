@@ -3,4 +3,4 @@ const publicRoutes = [
   '/register'
 ];
 
-export { publicRoutes };
+export { publicRoutes }; // eslint-disable-line import/prefer-default-export

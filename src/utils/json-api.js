@@ -5,4 +5,4 @@ function deserialize(data) {
   });
 }
 
-export { deserialize };
+export { deserialize }; // eslint-disable-line import/prefer-default-export

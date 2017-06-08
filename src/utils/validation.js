@@ -3,4 +3,4 @@ import Validation from 'react-validation';
 
 const validation = Object.assign(Validation.rules, { required, email, passwordConfirmation });
 
-export { validation };
+export { validation }; // eslint-disable-line import/prefer-default-export

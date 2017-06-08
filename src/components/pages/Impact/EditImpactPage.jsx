@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { dispatch } from 'main';
 import { getImpacts, updateImpact } from 'modules/impacts';
-import { getCategories, resetCategoryByType } from 'modules/categories';
+import { getCategories } from 'modules/categories';
 import getImpactDetail from 'selectors/impactDetail';
 import { Input, Button, Form, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
@@ -61,7 +61,9 @@ class EditImpactPage extends React.Component {
     }));
   }
 
-  onCategoryChange(level, val) {
+  onCategoryChange(level, initialVal) {
+    let val = initialVal;
+
     if (val) {
       val = Array.isArray(val) ?
         val.map(i => i.value) : val.value;
@@ -128,7 +130,8 @@ class EditImpactPage extends React.Component {
               <Input
                 type="text"
                 onChange={this.onInputChange}
-                name="name" value={this.props.impactDetail ? this.props.impactDetail.name : ''}
+                name="name"
+                value={this.props.impactDetail ? this.props.impactDetail.name : ''}
                 label="Impact name"
                 validations={['required']}
               />
