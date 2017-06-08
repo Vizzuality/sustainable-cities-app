@@ -2,5 +2,11 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "allowJs": true
-  }
+  },
+  "exclude": [
+    "/dist",
+    "/config",
+    "/scripts",
+    "/node_modules"
+  ]
 }
