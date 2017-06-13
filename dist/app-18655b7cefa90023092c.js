@@ -40856,7 +40856,7 @@ var EditBmePage = (_class = function (_React$Component) {
       categories: {
         bme: {},
         // contains data from selected solutions
-        solution: {}
+        solution: []
       },
       enablings: {},
       timing: {},
@@ -41438,7 +41438,7 @@ var EditBmePage = (_class = function (_React$Component) {
           this.state.categories.solution.length > 0 && this.state.categories.solution.map(function (sol, index) {
             return _react2.default.createElement(_SolutionSelector2.default, {
               index: index,
-              key: sol.nephew,
+              key: sol.nephew || index,
               solutionCategories: _this3.props.solutionCategories,
               state: sol,
               onChangeSelect: _this3.onChangeSolution,
