@@ -196,7 +196,6 @@ class EditStudyCasePage extends React.Component {
   }
 
   /* External sources methods */
-
   @Autobind
   showSourceForm(evt, opts = {}) {
     evt.preventDefault();
@@ -260,7 +259,6 @@ class EditStudyCasePage extends React.Component {
   }
 
   /* Project bmes methods */
-
   @Autobind
   addProjectBme(pbme) {
     // eslint-disable-next-line camelcase
@@ -405,7 +403,7 @@ class EditStudyCasePage extends React.Component {
               })}
             </ul>
           </div>
-          {/* External sources */}
+          {/* Sources */}
           <div>
             <button type="button" className="button" onClick={this.showSourceForm}>Add source</button>
             <ul>
