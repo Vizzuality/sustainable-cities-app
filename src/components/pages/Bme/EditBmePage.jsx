@@ -27,7 +27,7 @@ class EditBmePage extends React.Component {
       categories: {
         bme: {},
         // contains data from selected solutions
-        solution: {}
+        solution: []
       },
       enablings: {},
       timing: {},
@@ -528,7 +528,7 @@ class EditBmePage extends React.Component {
             && this.state.categories.solution.map((sol, index) => (
               <SolutionSelector
                 index={index}
-                key={sol.nephew}
+                key={sol.nephew || index}
                 solutionCategories={this.props.solutionCategories}
                 state={sol}
                 onChangeSelect={this.onChangeSolution}
