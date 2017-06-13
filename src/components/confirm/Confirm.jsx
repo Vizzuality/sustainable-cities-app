@@ -1,16 +1,17 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import BtnGroup from 'components/ui/BtnGroup';
 import { dispatch } from 'main';
 import { toggleModal } from 'modules/modal';
 
 export default function Confirm(props) {
   const onAccept = () => {
-    props.onAccept && props.onAccept();
+    if (props.onAccept) props.onAccept();
     dispatch(toggleModal(false));
   };
 
   const onCancel = () => {
-    props.onCancel && props.onCancel();
+    if (props.onCancel) props.onCancel();
     dispatch(toggleModal(false));
   };
 
@@ -26,7 +27,7 @@ export default function Confirm(props) {
 }
 
 Confirm.propTypes = {
-  text: React.PropTypes.string,
-  onAccept: React.PropTypes.func,
-  onCancel: React.PropTypes.func
+  text: PropTypes.string,
+  onAccept: PropTypes.func, // eslint-disable-line
+  onCancel: PropTypes.func
 };

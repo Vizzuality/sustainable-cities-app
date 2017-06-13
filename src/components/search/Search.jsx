@@ -23,7 +23,7 @@ export default class Search extends React.Component {
     return (
       <div className={cNames}>
         <input
-          ref={node => this.input = node}
+          ref={(node) => { this.input = node; }}
           className="search-input"
           type="search"
           onChange={_debounce(() => onChange(this.input.value), debounce)}

@@ -18,7 +18,9 @@ export default class SourceForm extends React.Component {
   @Autobind
   submit(evt) {
     evt.preventDefault();
-    this.props.onSubmit && this.props.onSubmit(this.form);
+    if (this.props.onSubmit) {
+      this.props.onSubmit(this.form);
+    }
   }
 
   render() {
@@ -53,7 +55,7 @@ export default class SourceForm extends React.Component {
               <Input
                 id="type"
                 label="Type"
-                defaultValue={source_type}
+                defaultValue={source_type} // eslint-disable-line camelcase
                 type="text"
                 name="source_type"
                 validations={[]}
@@ -74,7 +76,7 @@ export default class SourceForm extends React.Component {
               <Input
                 id="publication_year"
                 label="Publication year"
-                defaultValue={publication_year}
+                defaultValue={publication_year} // eslint-disable-line camelcase
                 type="text"
                 name="publication_year"
                 validations={[]}
@@ -107,7 +109,7 @@ export default class SourceForm extends React.Component {
               <Input
                 id="web_url"
                 label="Web url"
-                defaultValue={web_url}
+                defaultValue={web_url} // eslint-disable-line camelcase
                 type="text"
                 name="web_url"
                 validations={[]}

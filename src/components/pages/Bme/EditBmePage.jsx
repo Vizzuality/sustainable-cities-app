@@ -7,10 +7,13 @@ import { getEnablings } from 'modules/enablings';
 import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import SolutionSelector from 'components/solution/SolutionSelector';
+import SourceForm from 'components/sources/SourceForm';
 import getBmeDetail from 'selectors/bmeDetail';
+import { getIdRelations } from 'utils/relation';
 import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
 import { toastr } from 'react-redux-toastr';
+import { toggleModal } from 'modules/modal';
 import { connect } from 'react-redux';
 import isEqual from 'lodash/isEqual';
 
@@ -27,7 +30,8 @@ class EditBmePage extends React.Component {
         solution: {}
       },
       enablings: {},
-      timing: {}
+      timing: {},
+      external_sources_attributes: []
     };
 
     this.categoryGroups = {
@@ -46,9 +50,11 @@ class EditBmePage extends React.Component {
     dispatch(getCategories({ type: 'timing', pageSize: 9999 }));
     dispatch(getEnablings({ pageSize: 9999 }));
 
-    if (!this.props.bmesDetail) {
+    if (this.props.bmes.detailId) {
       dispatch(getBmes({ id: this.props.bmes.detailId }));
-    } else {
+    }
+
+    if (this.props.bmesDetail) {
       this.fillFields(this.props);
       this.setCategories(this.props);
       this.setDefaultSolutions(this.props);
@@ -56,7 +62,7 @@ class EditBmePage extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { bmeCategories, solutionCategories, bmesDetail } = this.props;
+    const { bmeCategories, solutionCategories, bmesDetail, bmes } = this.props;
     if (!isEqual(bmeCategories, nextProps.bmeCategories)) {
       this.categoryGroups = {
         ...this.categoryGroups,
@@ -74,6 +80,10 @@ class EditBmePage extends React.Component {
     if (!isEqual(bmesDetail, nextProps.bmesDetail)) {
       this.fillFields(nextProps);
       this.setDefaultSolutions(nextProps);
+    }
+
+    if (!isEqual(bmes.included, nextProps.bmes.included)) {
+      this.setDefaultSources(nextProps);
     }
 
     // review this
@@ -99,14 +109,23 @@ class EditBmePage extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
 
+    const {
+      categories,
+      enablings,
+      external_sources_attributes,
+      timing
+    } = this.state;
+
     const data = {
       ...this.form,
       category_ids: [
-        ...this.state.timing,
-        ...[this.state.categories.bme.nephew],
+        ...timing,
+        ...[categories.bme.nephew],
         ...this.solutionIds
       ],
-      enabling_ids: this.state.enablings
+      enabling_ids: enablings,
+      // eslint-disable-next-line no-underscore-dangle
+      external_sources_attributes: external_sources_attributes.filter(es => !es.id || es.edited || es._destroy),
     };
 
     // Update BME
@@ -119,7 +138,9 @@ class EditBmePage extends React.Component {
     }));
   }
 
-  onCategoryChange(group, level, val) {
+  onCategoryChange(group, level, initialVal) {
+    let val = initialVal;
+
     if (val) {
       val = Array.isArray(val) ?
         val.map(i => i.value) : val.value;
@@ -155,9 +176,121 @@ class EditBmePage extends React.Component {
     this.setState({ categories: newState });
   }
 
+  @Autobind
+  onAddSolution() {
+    const solutionState = this.state.categories.solution;
+    solutionState.push({});
+
+    const newState = {
+      ...this.state.categories,
+      ...{ solution: solutionState }
+    };
+
+    this.setState({ categories: newState });
+  }
+
+  @Autobind
+  onChangeSolution(state, index) {
+    this.solutionIds[index] = state.categories.nephew;
+    const solutionState = this.state.categories.solution;
+    solutionState[index] = state.categories;
+
+    const newState = {
+      ...this.state.categories,
+      ...{ solution: solutionState }
+    };
+
+    this.setState({ categories: newState });
+  }
+
+  @Autobind
+  onDeleteSolution(index) {
+    this.solutionIds.splice(index, 1);
+    const solutionState = this.state.categories.solution;
+    solutionState.splice(index, 1);
+
+    const newState = {
+      ...this.state.categories,
+      ...{ solution: solutionState }
+    };
+
+    this.setState({ categories: newState });
+  }
+
+  /* External sources methods */
+  @Autobind
+  showSourceForm(evt, opts = {}) {
+    evt.preventDefault();
+    let values = {};
+    let action = this.createSource;
+
+    if (opts.edit) {
+      values = this.state.external_sources_attributes[opts.index];
+      action = this.editSource;
+    }
+
+    dispatch(toggleModal(
+      true,
+      <SourceForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />
+    ));
+  }
+
+  @Autobind
+  createSource(data) {
+    this.setState({
+      external_sources_attributes: [...this.state.external_sources_attributes, data]
+    });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  editSource(data, index) {
+    // eslint-disable-next-line camelcase
+    const external_sources_attributes = this.state.external_sources_attributes.slice();
+    external_sources_attributes[index] = {
+      ...external_sources_attributes[index],
+      ...data,
+      edited: true
+    };
+    this.setState({ external_sources_attributes });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  deleteSource(index) {
+    const externalSources = this.props.bmes.included.filter(sc => sc.type === 'external_sources');
+    const sourceToDelete = this.state.external_sources_attributes[index];
+
+    const exists = externalSources.find(i => i.id === sourceToDelete.id);
+    const { external_sources_attributes } = this.state;
+
+    if (!exists) {
+      // Source still doesn't exist on database,
+      // just remove it from local array
+      external_sources_attributes.splice(index, 1);
+    } else {
+      // Source exists on database,
+      // we have to delete it from there
+      external_sources_attributes[index] = {
+        id: sourceToDelete.id,
+        _destroy: true
+      };
+    }
+
+    this.setState({ external_sources_attributes });
+  }
+
   setDefaultSolutions({ bmesDetail }) {
     const solutionsIds = bmesDetail.categories.filter(cat => cat.category_type === 'Solution').map(c => c.id);
     this.solutionIds = solutionsIds;
+  }
+
+  setDefaultSources({ bmes }) {
+    const external_sources_attributes = bmes.included.filter(s => s.type === 'external_sources');
+
+    this.setState({
+      external_sources_attributes
+    });
   }
 
   getFirstSelectOption(value, source, categoryGroupId) {
@@ -317,47 +450,6 @@ class EditBmePage extends React.Component {
     return options;
   }
 
-  @Autobind
-  onAddSolution() {
-    const solutionState = this.state.categories.solution;
-    solutionState.push({});
-
-    const newState = {
-      ...this.state.categories,
-      ...{ solution: solutionState }
-    };
-
-    this.setState({ categories: newState });
-  }
-
-  @Autobind
-  onChangeSolution(state, index) {
-    this.solutionIds[index] = state.categories.nephew;
-    const solutionState = this.state.categories.solution;
-    solutionState[index] = state.categories;
-
-    const newState = {
-      ...this.state.categories,
-      ...{ solution: solutionState }
-    };
-
-    this.setState({ categories: newState });
-  }
-
-  @Autobind
-  onDeleteSolution(index) {
-    this.solutionIds.splice(index, 1);
-    const solutionState = this.state.categories.solution;
-    solutionState.splice(index, 1);
-
-    const newState = {
-      ...this.state.categories,
-      ...{ solution: solutionState }
-    };
-
-    this.setState({ categories: newState });
-  }
-
   render() {
     const bmeSelectOptions = this.loadMultiSelectOptions(this.state.categories.bme, 'bme');
 
@@ -432,17 +524,37 @@ class EditBmePage extends React.Component {
           />
           {/* Solution categories */}
           <label htmlFor="solutions">Solutions</label>
-          {this.state.categories.solution.length
-            && this.state.categories.solution.map((sol, index) =>
+          {this.state.categories.solution.length > 0
+            && this.state.categories.solution.map((sol, index) => (
               <SolutionSelector
                 index={index}
-                key={index}
+                key={sol.nephew}
                 solutionCategories={this.props.solutionCategories}
                 state={sol}
                 onChangeSelect={this.onChangeSolution}
                 onDeleteSelect={this.onDeleteSolution}
-              />)}
+              />
+          ))}
           <button type="button" className="button" onClick={this.onAddSolution}>Add Solution</button>
+          {/* External sources */}
+          <div>
+            <label htmlFor="sources">Sources</label>
+            <ul>
+              {this.state.external_sources_attributes.map((source, i) => {
+                // eslint-disable-line no-underscore-dangle
+                return (
+                  <li
+                    key={source.name || i}
+                    className={`${source._destroy ? 'hidden' : ''}`}
+                  >
+                    <button onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</button>
+                    <button type="button" className="button" onClick={() => this.deleteSource(i)}>Delete</button>
+                  </li>
+                );
+              })}
+            </ul>
+            <button type="button" className="button" onClick={(evt) => this.showSourceForm(evt)}>Add source</button>
+          </div>
           {/* description */}
           <Textarea
             name="description"

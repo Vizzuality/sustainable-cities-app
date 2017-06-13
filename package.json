@@ -6,20 +6,20 @@
   "scripts": {
     "build": "NODE_ENV=production ./node_modules/.bin/webpack --config ./config/webpack/production.js --progress --colors",
     "postinstall": "yarn run build",
-    "test": "./node_modules/.bin/eslint .",
+    "test": "./node_modules/.bin/eslint ./src --ext .js --ext .jsx",
     "deploy-staging": "sh ./scripts/deploy-staging.sh",
     "deploy-production": "sh ./scripts/deploy-production.sh"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Vizzuality/aqueduct-water-risk.git"
+    "url": "git+https://github.com/Vizzuality/sustainable-cities-app.git"
   },
   "author": "Óscar Ferrándiz <oscar.ferrandiz@vizzuality.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Vizzuality/aqueduct-water-risk/issues"
+    "url": "https://github.com/Vizzuality/sustainable-cities-app/issues"
   },
-  "homepage": "https://github.com/Vizzuality/aqueduct-water-risk#readme",
+  "homepage": "https://github.com/Vizzuality/sustainable-cities-app#readme",
   "dependencies": {
     "babel-core": "^6.18.2",
     "babel-loader": "^6.2.7",
@@ -67,13 +67,13 @@
     "react-redux": "^4.4.5",
     "react-redux-toastr": "^6.2.4",
     "react-responsive": "^1.2.6",
-    "react-router": "^2.5.2",
+    "react-router": "^3.0.5",
     "react-router-redux": "^4.0.5",
     "react-router-scroll": "^0.2.0",
     "react-select": "^1.0.0-rc.3",
     "react-selectize": "^2.1.0",
     "react-sortable-hoc": "^0.4.5",
-    "react-validation": "^2.10.9",
+    "react-validation": "https://github.com/donovanhiland/react-validation.git#12ef14d",
     "redux": "^3.5.2",
     "redux-thunk": "^2.1.0",
     "reselect": "^2.5.4",
@@ -86,13 +86,13 @@
     "webpack-merge": "^4.1.0"
   },
   "devDependencies": {
-    "babel-eslint": "^7.2.1",
-    "eslint": "^3.9.1",
-    "eslint-config-airbnb": "^13.0.0",
-    "eslint-import-resolver-webpack": "^0.7.0",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^2.2.3",
-    "eslint-plugin-react": "^6.5.0"
+    "babel-eslint": "^7.2.3",
+    "eslint": "^3.19.0",
+    "eslint-config-vizzuality": "^1.0.5",
+    "eslint-import-resolver-webpack": "^0.8.1",
+    "eslint-plugin-import": "^2.3.0",
+    "eslint-plugin-jsx-a11y": "^5.0.3",
+    "eslint-plugin-react": "^7.0.1"
   },
   "engines": {
     "node": "7.2.0"

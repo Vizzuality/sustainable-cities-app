@@ -50,18 +50,23 @@ class EditStudyCasePage extends React.Component {
   /* Component lifecycle */
   componentWillReceiveProps(nextProps) {
     // Includes arrived! So, we can populate sub-entities
-    if ((!this.props.studyCases.included || !this.props.studyCases.included.length) && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
-
+    if ((!this.props.studyCases.included || !this.props.studyCases.included.length)
+      && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
       this.setState({
-        city: nextProps.studyCases.included.filter(sc => sc.type === 'cities').map(c => ({ label: c.name, value: c.id }))[0],
-        project_bmes_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'project_bmes').filter(pBme => !!pBme.relationships.bme.data).map(pBme => ({ id: pBme.id, bme_id: pBme.relationships.bme.data.id, description: pBme.description })),
+        city: nextProps.studyCases.included
+          .filter(sc => sc.type === 'cities')
+          .map(c => ({ label: c.name, value: c.id }))[0],
+        project_bmes_attributes: nextProps.studyCases.included
+          .filter(sc => sc.type === 'project_bmes')
+          .filter(pBme => !!pBme.relationships.bme.data)
+          .map(pBme => ({ id: pBme.id, bme_id: pBme.relationships.bme.data.id, description: pBme.description })),
         impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
         external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources')
       });
     }
 
     if (this.props.studyCaseDetail !== nextProps.studyCaseDetail) {
-      const category_id = nextProps.studyCaseDetail.category_id + '';
+      const category_id = `${nextProps.studyCaseDetail.category_id}`; // eslint-disable-line camelcase
       this.setState({ category_id });
     }
   }
@@ -69,6 +74,26 @@ class EditStudyCasePage extends React.Component {
   @Autobind
   onInputChange(evt) {
     this.form[evt.target.name] = evt.target.value;
+  }
+
+  @Autobind
+  onImpactCreate(form) {
+    this.setState({
+      impacts_attributes: [...this.state.impacts_attributes, form]
+    });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  onImpactEdit(data, index) {
+    const impacts_attributes = this.state.impacts_attributes.slice(); // eslint-disable-line camelcase
+    impacts_attributes[index] = {
+      ...impacts_attributes[index],
+      ...data,
+      edited: true
+    };
+    this.setState({ impacts_attributes });
+    dispatch(toggleModal(false));
   }
 
   /* Methods */
@@ -95,8 +120,11 @@ class EditStudyCasePage extends React.Component {
         ...this.form,
         city_ids: [city.value],
         category_id,
+        // eslint-disable-next-line no-underscore-dangle
         impacts_attributes: impacts_attributes.filter(i => !i.id || i._destroy || i.edited),
+        // eslint-disable-next-line no-underscore-dangle
         project_bmes_attributes: project_bmes_attributes.filter(pbme => !pbme.id || pbme.edited || pbme._destroy),
+        // eslint-disable-next-line no-underscore-dangle
         external_sources_attributes: external_sources_attributes.filter(es => !es.id || es.edited || es._destroy),
         operational_year: operationalDate
       },
@@ -137,15 +165,10 @@ class EditStudyCasePage extends React.Component {
       action = this.onImpactEdit;
     }
 
-    dispatch(toggleModal(true, <ImpactForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />));
-  }
-
-  @Autobind
-  onImpactCreate(form) {
-    this.setState({
-      impacts_attributes: [...this.state.impacts_attributes, form]
-    });
-    dispatch(toggleModal(false));
+    dispatch(toggleModal(
+      true,
+      <ImpactForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />
+    ));
   }
 
   @Autobind
@@ -172,20 +195,7 @@ class EditStudyCasePage extends React.Component {
     this.setState({ impacts_attributes });
   }
 
-  @Autobind
-  onImpactEdit(data, index) {
-    const impacts_attributes = this.state.impacts_attributes.slice();
-    impacts_attributes[index] = {
-      ...impacts_attributes[index],
-      ...data,
-      edited: true
-    };
-    this.setState({ impacts_attributes });
-    dispatch(toggleModal(false));
-  }
-
   /* External sources methods */
-
   @Autobind
   showSourceForm(evt, opts = {}) {
     evt.preventDefault();
@@ -197,7 +207,10 @@ class EditStudyCasePage extends React.Component {
       action = this.editSource;
     }
 
-    dispatch(toggleModal(true, <SourceForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />));
+    dispatch(toggleModal(
+      true,
+      <SourceForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />
+    ));
   }
 
   @Autobind
@@ -210,6 +223,7 @@ class EditStudyCasePage extends React.Component {
 
   @Autobind
   editSource(data, index) {
+    // eslint-disable-next-line camelcase
     const external_sources_attributes = this.state.external_sources_attributes.slice();
     external_sources_attributes[index] = {
       ...external_sources_attributes[index],
@@ -245,9 +259,9 @@ class EditStudyCasePage extends React.Component {
   }
 
   /* Project bmes methods */
-
   @Autobind
   addProjectBme(pbme) {
+    // eslint-disable-next-line camelcase
     const project_bmes_attributes = [
       ...this.state.project_bmes_attributes,
       pbme
@@ -257,6 +271,7 @@ class EditStudyCasePage extends React.Component {
 
   @Autobind
   editProjectBme(data, index) {
+    // eslint-disable-next-line camelcase
     const project_bmes_attributes = this.state.project_bmes_attributes.slice();
     project_bmes_attributes[index] = {
       ...project_bmes_attributes[index],
@@ -272,6 +287,7 @@ class EditStudyCasePage extends React.Component {
 
   @Autobind
   deleteProjectBme(index) {
+    // eslint-disable-next-line camelcase
     const project_bmes_attributes = this.state.project_bmes_attributes.slice();
     const bmeToDelete = project_bmes_attributes[index];
 
@@ -296,7 +312,9 @@ class EditStudyCasePage extends React.Component {
     // Study case initial values
     const { studyCaseDetail } = this.props;
     const name = studyCaseDetail ? studyCaseDetail.name : '';
-    const operationalYear = studyCaseDetail && studyCaseDetail.operational_year ? new Date(studyCaseDetail.operational_year).getFullYear() : '';
+    const operationalYear = studyCaseDetail && studyCaseDetail.operational_year
+      ? new Date(studyCaseDetail.operational_year).getFullYear()
+      : '';
     const solution = studyCaseDetail ? studyCaseDetail.solution : '';
     const situation = studyCaseDetail ? studyCaseDetail.situation : '';
 
@@ -308,7 +326,14 @@ class EditStudyCasePage extends React.Component {
             <button type="button" className="button alert" onClick={this.showDeleteModal}>Delete</button>
             <Link to="/study-cases" className="button">Cancel</Link>
           </BtnGroup>
-          <Input type="text" name="name" value={name} label="Study case title" validations={['required']} onChange={this.onInputChange} />
+          <Input
+            type="text"
+            name="name"
+            value={name}
+            label="Study case title"
+            validations={['required']}
+            onChange={this.onInputChange}
+          />
           <div className="row expanded">
             <div className="column small-6">
               {/* City */}
@@ -341,7 +366,13 @@ class EditStudyCasePage extends React.Component {
             options={this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }))}
           />
           <Textarea name="solution" value={solution} label="Solution" validations={[]} onChange={this.onInputChange} />
-          <Textarea name="situation" value={situation} label="situation" validations={[]} onChange={this.onInputChange} />
+          <Textarea
+            name="situation"
+            value={situation}
+            label="situation"
+            validations={[]}
+            onChange={this.onInputChange}
+          />
           <Creator
             title="BMEs"
             onAdd={this.addProjectBme}
@@ -357,22 +388,32 @@ class EditStudyCasePage extends React.Component {
             <ul>
               {this.state.impacts_attributes.map((impact, i) => {
                 return (
-                  <li key={i} className={`${impact._destroy ? 'hidden' : ''}`}>
-                    <span onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>{impact.name || 'No name'}</span>
+                  <li
+                    key={impact.name}
+                    className={`${impact._destroy ? 'hidden' : ''}`} // eslint-disable-line no-underscore-dangle
+                  >
+                    <button
+                      onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}
+                    >
+                      {impact.name || 'No name'}
+                    </button>
                     <button type="button" className="button" onClick={() => this.deleteImpact(i)}>Delete</button>
                   </li>
                 );
               })}
             </ul>
           </div>
-          {/* External sources */}
+          {/* Sources */}
           <div>
             <button type="button" className="button" onClick={this.showSourceForm}>Add source</button>
             <ul>
               {this.state.external_sources_attributes.map((source, i) => {
                 return (
-                  <li key={i} className={`${source._destroy ? 'hidden' : ''}`}>
-                    <span onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</span>
+                  <li
+                    key={source.name}
+                    className={`${source._destroy ? 'hidden' : ''}`} // eslint-disable-line no-underscore-dangle
+                  >
+                    <button onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</button>
                     <button type="button" className="button" onClick={() => this.deleteSource(i)}>Delete</button>
                   </li>
                 );

@@ -146,13 +146,14 @@ function getBmes(paramsConfig = {}) {
     get({
       url,
       onSuccess({ data, meta, included }) {
+        let parsedData = data;
         // Parse data to json api format
-        if (!Array.isArray(data)) {
-          data = [data];
+        if (!Array.isArray(parsedData)) {
+          parsedData = [data];
         }
 
         const bmeData = {
-          list: deserialize(data),
+          list: deserialize(parsedData),
           itemCount: meta.total_items
         };
 
@@ -162,7 +163,7 @@ function getBmes(paramsConfig = {}) {
 
         dispatch(setBmesLoading(false));
         dispatch(setBmes(bmeData));
-        onSuccess && onSuccess();
+        if (onSuccess) onSuccess();
       },
       onError(data) {
         const { status, title } = data.errors[0];
@@ -190,7 +191,7 @@ function createBme({ data, onSuccess }) {
       },
       onSuccess() {
         dispatch(setBmesLoading(false));
-        onSuccess && onSuccess();
+        if (onSuccess) onSuccess();
       }
     });
   };
@@ -206,7 +207,7 @@ function updateBme({ id, data, onSuccess }) {
       },
       onSuccess() {
         dispatch(setBmesLoading(false));
-        onSuccess && onSuccess(id);
+        if (onSuccess) onSuccess(id);
       }
     });
   };
@@ -219,7 +220,7 @@ function deleteBme({ id, onSuccess }) {
       url: `${config.API_URL}/business-model-elements/${id}`,
       onSuccess() {
         dispatch(setBmesLoading(false));
-        onSuccess && onSuccess(id);
+        if (onSuccess) onSuccess(id);
       }
     });
   };
@@ -231,4 +232,14 @@ function resetBmes() {
   };
 }
 
-export { bmesReducer, getBmes, createBme, deleteBme, setBmesDetail, updateBme, setFilters, setBmesSearch, resetBmes };
+export {
+  bmesReducer,
+  getBmes,
+  createBme,
+  deleteBme,
+  setBmesDetail,
+  updateBme,
+  setFilters,
+  setBmesSearch,
+  resetBmes
+};

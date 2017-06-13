@@ -9,4 +9,4 @@ const links = [
   }
 ];
 
-export { links };
+export { links }; // eslint-disable-line import/prefer-default-export

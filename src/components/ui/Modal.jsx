@@ -1,6 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Icon from 'components/ui/Icon';
-import Spinner from 'components/ui/Spinner';
 import { dispatch } from 'main';
 import { setModalChildren, toggleModal } from 'modules/modal';
 import classnames from 'classnames';
@@ -42,7 +42,8 @@ class Modal extends React.Component {
             {this.props.children}
           </div>
         </div>
-        <area className="modal-backdrop" onClick={() => dispatch(toggleModal(false))} />
+        { // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+        } <div className="modal-backdrop" onClick={() => dispatch(toggleModal(false))} />
       </section>
     );
   }
@@ -50,8 +51,8 @@ class Modal extends React.Component {
 
 Modal.propTypes = {
   // STORE
-  opened: React.PropTypes.bool,
-  children: React.PropTypes.any
+  opened: PropTypes.bool,
+  children: PropTypes.any
 };
 
 Modal.defaultProps = {

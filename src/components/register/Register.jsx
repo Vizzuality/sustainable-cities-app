@@ -1,5 +1,6 @@
 import React from 'react';
-import { validation } from 'utils/validation';
+import PropTypes from 'prop-types';
+import { validation } from 'utils/validation'; // eslint-disable-line no-unused-vars
 import { Autobind } from 'es-decorators';
 import { Input, Button, Form } from 'components/form/Form';
 import { dispatch } from 'main';
@@ -39,11 +40,46 @@ export default class Register extends React.Component {
       <section className="c-form -register">
         <h3>Register</h3>
         <Form onSubmit={this.onSubmit}>
-          <Input name="email" type="Email" onChange={this.onInputChange} value="" placeholder="Email" validations={['required', 'email']} />
-          <Input name="nickname" type="text" onChange={this.onInputChange} value="" placeholder="Nick name" validations={['required']} />
-          <Input name="name" type="text" onChange={this.onInputChange} value="" placeholder="Name" validations={['required']} />
-          <Input name="password" type="password" onChange={this.onInputChange} value="" placeholder="Password" validations={['required']} />
-          <Input name="password_confirmation" type="password" onChange={this.onInputChange} value="" placeholder="Password confirmation" validations={['required', 'passwordConfirmation']} />
+          <Input
+            name="email"
+            type="Email"
+            onChange={this.onInputChange}
+            value=""
+            placeholder="Email"
+            validations={['required', 'email']}
+          />
+          <Input
+            name="nickname"
+            type="text"
+            onChange={this.onInputChange}
+            value=""
+            placeholder="Nick name"
+            validations={['required']}
+          />
+          <Input
+            name="name"
+            type="text"
+            onChange={this.onInputChange}
+            value=""
+            placeholder="Name"
+            validations={['required']}
+          />
+          <Input
+            name="password"
+            type="password"
+            onChange={this.onInputChange}
+            value=""
+            placeholder="Password"
+            validations={['required']}
+          />
+          <Input
+            name="password_confirmation"
+            type="password"
+            onChange={this.onInputChange}
+            value=""
+            placeholder="Password confirmation"
+            validations={['required', 'passwordConfirmation']}
+          />
           <Button className="button">Register</Button>
           <Spinner isLoading={this.props.user.loading} />
         </Form>
@@ -53,5 +89,5 @@ export default class Register extends React.Component {
 }
 
 Register.propTypes = {
-  user: React.PropTypes.object
+  user: PropTypes.object
 };

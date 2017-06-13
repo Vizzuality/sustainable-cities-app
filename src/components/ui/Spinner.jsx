@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
 export default function Spinner({ isLoading, className, style }) {
@@ -17,7 +18,7 @@ export default function Spinner({ isLoading, className, style }) {
 }
 
 Spinner.propTypes = {
-  isLoading: React.PropTypes.bool,
-  style: React.PropTypes.object,
-  className: React.PropTypes.string
+  isLoading: PropTypes.bool,
+  style: PropTypes.object,
+  className: PropTypes.string
 };

@@ -80,7 +80,12 @@ class EnablingPage extends React.Component {
           pagination={this.props.enablings.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
           onDelete={(item) => {
-            const confirm = <Confirm text={`Enabling condition "${item.name}" will be deleted. Are you sure?`} onAccept={() => this.deleteEnabling(item)} />;
+            const confirm = (
+              <Confirm
+                text={`Enabling condition "${item.name}" will be deleted. Are you sure?`}
+                onAccept={() => this.deleteEnabling(item)}
+              />
+            );
             dispatch(toggleModal(true, confirm));
           }}
         />

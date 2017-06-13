@@ -1,10 +1,10 @@
 import React from 'react';
 import Proptypes from 'prop-types';
+import { validation } from 'utils/validation'; // eslint-disable-line no-unused-vars
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import { push } from 'react-router-redux';
 import { toastr } from 'react-redux-toastr';
-import { validation } from 'utils/validation';
 import { Autobind } from 'es-decorators';
 import { dispatch } from 'main';
 
@@ -87,7 +87,14 @@ class NewCategoryPage extends React.Component {
         </div>
         {/* BME question */}
         {this.state.category_type === 'bme' &&
-          <Input type="text" onChange={this.onInputChange} name="label" value="" label="Question" validations={['required']} />}
+          <Input
+            type="text"
+            onChange={this.onInputChange}
+            name="label"
+            value=""
+            label="Question"
+            validations={['required']}
+          />}
         {/* description */}
         <Textarea
           validations={[]}
@@ -110,7 +117,14 @@ class NewCategoryPage extends React.Component {
           <div className="row expanded">
             <div className="small-12 columns">
               {/* name */}
-              <Input type="text" onChange={this.onInputChange} name="name" value="" label="Category name" validations={['required']} />
+              <Input
+                type="text"
+                onChange={this.onInputChange}
+                name="name"
+                value=""
+                label="Category name"
+                validations={['required']}
+              />
               <Select
                 name="category_type"
                 value={this.state.category_type}

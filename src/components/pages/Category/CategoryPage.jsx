@@ -13,7 +13,7 @@ import { toggleModal } from 'modules/modal';
 import Table from 'components/ui/Table';
 import Spinner from 'components/ui/Spinner';
 import Search from 'components/search/Search';
-import Confirm from 'components/confirm/confirm';
+import Confirm from 'components/confirm/Confirm';
 
 import {
   CATEGORY_TABLE_FIELDS,
@@ -26,7 +26,9 @@ import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/ta
 class CategoryPage extends React.Component {
 
   componentWillMount() {
-    this.props.categoryEntities.length || dispatch(getCategories({ type: 'all' }));
+    if (!this.props.categoryEntities.length) {
+      dispatch(getCategories({ type: 'all' }));
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -87,7 +89,12 @@ class CategoryPage extends React.Component {
           pagination={this.props.categories.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
           onDelete={(item) => {
-            const confirm = <Confirm text={`Category "${item.name}" will be deleted. Are you sure?`} onAccept={() => this.onDeleteCategory(item)} />;
+            const confirm = (
+              <Confirm
+                text={`Category "${item.name}" will be deleted. Are you sure?`}
+                onAccept={() => this.onDeleteCategory(item)}
+              />
+            );
             dispatch(toggleModal(true, confirm));
           }}
         />
