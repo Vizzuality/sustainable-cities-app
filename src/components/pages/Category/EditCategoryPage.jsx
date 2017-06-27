@@ -1,10 +1,9 @@
 import React from 'react';
 import Proptypes from 'prop-types';
+import { validation } from 'utils/validation'; // eslint-disable-line no-unused-vars
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
-import { push } from 'react-router-redux';
 import { toastr } from 'react-redux-toastr';
-import { validation } from 'utils/validation';
 import { Autobind } from 'es-decorators';
 import { dispatch } from 'main';
 import isEqual from 'lodash/isEqual';

@@ -138,7 +138,7 @@ function register({ email, nickname, password, password_confirmation, name }, lo
       onSuccess() {
         // Login user after register
         dispatch(setLoading(false));
-        loginAfterRegister && dispatch(login({ email, password }));
+        if (loginAfterRegister) dispatch(login({ email, password }));
       },
       onError(error) {
         dispatch(setLoading(false));

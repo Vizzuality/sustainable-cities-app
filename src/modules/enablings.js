@@ -151,12 +151,14 @@ function getEnablings(paramsConfig = {}) {
     get({
       url,
       onSuccess({ data, included, meta }) {
+        let parsedData = data;
+
         // Parse data to json api format
-        if (!Array.isArray(data)) {
-          data = [data];
+        if (!Array.isArray(parsedData)) {
+          parsedData = [data];
         }
 
-        const parsedData = deserialize(data);
+        parsedData = deserialize(parsedData);
         const parsedIncluded = included.map(incl => deserialize([incl])[0]);
 
         dispatch(setEnablingsLoading(false));
@@ -165,7 +167,7 @@ function getEnablings(paramsConfig = {}) {
           included: parsedIncluded,
           itemCount: meta.total_items
         }));
-        onSuccess && onSuccess();
+        if (onSuccess) onSuccess();
       },
       onError(data) {
         const { status, title } = data.errors[0];
@@ -189,7 +191,7 @@ function deleteEnabling({ id, onSuccess }) {
       url: `${config.API_URL}/enablings/${id}`,
       onSuccess() {
         dispatch(setEnablingsLoading(false));
-        onSuccess && onSuccess(id);
+        if (onSuccess) onSuccess(id);
       }
     });
   };
@@ -206,7 +208,7 @@ function createEnabling({ data, onSuccess }) {
       },
       onSuccess() {
         dispatch(setEnablingsLoading(false));
-        onSuccess && onSuccess();
+        if (onSuccess) onSuccess();
       }
     });
   };
@@ -222,10 +224,20 @@ function updateEnabling({ id, data, onSuccess }) {
       },
       onSuccess() {
         dispatch(setEnablingsLoading(false));
-        onSuccess && onSuccess(id);
+        if (onSuccess) onSuccess(id);
       }
     });
   };
 }
 
-export { enablingsReducer, getEnablings, deleteEnabling, createEnabling, updateEnabling, setFilters, setEnablingDetail, resetEnablings, setEnablingsSearch };
+export {
+  enablingsReducer,
+  getEnablings,
+  deleteEnabling,
+  createEnabling,
+  updateEnabling,
+  setFilters,
+  setEnablingDetail,
+  resetEnablings,
+  setEnablingsSearch
+};

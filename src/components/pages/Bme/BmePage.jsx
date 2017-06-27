@@ -24,7 +24,7 @@ class BmePage extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { filters, sort, pagination, search } = this.props.bmes;
+    const { filters, sort, pagination } = this.props.bmes;
     if (!isEqual(filters, nextProps.bmes.filters)
       || !isEqual(sort, nextProps.bmes.sort)
       || !isEqual(pagination, nextProps.bmes.pagination)
@@ -40,6 +40,26 @@ class BmePage extends React.Component {
 
   componentWillUnmount() {
     dispatch(resetBmes());
+  }
+
+  setCategory() {
+    return this.props.bmes.list.map((bme) => {
+      if (!bme.categories.length) return { bme };
+      const category = bme.categories.find(cat => cat.category_type === 'Bme');
+      return {
+        ...bme,
+        ...{ category: category ? category.name : '-' }
+      };
+    });
+  }
+
+  @Autobind
+  search(val) {
+    dispatch(setBmesSearch(val.toLowerCase()));
+    dispatch(setFilters('pagination', {
+      pageNumber: DEFAULT_PAGINATION_NUMBER,
+      pageSize: DEFAULT_PAGINATION_SIZE
+    }));
   }
 
   deleteBme(bme) {
@@ -58,26 +78,6 @@ class BmePage extends React.Component {
         }
       })
     );
-  }
-
-  @Autobind
-  search(val) {
-    dispatch(setBmesSearch(val.toLowerCase()));
-    dispatch(setFilters('pagination', {
-      pageNumber: DEFAULT_PAGINATION_NUMBER,
-      pageSize: DEFAULT_PAGINATION_SIZE
-    }));
-  }
-
-  setCategory() {
-    return this.props.bmes.list.map((bme) => {
-      if (!bme.categories.length) return { bme };
-      const category = bme.categories.find(cat => cat.category_type === 'Bme');
-      return {
-        ...bme,
-        ...{ category: category ? category.name : '-' }
-      };
-    });
   }
 
   render() {
@@ -100,7 +100,12 @@ class BmePage extends React.Component {
           pagination={this.props.bmes.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
           onDelete={(item) => {
-            const confirm = <Confirm text={`Business model element "${item.name}" will be deleted. Are you sure?`} onAccept={() => this.deleteBme(item)} />;
+            const confirm = (
+              <Confirm
+                text={`Business model element "${item.name}" will be deleted. Are you sure?`}
+                onAccept={() => this.deleteBme(item)}
+              />
+            );
             dispatch(toggleModal(true, confirm));
           }}
         />

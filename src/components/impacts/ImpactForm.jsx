@@ -37,14 +37,14 @@ class ImpactForm extends React.Component {
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
-    const { parent, children } = this.state.categories;
-    this.props.onSubmit && this.props.onSubmit({
-      ...this.form,
-      ...{ categories: {
-        parent,
-        children
-      } }
-    });
+    const { children } = this.state.categories;
+    const data = { ...this.form };
+
+    if (children) data.category_id = children;
+
+    if (this.props.onSubmit) {
+      this.props.onSubmit(data);
+    }
   }
 
   @Autobind
@@ -52,7 +52,9 @@ class ImpactForm extends React.Component {
     this.form[evt.target.name] = evt.target.value;
   }
 
-  onCategoryChange(level, val) {
+  onCategoryChange(level, initialVal) {
+    let val = initialVal;
+
     if (val) {
       val = Array.isArray(val) ?
         val.map(i => i.value) : val.value;
@@ -126,7 +128,7 @@ class ImpactForm extends React.Component {
               <Input
                 type="text"
                 label="Value"
-                defaultValue={impact_value}
+                defaultValue={impact_value} // eslint-disable-line camelcase
                 name="impact_value"
                 validations={[]}
                 onChange={this.onInputChange}
@@ -136,7 +138,7 @@ class ImpactForm extends React.Component {
               <Input
                 type="text"
                 label="Unit"
-                defaultValue={impact_unit}
+                defaultValue={impact_unit} // eslint-disable-line camelcase
                 name="impact_unit"
                 validations={[]}
                 onChange={this.onInputChange}

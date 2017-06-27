@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Autobind } from 'es-decorators';
 
-import { Select } from 'components/Form/form';
+import { Select } from 'components/form/Form';
 
 export default class SolutionSelector extends React.Component {
 
@@ -21,7 +21,8 @@ export default class SolutionSelector extends React.Component {
     });
   }
 
-  onCategoryChange(level, val) {
+  onCategoryChange(level, initialVal) {
+    let val = initialVal;
     if (val) {
       val = Array.isArray(val) ?
         val.map(i => i.value) : val.value;
@@ -50,13 +51,17 @@ export default class SolutionSelector extends React.Component {
     }
 
     this.setState({ categories }, () => {
-      this.props.onChangeSelect && this.props.onChangeSelect(this.state, this.props.index);
+      if (this.props.onChangeSelect) {
+        this.props.onChangeSelect(this.state, this.props.index);
+      }
     });
   }
 
   @Autobind
   onDeleteSelect() {
-    this.props.onDeleteSelect && this.props.onDeleteSelect(this.props.index);
+    if (this.props.onDeleteSelect) {
+      this.props.onDeleteSelect(this.props.index);
+    }
   }
 
   getFirstSelectOption(value, source) {
@@ -115,6 +120,7 @@ export default class SolutionSelector extends React.Component {
 
   render() {
     const selectOptions = this.loadMultiSelectOptions();
+    const { parent, children, nephew } = this.state.categories;
 
     return (
       <div className="c-solution-selector">
@@ -122,7 +128,7 @@ export default class SolutionSelector extends React.Component {
           <div className="small-4 columns">
             <Select
               name="categories"
-              value={this.state.categories.parent}
+              value={parent}
               onChange={val => this.onCategoryChange('parent', val)}
               label="Solution group"
               options={this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }))}
@@ -131,7 +137,7 @@ export default class SolutionSelector extends React.Component {
           <div className="small-4 columns">
             <Select
               name="categories"
-              value={this.state.categories.children}
+              value={children}
               onChange={val => this.onCategoryChange('children', val)}
               label="Solution category"
               options={selectOptions.children}
@@ -140,7 +146,7 @@ export default class SolutionSelector extends React.Component {
           <div className="small-4 columns">
             <Select
               name="categories"
-              value={this.state.categories.nephew}
+              value={nephew && nephew.id ? nephew.id : nephew}
               onChange={val => this.onCategoryChange('nephew', val)}
               label="Solution sub-category"
               options={selectOptions.nephew}

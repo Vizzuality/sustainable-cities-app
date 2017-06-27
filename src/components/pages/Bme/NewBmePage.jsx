@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { validation } from 'utils/validation'; // eslint-disable-line no-unused-vars
 import { dispatch } from 'main';
 import { createBme } from 'modules/bmes';
 import { getEnablings } from 'modules/enablings';
@@ -8,7 +9,7 @@ import { toggleModal } from 'modules/modal';
 import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import SolutionForm from 'components/form/Solution/SolutionForm';
-import { validation } from 'utils/validation';
+import SourceForm from 'components/sources/SourceForm';
 import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
 import { toastr } from 'react-redux-toastr';
@@ -28,7 +29,8 @@ class NewBmePage extends React.Component {
       categories: {
         bme: {}
       },
-      solutions: []
+      solutions: [],
+      external_sources_attributes: []
     };
 
     this.categoryGroups = {
@@ -72,16 +74,24 @@ class NewBmePage extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
 
-    const solutions = this.state.solutions.map(solution => solution.nephew.id);
+    const {
+      categories,
+      enablings,
+      external_sources_attributes,
+      solutions,
+      timing
+    } = this.state;
+
 
     const data = {
       ...this.form,
       category_ids: [
-        ...this.state.timing,
-        ...[this.state.categories.bme.nephew],
-        ...solutions
+        ...timing,
+        ...[categories.bme.nephew],
+        ...{ solutions: solutions.map(solution => solution.nephew.id) }
       ],
-      enabling_ids: this.state.enablings
+      enabling_ids: enablings,
+      external_sources_attributes
     };
 
     // Create Bme
@@ -101,7 +111,9 @@ class NewBmePage extends React.Component {
     });
   }
 
-  onCategoryChange(group, level, val) {
+  onCategoryChange(group, level, initialVal) {
+    let val = initialVal;
+
     if (val) {
       val = Array.isArray(val) ?
         val.map(i => i.value) : val.value;
@@ -137,6 +149,55 @@ class NewBmePage extends React.Component {
     this.setState({ categories: newState });
   }
 
+  /* Source methods */
+  @Autobind
+  onAddSource(evt, opts = {}) {
+    evt.preventDefault();
+    let values = {};
+    let action = this.onCreateSource;
+
+    if (opts.edit) {
+      values = this.state.external_sources_attributes[opts.index];
+      action = this.onEditSource;
+    }
+
+    dispatch(toggleModal(
+      true,
+      <SourceForm text="Add Source" values={values} onSubmit={(...args) => action(...args, opts.index)} />
+    ));
+  }
+
+  @Autobind
+  onCreateSource(formParams) {
+    this.setState({
+      external_sources_attributes: [
+        ...this.state.external_sources_attributes,
+        formParams
+      ]
+    });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  editSource(form, index) {
+    // eslint-disable-next-line camelcase
+    const sources = this.state.external_sources_attributes.slice();
+    external_sources_attributes[index] = {
+      ...external_sources_attributes[index],
+      ...form
+    };
+    this.setState({ external_sources_attributes });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  onDeleteSource(index) {
+    const { external_sources_attributes } = this.state;
+    external_sources_attributes.splice(index, 1);
+    this.setState({ external_sources_attributes });
+  }
+
+  /* Solution methods */
   @Autobind
   onCreateSolution(formParams) {
     this.setState({
@@ -156,7 +217,10 @@ class NewBmePage extends React.Component {
       action = this.onEditSolution;
     }
 
-    dispatch(toggleModal(true, <SolutionForm text="Add Solution" values={values} onSubmit={(...args) => action(...args, opts.index)} />));
+    dispatch(toggleModal(
+      true,
+      <SolutionForm text="Add Solution" values={values} onSubmit={(...args) => action(...args, opts.index)} />
+    ));
   }
 
   @Autobind
@@ -169,6 +233,13 @@ class NewBmePage extends React.Component {
 
     this.setState({ solutions });
     dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  deleteSolution(index) {
+    const { solutions } = this.state;
+    solutions.splice(index, 1);
+    this.setState({ solutions });
   }
 
   getFirstSelectOption(value, source, categoryGroupId) {
@@ -228,13 +299,6 @@ class NewBmePage extends React.Component {
     return options;
   }
 
-  @Autobind
-  deleteSolution(index) {
-    const { solutions } = this.state;
-    solutions.splice(index, 1);
-    this.setState({ solutions });
-  }
-
   render() {
     const bmeSelectOptions = this.loadMultiSelectOptions(this.state.categories.bme, 'bme');
 
@@ -246,7 +310,14 @@ class NewBmePage extends React.Component {
             <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
           {/* Name */}
-          <Input type="text" onChange={this.onInputChange} name="name" value="" label="Business model element name" validations={['required']} />
+          <Input
+            type="text"
+            onChange={this.onInputChange}
+            name="name"
+            value=""
+            label="Business model element name"
+            validations={['required']}
+          />
           {/* BME categories */}
           <div className="row expanded">
             <div className="small-4 columns">
@@ -304,9 +375,30 @@ class NewBmePage extends React.Component {
               <ul>
                 {this.state.solutions.map((solution, i) => {
                   return (
-                    <li key={i}>
-                      <span onClick={evt => this.onAddSolution(evt, { edit: true, index: i })}>{`${solution.nephew.name} - ${solution.nephew.id}`}</span>
+                    <li key={solution.nephew.id}>
+                      <button onClick={evt => this.onAddSolution(evt, { edit: true, index: i })}>
+                        {`${solution.nephew.name} - ${solution.nephew.id}`}
+                      </button>
                       <button className="button" onClick={() => this.deleteSolution(i)}>Delete solution</button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
+          {/* Sources */}
+          <div className="row expanded">
+            <div className="small-12 column">
+              <label htmlFor="sources">Sources</label>
+              <button type="button" className="button" onClick={this.onAddSource}>Add Source</button>
+              <ul>
+                {this.state.external_sources_attributes.map((source, i) => {
+                  return (
+                    <li key={i}>
+                      <button onClick={evt => this.onAddSource(evt, { edit: true, index: i })}>
+                        {source.name}
+                      </button>
+                      <button type="button" className="button" onClick={() => this.onDeleteSource(i)}>Delete source</button>
                     </li>
                   );
                 })}

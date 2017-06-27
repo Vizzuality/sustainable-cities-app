@@ -1,10 +1,11 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { validation } from 'utils/validation'; // eslint-disable-line no-unused-vars
 import { Input, Button, Form } from 'components/form/Form';
 import Spinner from 'components/ui/Spinner';
 import { login } from 'modules/user';
 import { Autobind } from 'es-decorators';
 import { dispatch } from 'main';
-import { validation } from 'utils/validation';
 import { toastr } from 'react-redux-toastr';
 import isEqual from 'lodash/isEqual';
 import capitalize from 'lodash/capitalize';
@@ -41,8 +42,22 @@ export default class Login extends React.Component {
       <section className="c-form -login">
         <Form className="login-form" onSubmit={this.onSubmit}>
           <h3>Login</h3>
-          <Input type="email" onChange={this.onInputChange} name="email" value="" placeholder="Email" validations={['required', 'email']} />
-          <Input type="password" onChange={this.onInputChange} name="password" value="" placeholder="Password" validations={['required']} />
+          <Input
+            type="email"
+            onChange={this.onInputChange}
+            name="email"
+            value=""
+            placeholder="Email"
+            validations={['required', 'email']}
+          />
+          <Input
+            type="password"
+            onChange={this.onInputChange}
+            name="password"
+            value=""
+            placeholder="Password"
+            validations={['required']}
+          />
           <Button className="button">Login</Button>
           <Spinner isLoading={this.props.user.loading} />
         </Form>
@@ -52,5 +67,5 @@ export default class Login extends React.Component {
 }
 
 Login.propTypes = {
-  user: React.PropTypes.object
+  user: PropTypes.object
 };

@@ -13,7 +13,7 @@ const email = {
 
 const passwordConfirmation = {
   rule: (value, components) => value === components.password.state.value,
-  hint: () => <span className="form-error -password-confirmation">Passwords don't match</span>
+  hint: () => <span className="form-error -password-confirmation">{'Passwords don\'t match'}</span>
 };
 
 export { required, email, passwordConfirmation };

@@ -1,14 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { validation } from 'utils/validation'; // eslint-disable-line no-unused-vars
 import { dispatch } from 'main';
 import { push } from 'react-router-redux';
 
-import { getBmes } from 'modules/bmes';
 import { createImpact } from 'modules/impacts';
 import { getCategories } from 'modules/categories';
-import { Input, Button, Form, Textarea, Select, Radio } from 'components/form/Form';
+import { Input, Button, Form, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
-import { validation } from 'utils/validation';
 import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
 import { toastr } from 'react-redux-toastr';
@@ -27,7 +26,9 @@ class NewImpactPage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.impactCategories.length || dispatch(getCategories({ type: 'Impact', tree: true, pageSize: 9999 }));
+    if (!this.props.impactCategories.length) {
+      dispatch(getCategories({ type: 'Impact', tree: true, pageSize: 9999 }));
+    }
   }
 
   /* Methods */
@@ -36,9 +37,10 @@ class NewImpactPage extends React.Component {
     this.form[evt.target.name] = evt.target.value;
   }
 
-  onSelectChange(field, val) {
+  onSelectChange(field, initialVal) {
+    let val = initialVal;
     if (!Array.isArray(val)) {
-      val = val.value
+      val = val.value;
     } else {
       val = val.map(v => v.value);
     }
@@ -48,7 +50,8 @@ class NewImpactPage extends React.Component {
     });
   }
 
-  onCategoryChange(level, val) {
+  onCategoryChange(level, initialVal) {
+    let val = initialVal;
     if (val) {
       val = Array.isArray(val) ?
         val.map(i => i.value) : val.value;
@@ -120,7 +123,14 @@ class NewImpactPage extends React.Component {
           <div className="row expanded">
             <div className="small-12 columns">
               {/* Name */}
-              <Input type="text" onChange={this.onInputChange} name="name" value="" label="Impact name" validations={['required']} />
+              <Input
+                type="text"
+                onChange={this.onInputChange}
+                name="name"
+                value=""
+                label="Impact name"
+                validations={['required']}
+              />
             </div>
             <div className="small-6 columns">
               <Select
@@ -142,11 +152,25 @@ class NewImpactPage extends React.Component {
             </div>
             <div className="small-6 columns">
               {/* Unit */}
-              <Input type="text" onChange={this.onInputChange} name="impact_unit" value="" label="Unit" validations={['required']} />
+              <Input
+                type="text"
+                onChange={this.onInputChange}
+                name="impact_unit"
+                value=""
+                label="Unit"
+                validations={['required']}
+              />
             </div>
             <div className="small-6 columns">
               {/* Value */}
-              <Input type="text" onChange={this.onInputChange} name="impact_value" value="" label="Value" validations={['required']} />
+              <Input
+                type="text"
+                onChange={this.onInputChange}
+                name="impact_value"
+                value=""
+                label="Value"
+                validations={['required']}
+              />
             </div>
             {/* TODO: add source */}
           </div>
