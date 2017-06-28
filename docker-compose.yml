@@ -1,6 +1,6 @@
 version: "2"
 services:
-  resource-watch:
+  sustainable-cities-backoffice:
     command: "npm start"
     build:
       context: .
