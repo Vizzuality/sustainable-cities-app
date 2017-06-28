@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { dispatch } from 'main';
 import { getStudyCases } from 'modules/study-cases';
@@ -7,7 +8,6 @@ import StudyCaseList from 'components/study-case/StudyCaseList';
 import Search from 'components/search/Search';
 import Spinner from 'components/ui/Spinner';
 import debounce from 'lodash/debounce';
-import isEqual from 'lodash/isEqual';
 import { Autobind } from 'es-decorators';
 
 
@@ -54,8 +54,8 @@ class StudyCasesPage extends React.Component {
   }
 
   setScrollListener() {
-    this._scrollListener = debounce(this.scrollListener, 100);
-    window.addEventListener('scroll', this._scrollListener, { passive: true });
+    this.scrollListener = debounce(this.scrollListener, 100);
+    window.addEventListener('scroll', this.scrollListener, { passive: true });
   }
 
   scrollListener() {
@@ -84,8 +84,8 @@ class StudyCasesPage extends React.Component {
   }
 
   removeScrollListener() {
-    window.removeEventListener('scroll', this._scrollListener);
-    this._scrollListener = null;
+    window.removeEventListener('scroll', this.scrollListener);
+    this.scrollListener = null;
   }
 
   render() {
@@ -108,7 +108,7 @@ class StudyCasesPage extends React.Component {
 }
 
 StudyCasesPage.propTypes = {
-  studyCases: React.PropTypes.object
+  studyCases: PropTypes.object
 };
 
 // Map state to props

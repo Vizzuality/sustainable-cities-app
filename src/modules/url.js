@@ -1,8 +1,8 @@
 import { dispatch } from 'main';
 import { setBmesDetail } from 'modules/bmes';
 import { setImpactDetail } from 'modules/impacts';
-import { setEnablingDetail } from 'modules/enablings'
-import { setStudyCaseDetail } from 'modules/study-cases'
+import { setEnablingDetail } from 'modules/enablings';
+import { setStudyCaseDetail } from 'modules/study-cases';
 import { setCategoryDetail } from 'modules/categories';
 
 
@@ -36,4 +36,10 @@ function onEnterEditStudyCase({ params }, replaceUrl, done) {
   done();
 }
 
-export { onEnterEditBmePage, onEnterEditEnablingPage, onEnterEditImpactPage, onEnterEditStudyCase, onEnterEditCategoryPage };
+export {
+  onEnterEditBmePage,
+  onEnterEditEnablingPage,
+  onEnterEditImpactPage,
+  onEnterEditStudyCase,
+  onEnterEditCategoryPage
+};

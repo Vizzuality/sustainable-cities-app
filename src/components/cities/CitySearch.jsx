@@ -1,7 +1,7 @@
-import React from 'React';
+import React from 'react';
 import { AsyncSelect } from 'components/form/Form';
 import { get } from 'utils/request';
-import debounce from 'lodash/debounce'
+import debounce from 'lodash/debounce';
 
 function getCities(input, cb) {
   if (!input.length) {

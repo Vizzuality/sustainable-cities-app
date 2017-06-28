@@ -1,5 +1,5 @@
 import React from 'react';
-import Dropzone from 'react-dropzone'
+import Dropzone from 'react-dropzone';
 import PropTypes from 'prop-types';
 import Icon from 'components/ui/Icon';
 
@@ -11,7 +11,7 @@ export default function DropZone({ withImage, title, files, onDelete, ...props }
       <ul className="dropzone-img-list">
         {files.map((file, i) => {
           return (
-            <li className="img-item" key={i}>
+            <li className="img-item" key={file.name}>
               {withImage ? <img className="img" alt={file.name} src={file.attachment} /> : <span>{file.name}</span>}
               <button className="item-btn" onClick={() => onDelete && onDelete(i)}><Icon name="icon-cross" /></button>
             </li>

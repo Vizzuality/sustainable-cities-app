@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
 export default function SvgIcon({ name, className }) {
@@ -14,6 +15,6 @@ export default function SvgIcon({ name, className }) {
 }
 
 SvgIcon.propTypes = {
-  name: React.PropTypes.string.isRequired,
-  className: React.PropTypes.string
+  name: PropTypes.string.isRequired,
+  className: PropTypes.string
 };

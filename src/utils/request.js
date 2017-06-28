@@ -1,17 +1,14 @@
-import { dispatch } from 'main';
-import { logout } from 'modules/user';
-
 function post({ url, body, headers, onSuccess, onError }) {
   const request = new XMLHttpRequest();
   request.open('POST', url);
 
-  const _headers = { ...headers,
+  const customHeaders = { ...headers,
     'Content-Type': 'application/json',
     'SC-API-KEY': config['SC-API-KEY']
   };
 
-  Object.keys(_headers).forEach((h) => {
-    request.setRequestHeader(h, _headers[h]);
+  Object.keys(customHeaders).forEach((h) => {
+    request.setRequestHeader(h, customHeaders[h]);
   });
 
   const requestBody = body ? JSON.stringify(body) : undefined;
@@ -22,13 +19,13 @@ function post({ url, body, headers, onSuccess, onError }) {
     if (request.readyState === 4) {
       const data = JSON.parse(request.responseText);
       if ([200, 201].includes(request.status)) {
-        onSuccess && onSuccess(data);
+        if (onSuccess) onSuccess(data);
       } else {
         if (data.errors[0].status === '401') {
           // Log out
           // dispatch(logout());
         }
-        onError && onError(data);
+        if (onError) onError(data);
       }
     }
   };
@@ -40,14 +37,14 @@ function get({ url, headers, onSuccess, onError }) {
   const request = new XMLHttpRequest();
   request.open('GET', url);
 
-  const _headers = { ...headers,
+  const customHeaders = { ...headers,
     'Content-Type': 'application/json',
     'SC-API-KEY': config['SC-API-KEY'],
     Authorization: `Bearer ${localStorage.token}`
   };
 
-  Object.keys(_headers).forEach((h) => {
-    request.setRequestHeader(h, _headers[h]);
+  Object.keys(customHeaders).forEach((h) => {
+    request.setRequestHeader(h, customHeaders[h]);
   });
 
   request.send();
@@ -56,9 +53,9 @@ function get({ url, headers, onSuccess, onError }) {
     if (request.readyState === 4) {
       const data = JSON.parse(request.responseText);
       if (request.status === 200) {
-        onSuccess && onSuccess(data);
-      } else {
-        onError && onError(data);
+        if (onSuccess) onSuccess(data);
+      } else if (onError) {
+        onError(data);
       }
     }
   };
@@ -66,18 +63,19 @@ function get({ url, headers, onSuccess, onError }) {
   return request;
 }
 
+// eslint-disable-next-line no-underscore-dangle
 function _delete({ url, headers, onSuccess, onError }) {
   const request = new XMLHttpRequest();
   request.open('DELETE', url);
 
-  const _headers = { ...headers,
+  const customHeaders = { ...headers,
     'Content-Type': 'application/json',
     'SC-API-KEY': config['SC-API-KEY'],
     Authorization: `Bearer ${localStorage.token}`
   };
 
-  Object.keys(_headers).forEach((h) => {
-    request.setRequestHeader(h, _headers[h]);
+  Object.keys(customHeaders).forEach((h) => {
+    request.setRequestHeader(h, customHeaders[h]);
   });
 
   request.send();
@@ -86,9 +84,9 @@ function _delete({ url, headers, onSuccess, onError }) {
     if (request.readyState === 4) {
       const data = JSON.parse(request.responseText);
       if (request.status === 200) {
-        onSuccess && onSuccess(data);
-      } else {
-        onError && onError(data);
+        if (onSuccess) onSuccess(data);
+      } else if (onError) {
+        onError(data);
       }
     }
   };
@@ -100,14 +98,14 @@ function patch({ url, headers, body, onSuccess, onError }) {
   const request = new XMLHttpRequest();
   request.open('PATCH', url);
 
-  const _headers = { ...headers,
+  const customHeaders = { ...headers,
     'Content-Type': 'application/json',
     'SC-API-KEY': config['SC-API-KEY'],
     Authorization: `Bearer ${localStorage.token}`
   };
 
-  Object.keys(_headers).forEach((h) => {
-    request.setRequestHeader(h, _headers[h]);
+  Object.keys(customHeaders).forEach((h) => {
+    request.setRequestHeader(h, customHeaders[h]);
   });
 
   const requestBody = body ? JSON.stringify(body) : undefined;
@@ -118,9 +116,9 @@ function patch({ url, headers, body, onSuccess, onError }) {
     if (request.readyState === 4) {
       const data = JSON.parse(request.responseText);
       if (request.status === 200) {
-        onSuccess && onSuccess(data);
-      } else {
-        onError && onError(data);
+        if (onSuccess) onSuccess(data);
+      } else if (onError) {
+        onError(data);
       }
     }
   };

@@ -147,13 +147,15 @@ function getImpacts(paramsConfig = {}) {
     get({
       url,
       onSuccess({ data, meta, included }) {
+        let parsedData = data;
+
         // Parse data to json api format
-        if (!Array.isArray(data)) {
-          data = [data];
+        if (!Array.isArray(parsedData)) {
+          parsedData = [parsedData];
         }
 
         const impactData = {
-          list: deserialize(data),
+          list: deserialize(parsedData),
           itemCount: meta.total_items
         };
 
@@ -163,7 +165,7 @@ function getImpacts(paramsConfig = {}) {
 
         dispatch(setImpactLoading(false));
         dispatch(setImpacts(impactData));
-        onSuccess && onSuccess();
+        if (onSuccess) onSuccess();
       },
       onError(data) {
         const { status, title } = data.errors[0];
@@ -191,7 +193,7 @@ function createImpact({ data, onSuccess }) {
       },
       onSuccess() {
         dispatch(setImpactLoading(false));
-        onSuccess && onSuccess();
+        if (onSuccess) onSuccess();
       }
     });
   };
@@ -207,7 +209,7 @@ function updateImpact({ id, data, onSuccess }) {
       },
       onSuccess() {
         dispatch(setImpactLoading(false));
-        onSuccess && onSuccess(id);
+        if (onSuccess) onSuccess(id);
       }
     });
   };
@@ -220,10 +222,20 @@ function deleteImpact({ id, onSuccess }) {
       url: `${config.API_URL}/impacts/${id}`,
       onSuccess() {
         dispatch(setImpactLoading(false));
-        onSuccess && onSuccess(id);
+        if (onSuccess) onSuccess(id);
       }
     });
   };
 }
 
-export { impactReducer, getImpacts, createImpact, deleteImpact, setImpactDetail, updateImpact, setFilters, resetImpacts, setImpactSearch };
+export {
+  impactReducer,
+  getImpacts,
+  createImpact,
+  deleteImpact,
+  setImpactDetail,
+  updateImpact,
+  setFilters,
+  resetImpacts,
+  setImpactSearch
+};

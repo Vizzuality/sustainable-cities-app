@@ -6,7 +6,7 @@ import { Autobind } from 'es-decorators';
 
 import { getCategories } from 'modules/categories';
 
-import { Button, Form, Select } from 'components/form/Form';
+import { Button, Form } from 'components/form/Form';
 import SolutionSelector from 'components/solution/SolutionSelector';
 
 class SolutionForm extends React.Component {
@@ -36,6 +36,32 @@ class SolutionForm extends React.Component {
     }
   }
 
+  @Autobind
+  onSelectSolution(state) {
+    this.setState({ categories: state.categories });
+  }
+
+  @Autobind
+  onSubmit(evt) {
+    evt.preventDefault();
+    const { parent, children, nephew } = this.state.categories;
+    if (!nephew) return;
+    const nephewName = this.getCategoryName(nephew);
+    if (this.props.onSubmit) {
+      this.props.onSubmit({
+        ...this.form,
+        ...{ categories: {
+          parent,
+          children,
+          nephew: {
+            id: nephew,
+            name: nephewName
+          }
+        } }
+      });
+    }
+  }
+
   /* this is probably a temporary patch */
   getCategoryName(categoryId) {
     const solutionSelectOptions = this.loadMultiSelectOptions(this.state.categories);
@@ -48,30 +74,6 @@ class SolutionForm extends React.Component {
 
 
     return categoryName;
-  }
-
-  @Autobind
-  onSelectSolution(state) {
-    this.setState({ categories: state.categories });
-  }
-
-  @Autobind
-  onSubmit(evt) {
-    evt.preventDefault();
-    const { parent, children, nephew } = this.state.categories;
-    if (!nephew) return;
-    const nephewName = this.getCategoryName(nephew);
-    this.props.onSubmit && this.props.onSubmit({
-      ...this.form,
-      ...{ categories: {
-        parent,
-        children,
-        nephew: {
-          id: nephew,
-          name: nephewName
-        }
-      } }
-    });
   }
 
   loadMultiSelectOptions() {

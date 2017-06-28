@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { validation } from 'utils/validation'; // eslint-disable-line no-unused-vars
 import { dispatch } from 'main';
 import { getBmes } from 'modules/bmes';
 import { createEnabling, getEnablings } from 'modules/enablings';
 import { getCategories } from 'modules/categories';
-import { Input, Button, Form, Textarea, Select, Radio } from 'components/form/Form';
+import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
-import { validation } from 'utils/validation';
 import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
 import { toastr } from 'react-redux-toastr';
@@ -27,7 +27,9 @@ class NewEnablingPage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    this.props.enablings.categories.length || dispatch(getCategories({ type: 'enablings', tree: false, pageSize: 9999, sort: 'name' }));
+    if (!this.props.enablings.categories.length) {
+      dispatch(getCategories({ type: 'enablings', tree: false, pageSize: 9999, sort: 'name' }));
+    }
     dispatch(getBmes({ pageSize: 9999 }));
     dispatch(getEnablings());
   }
@@ -38,9 +40,10 @@ class NewEnablingPage extends React.Component {
     this.form[evt.target.name] = evt.target.value;
   }
 
-  onSelectChange(field, val) {
+  onSelectChange(field, initialVal) {
+    let val = initialVal;
     if (!Array.isArray(val)) {
-      val = val.value
+      val = val.value;
     } else {
       val = val.map(v => v.value);
     }
@@ -82,8 +85,21 @@ class NewEnablingPage extends React.Component {
             <Link to="/enabling-condition" className="button alert">Cancel</Link>
             <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
-          <Input type="text" onChange={this.onInputChange} name="name" value="" label="Enabling condition title" validations={['required']} />
-          <Textarea onChange={this.onInputChange} name="description" value="" label="Description" validations={['required']} />
+          <Input
+            type="text"
+            onChange={this.onInputChange}
+            name="name"
+            value=""
+            label="Enabling condition title"
+            validations={['required']}
+          />
+          <Textarea
+            onChange={this.onInputChange}
+            name="description"
+            value=""
+            label="Description"
+            validations={['required']}
+          />
           <Select
             name="category"
             label="Category"

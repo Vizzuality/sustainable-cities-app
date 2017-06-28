@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { validation } from 'utils/validation'; // eslint-disable-line no-unused-vars
 import { dispatch } from 'main';
 import { getBmes } from 'modules/bmes';
 import { getEnablings, updateEnabling } from 'modules/enablings';
@@ -6,7 +8,6 @@ import { getCategories } from 'modules/categories';
 import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import getEnablingDetail from 'selectors/enablingDetail';
-import { validation } from 'utils/validation';
 import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
 import { toastr } from 'react-redux-toastr';
@@ -52,7 +53,8 @@ class EditBmePage extends React.Component {
     this.form[evt.target.name] = evt.target.value;
   }
 
-  onSelectChange(field, val) {
+  onSelectChange(field, initialVal) {
+    let val = initialVal;
     if (Array.isArray(val)) {
       val = val.map(v => v.value);
     } else {
@@ -123,7 +125,8 @@ class EditBmePage extends React.Component {
           <Input
             type="text"
             onChange={this.onInputChange}
-            name="name" value={this.props.enablingDetail ? this.props.enablingDetail.name : ''}
+            name="name"
+            value={this.props.enablingDetail ? this.props.enablingDetail.name : ''}
             label="Enabling condition title"
             validations={['required']}
           />
@@ -175,10 +178,10 @@ class EditBmePage extends React.Component {
 }
 
 EditBmePage.propTypes = {
-  bmes: React.PropTypes.object,
-  categories: React.PropTypes.object,
-  enablings: React.PropTypes.object,
-  enablingDetail: React.PropTypes.object
+  bmes: PropTypes.object,
+  categories: PropTypes.object,
+  enablings: PropTypes.object,
+  enablingDetail: PropTypes.object
 };
 
 // Map state to props
