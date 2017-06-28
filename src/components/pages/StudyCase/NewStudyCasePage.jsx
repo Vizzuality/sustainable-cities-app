@@ -35,7 +35,7 @@ class NewStudyCasePage extends React.Component {
     super(props);
     this.state = {
       category_id: null,
-      city_ids: [],
+      city: {},
       bmes: [],
       photos_attributes: [],
       documents_attributes: [],
@@ -64,13 +64,18 @@ class NewStudyCasePage extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
     const {
-      city_ids,
+      city,
       photos_attributes,
       documents_attributes,
       category_id,
       impacts_attributes,
       external_sources_attributes
     } = this.state;
+
+    const { operational_year } = this.form;
+    delete this.form.operational_year;
+    const operationalDate = new Date();
+    operationalDate.setYear(operational_year);
 
     dispatch(createStudyCase({
       data: {
@@ -82,7 +87,8 @@ class NewStudyCasePage extends React.Component {
         project_bmes_attributes: this.state.bmes.map(bme => ({ bme_id: bme.id,
           description: bme.description })),
         external_sources_attributes,
-        city_ids: city_ids.map(c => c.value)
+        city_ids: [city.value],
+        operational_year: operationalDate
       },
       onSuccess() {
         dispatch(push('/study-cases'));
@@ -288,14 +294,29 @@ class NewStudyCasePage extends React.Component {
           onChange={item => this.setState({ category_id: item.value })}
           options={this.props.categories.solution.map(cat => ({ value: cat.id, label: cat.name }))}
         />
-        <CitySearch
-          multi
-          name="city_ids"
-          label="Cities"
-          validations={['required']}
-          value={this.state.city_ids}
-          onChange={items => this.setState({ city_ids: items })}
-        />
+        <div className="row expanded">
+          <div className="column small-6">
+            {/* City */}
+            <CitySearch
+              name="city"
+              label="City"
+              validations={['required']}
+              value={this.state.city}
+              onChange={city => this.setState({ city })}
+            />
+          </div>
+          <div className="column small-6">
+            {/* Year */}
+            <Input
+              type="number"
+              value=""
+              name="operational_year"
+              onChange={this.onInputChange}
+              label="Year"
+              validations={['required']}
+            />
+          </div>
+        </div>
         <Textarea validations={[]} onChange={this.onInputChange} label="Solution" name="solution" />
         <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
         <Creator
