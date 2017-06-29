@@ -19,6 +19,9 @@ import Creator from 'components/creator/Creator';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
 
+import compact from 'lodash/compact'
+import difference from 'lodash/difference';
+
 class EditStudyCasePage extends React.Component {
 
   /* Constructor */
@@ -114,6 +117,11 @@ class EditStudyCasePage extends React.Component {
     const operationalDate = new Date();
     operationalDate.setYear(operational_year);
 
+    if(impacts_attributes) {
+      impacts_attributes.forEach(impact => delete impact['relationships']);
+    }
+
+
     dispatch(updateStudyCase({
       id: this.props.studyCaseDetail.id,
       data: {
@@ -121,16 +129,17 @@ class EditStudyCasePage extends React.Component {
         city_ids: [city.value],
         category_id,
         // eslint-disable-next-line no-underscore-dangle
-        impacts_attributes: impacts_attributes.filter(i => !i.id || i._destroy || i.edited),
+        impacts_attributes: impacts_attributes,
         // eslint-disable-next-line no-underscore-dangle
         project_bmes_attributes: project_bmes_attributes.filter(pbme => !pbme.id || pbme.edited || pbme._destroy),
         // eslint-disable-next-line no-underscore-dangle
-        external_sources_attributes: external_sources_attributes.filter(es => !es.id || es.edited || es._destroy),
+        external_sources_attributes: external_sources_attributes,
         operational_year: operationalDate
       },
       onSuccess: () => {
         toastr.success('The study case has been edited');
-        // dispatch(getStudyCases({ id: this.props.studyCases.detailId }));
+        // updates detail after editing
+        dispatch(getStudyCases({ id: this.props.studyCases.detailId }));
       }
     }));
   }
@@ -153,21 +162,33 @@ class EditStudyCasePage extends React.Component {
   }
 
   /* Impact methods */
-
   @Autobind
   showImpactForm(evt, opts = {}) {
     evt.preventDefault();
+    let action = opts.edit ? this.onImpactEdit : this.onImpactCreate;
     let values = {};
-    let action = this.onImpactCreate;
+    const { external_sources_attributes } = this.state;
+    // values.external_sources_index = external_sources_attributes.filter(s => !s._destroy).map(source => source.id);
+    values.external_sources_index = [];
 
     if (opts.edit) {
       values = this.state.impacts_attributes[opts.index];
-      action = this.onImpactEdit;
+
+      if(values.external_sources_index) {
+        values.external_sources_index = values.external_sources_index;
+      } else {
+        values.external_sources_index = values.relationships.external_sources.data.map(source => source.id);
+      }
     }
 
     dispatch(toggleModal(
       true,
-      <ImpactForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />
+      <ImpactForm
+        text="Add"
+        values={values}
+        sources={external_sources_attributes.filter(s => !s._destroy).map((source, i) => ({ index: i, id: source.id, name: source.name }))}
+        onSubmit={(...args) => action(...args, opts.index)}
+      />
     ));
   }
 
@@ -236,19 +257,21 @@ class EditStudyCasePage extends React.Component {
 
   @Autobind
   deleteSource(index) {
+    // retrieves sources of the project
     const externalSources = this.props.studyCases.included.filter(sc => sc.type === 'external_sources');
-    const sourceToDelete = this.state.external_sources_attributes[index];
+    const { external_sources_attributes, impacts_attributes } = this.state;
 
+    // selects source will be deleted
+    const sourceToDelete = external_sources_attributes[index];
+
+    // check if exists in API
     const exists = externalSources.find(i => i.id === sourceToDelete.id);
-    const { external_sources_attributes } = this.state;
 
     if (!exists) {
-      // Source still doesn't exist on database,
-      // just remove it from local array
+      // Source still doesn't exist on API, just remove it from local array
       external_sources_attributes.splice(index, 1);
     } else {
-      // Source exists on database,
-      // we have to delete it from there
+      // Source exists on API, we have to delete it from there
       external_sources_attributes[index] = {
         id: sourceToDelete.id,
         _destroy: true
@@ -313,8 +336,7 @@ class EditStudyCasePage extends React.Component {
     const { studyCaseDetail } = this.props;
     const name = studyCaseDetail ? studyCaseDetail.name : '';
     const operationalYear = studyCaseDetail && studyCaseDetail.operational_year
-      ? new Date(studyCaseDetail.operational_year).getFullYear()
-      : '';
+      ? new Date(studyCaseDetail.operational_year).getFullYear() : '';
     const solution = studyCaseDetail ? studyCaseDetail.solution : '';
     const situation = studyCaseDetail ? studyCaseDetail.situation : '';
 
@@ -382,6 +404,23 @@ class EditStudyCasePage extends React.Component {
             onDelete={this.deleteProjectBme}
             selectedField="bme_id"
           />
+          {/* Sources */}
+          <div>
+            <button type="button" className="button" onClick={this.showSourceForm}>Add source</button>
+            <ul>
+              {this.state.external_sources_attributes.map((source, i) => {
+                return (
+                  <li
+                    key={`${source.name}-${i}`}
+                    className={`${source._destroy ? 'hidden' : ''}`} // eslint-disable-line no-underscore-dangle
+                  >
+                    <button onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</button>
+                    <button type="button" className="button" onClick={() => this.deleteSource(i)}>Delete</button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
           {/* Impacts */}
           <div>
             <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
@@ -389,7 +428,7 @@ class EditStudyCasePage extends React.Component {
               {this.state.impacts_attributes.map((impact, i) => {
                 return (
                   <li
-                    key={impact.name}
+                    key={impact.id || i}
                     className={`${impact._destroy ? 'hidden' : ''}`} // eslint-disable-line no-underscore-dangle
                   >
                     <button
@@ -398,23 +437,6 @@ class EditStudyCasePage extends React.Component {
                       {impact.name || 'No name'}
                     </button>
                     <button type="button" className="button" onClick={() => this.deleteImpact(i)}>Delete</button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          {/* Sources */}
-          <div>
-            <button type="button" className="button" onClick={this.showSourceForm}>Add source</button>
-            <ul>
-              {this.state.external_sources_attributes.map((source, i) => {
-                return (
-                  <li
-                    key={source.name}
-                    className={`${source._destroy ? 'hidden' : ''}`} // eslint-disable-line no-underscore-dangle
-                  >
-                    <button onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</button>
-                    <button type="button" className="button" onClick={() => this.deleteSource(i)}>Delete</button>
                   </li>
                 );
               })}

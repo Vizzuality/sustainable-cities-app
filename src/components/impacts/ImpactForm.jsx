@@ -6,6 +6,9 @@ import { getCategories } from 'modules/categories';
 import { Form, Input, Button, Select } from 'components/form/Form';
 import { Autobind } from 'es-decorators';
 
+import compact from 'lodash/compact';
+import difference from 'lodash/difference';
+
 class ImpactForm extends React.Component {
 
   constructor(props) {
@@ -13,22 +16,37 @@ class ImpactForm extends React.Component {
 
     this.form = {};
     this.state = {
-      categories: {}
+      categories: {},
+      // used to add new sources
+      external_sources_index: []
     };
+
+    // used to remove sources already added in the database
+    this.external_sources_id = [];
+
   }
 
   /* lifecycle */
   componentWillMount() {
+    const { sources, values } = this.props;
     dispatch(getCategories({ type: 'Impact', tree: true, pageSize: 9999, sort: 'name' }));
+
+    // for editing...
+    if (sources && Object.keys(values).length) {
+      this.setState({
+        external_sources_index: values.external_sources_index.map(sourceId => sourceId)
+      });
+    }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.values && nextProps.values.categories) {
-      const { parent, children } = nextProps.values.categories;
+    if (nextProps.values && nextProps.values) {
+      const { category_parent_id, category_id } = nextProps.values;
+
       this.setState({
         categories: {
-          parent,
-          children
+          parent: category_parent_id,
+          children: category_id
         }
       });
     }
@@ -37,10 +55,19 @@ class ImpactForm extends React.Component {
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
-    const { children } = this.state.categories;
+    const { parent, children } = this.state.categories;
+    const { external_sources_index } = this.state;
     const data = { ...this.form };
 
     if (children) data.category_id = children;
+    if (parent) data.category_parent_id = parent;
+
+    data.external_sources_index = external_sources_index;
+
+    // add ids to remove
+    if (this.external_sources_id.length) {
+      data.remove_external_sources = this.external_sources_id;
+    }
 
     if (this.props.onSubmit) {
       this.props.onSubmit(data);
@@ -50,6 +77,23 @@ class ImpactForm extends React.Component {
   @Autobind
   onInputChange(evt) {
     this.form[evt.target.name] = evt.target.value;
+  }
+
+  @Autobind
+  onSelectChange(field, initialVal) {
+    let val = initialVal;
+    if (!Array.isArray(val)) {
+      val = val.value;
+    } else {
+      val = val.map(v => v.value);
+    }
+
+    // gets the sources id removed
+    this.external_sources_id = difference(this.state.external_sources_index, val);
+
+    this.setState({
+      [field]: val
+    });
   }
 
   onCategoryChange(level, initialVal) {
@@ -77,10 +121,19 @@ class ImpactForm extends React.Component {
     return parentCategory && parentCategory.children ? parentCategory.children[0].id : null;
   }
 
+  getSources(sourceIds) {
+    const { sources } = this.props;
+    return sourceIds.map(id => {
+      sources[id].index = id;
+      return sources[id];
+    });
+  }
+
   render() {
     const { values, text } = this.props;
     const { name, impact_value, impact_unit } = values;
-    const { parent } = this.state.categories;
+    const { external_sources_index, categories } = this.state;
+    const { parent, children } = categories;
 
     let childrenOptions = [];
     let parentCategory = null;
@@ -106,10 +159,21 @@ class ImpactForm extends React.Component {
                 onChange={this.onInputChange}
               />
             </div>
+            {/* Sources */}
+            <div className="column small-12">
+              <Select
+                multi
+                name="sources"
+                value={external_sources_index}
+                onChange={val => this.onSelectChange('external_sources_index', val)}
+                label="Sources"
+                options={this.props.sources.map((source, index) => ({ value: source.id || index, label: source.name }))}
+              />
+            </div>
             <div className="small-6 columns">
               <Select
                 name="categories"
-                value={this.state.categories.parent}
+                value={parent}
                 onChange={val => this.onCategoryChange('parent', val)}
                 label="Category"
                 options={this.props.impactCategories.map(cat => ({ value: cat.id, label: cat.name }))}
@@ -118,7 +182,7 @@ class ImpactForm extends React.Component {
             <div className="small-6 columns">
               <Select
                 name="categories"
-                value={this.state.categories.children}
+                value={children}
                 onChange={val => this.onCategoryChange('children', val)}
                 label="Sub-category"
                 options={childrenOptions}
@@ -154,13 +218,15 @@ class ImpactForm extends React.Component {
 
 ImpactForm.propTypes = {
   impactCategories: PropTypes.array,
+  sources: PropTypes.array,
   values: PropTypes.object,
   text: PropTypes.string,
   onSubmit: PropTypes.func
 };
 
 ImpactForm.defaultProps = {
-  values: {}
+  values: {},
+  sources: []
 };
 
 const mapStateToProps = ({ categories }) => ({
