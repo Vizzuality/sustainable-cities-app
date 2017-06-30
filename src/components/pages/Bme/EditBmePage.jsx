@@ -190,10 +190,10 @@ class EditBmePage extends React.Component {
   }
 
   @Autobind
-  onChangeSolution(state, index) {
-    this.solutionIds[index] = state.categories.nephew;
+  onChangeSolution(values, index) {
+    this.solutionIds[index] = values.nephew;
     const solutionState = this.state.categories.solution;
-    solutionState[index] = state.categories;
+    solutionState[index] = values;
 
     const newState = {
       ...this.state.categories,
@@ -528,7 +528,7 @@ class EditBmePage extends React.Component {
             && this.state.categories.solution.map((sol, index) => (
               <SolutionSelector
                 index={index}
-                key={sol.nephew || index}
+                key={index}
                 solutionCategories={this.props.solutionCategories}
                 state={sol}
                 onChangeSelect={this.onChangeSolution}
