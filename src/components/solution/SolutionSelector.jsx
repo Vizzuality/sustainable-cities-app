@@ -52,7 +52,7 @@ export default class SolutionSelector extends React.Component {
 
     this.setState({ categories }, () => {
       if (this.props.onChangeSelect) {
-        this.props.onChangeSelect(this.state, this.props.index);
+        this.props.onChangeSelect(categories, this.props.index);
       }
     });
   }
@@ -102,7 +102,7 @@ export default class SolutionSelector extends React.Component {
       children: [],
       nephew: []
     };
-    const { parent, children } = this.state.categories;
+    const { parent, children } = this.state.categories || {};
 
 
     if (parent) {
@@ -120,7 +120,7 @@ export default class SolutionSelector extends React.Component {
 
   render() {
     const selectOptions = this.loadMultiSelectOptions();
-    const { parent, children, nephew } = this.state.categories;
+    const { parent, children, nephew } = this.state.categories || {};
 
     return (
       <div className="c-solution-selector">

@@ -37,14 +37,14 @@ class SolutionForm extends React.Component {
   }
 
   @Autobind
-  onSelectSolution(state) {
-    this.setState({ categories: state.categories });
+  onSelectSolution(categories) {
+    this.setState({ categories });
   }
 
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
-    const { parent, children, nephew } = this.state.categories;
+    const { parent, children, nephew } = this.state.categories || {};
     if (!nephew) return;
     const nephewName = this.getCategoryName(nephew);
     if (this.props.onSubmit) {
@@ -81,7 +81,7 @@ class SolutionForm extends React.Component {
       children: [],
       nephew: []
     };
-    const { parent, children } = this.state.categories;
+    const { parent, children } = this.state.categories || {};
 
     if (parent) {
       const parentCategory = this.props.solutionCategories.find(cat => cat.id === parent);

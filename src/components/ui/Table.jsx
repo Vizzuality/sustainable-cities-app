@@ -91,9 +91,9 @@ export default class Table extends React.Component {
   renderTableContent() {
     const { items, fields, editUrl, onDelete } = this.props;
 
-    return items.map((item) => {
+    return items.map((item, index) => {
       return (
-        <tr key={item.id}>
+        <tr key={`${item}-${index}`}>
           {fields.map(field => <td key={field.value}>{item[field.value]}</td>)}
           <td>
             <BtnGroup>

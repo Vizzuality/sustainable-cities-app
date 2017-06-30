@@ -88,7 +88,7 @@ class NewBmePage extends React.Component {
       category_ids: [
         ...timing,
         ...[categories.bme.nephew],
-        ...{ solutions: solutions.map(solution => solution.nephew.id) }
+        ...solutions.map(solution => solution.nephew.id)
       ],
       enabling_ids: enablings,
       external_sources_attributes
