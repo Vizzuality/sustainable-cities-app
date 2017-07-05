@@ -19,7 +19,6 @@ import Creator from 'components/creator/Creator';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
 
-import compact from 'lodash/compact'
 import difference from 'lodash/difference';
 
 class EditStudyCasePage extends React.Component {

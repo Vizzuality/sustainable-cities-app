@@ -18,6 +18,7 @@ import CitySearch from 'components/cities/CitySearch';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
 import { toggleModal } from 'modules/modal';
+
 import debounce from 'lodash/debounce';
 
 /* Utils */
