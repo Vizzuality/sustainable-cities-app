@@ -18,6 +18,7 @@ import CitySearch from 'components/cities/CitySearch';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
 import { toggleModal } from 'modules/modal';
+
 import debounce from 'lodash/debounce';
 
 /* Utils */
@@ -76,6 +77,11 @@ class NewStudyCasePage extends React.Component {
     delete this.form.operational_year;
     const operationalDate = new Date();
     operationalDate.setYear(operational_year);
+
+    // removes unnecessary params
+    if(impacts_attributes) {
+      impacts_attributes.forEach(imp => { delete imp['category_parent_id'] })
+    }
 
     dispatch(createStudyCase({
       data: {
@@ -250,7 +256,12 @@ class NewStudyCasePage extends React.Component {
 
     dispatch(toggleModal(
       true,
-      <ImpactForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />
+      <ImpactForm
+        text="Add"
+        values={values}
+        sources={this.state.external_sources_attributes.map((source, i) => ({ id: i, name: source.name }))}
+        onSubmit={(...args) => action(...args, opts.index)}
+      />
     ));
   }
 
@@ -348,6 +359,18 @@ class NewStudyCasePage extends React.Component {
           onEdit={(...args) => this.editProjectBme(...args)}
           onDelete={this.deleteProjectBme}
         />
+        {/* Sources */}
+        <div>
+          <button type="button" className="button" onClick={this.showSourceForm}>Add Source</button>
+          {this.state.external_sources_attributes.map((source, i) => {
+            return (
+              <li key={source.name}>
+                <button onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</button>
+                <button className="button" onClick={() => this.deleteSource(i)}>Delete</button>
+              </li>
+            );
+          })}
+        </div>
         {/* Impacts */}
         <div>
           <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
@@ -361,18 +384,6 @@ class NewStudyCasePage extends React.Component {
               );
             })}
           </ul>
-        </div>
-        {/* Sources */}
-        <div>
-          <button type="button" className="button" onClick={this.showSourceForm}>Add Source</button>
-          {this.state.external_sources_attributes.map((source, i) => {
-            return (
-              <li key={source.name}>
-                <button onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</button>
-                <button className="button" onClick={() => this.deleteSource(i)}>Delete</button>
-              </li>
-            );
-          })}
         </div>
         <div className="row expanded">
           <div className="column small-6">
