@@ -167,7 +167,6 @@ class EditStudyCasePage extends React.Component {
     let action = opts.edit ? this.onImpactEdit : this.onImpactCreate;
     let values = {};
     const { external_sources_attributes } = this.state;
-    // values.external_sources_index = external_sources_attributes.filter(s => !s._destroy).map(source => source.id);
     values.external_sources_index = [];
 
     if (opts.edit) {
