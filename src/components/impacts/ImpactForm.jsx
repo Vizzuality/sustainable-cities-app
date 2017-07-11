@@ -23,7 +23,6 @@ class ImpactForm extends React.Component {
 
     // used to remove sources already added in the database
     this.external_sources_id = [];
-
   }
 
   /* lifecycle */
@@ -123,7 +122,7 @@ class ImpactForm extends React.Component {
 
   getSources(sourceIds) {
     const { sources } = this.props;
-    return sourceIds.map(id => {
+    return sourceIds.map((id) => {
       sources[id].index = id;
       return sources[id];
     });

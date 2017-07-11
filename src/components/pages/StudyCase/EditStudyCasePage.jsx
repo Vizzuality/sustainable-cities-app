@@ -116,8 +116,8 @@ class EditStudyCasePage extends React.Component {
     const operationalDate = new Date();
     operationalDate.setYear(operational_year);
 
-    if(impacts_attributes) {
-      impacts_attributes.forEach(impact => delete impact['relationships']);
+    if (impacts_attributes) {
+      impacts_attributes.forEach(impact => delete impact.relationships);
     }
 
 
@@ -128,11 +128,11 @@ class EditStudyCasePage extends React.Component {
         city_ids: [city.value],
         category_id,
         // eslint-disable-next-line no-underscore-dangle
-        impacts_attributes: impacts_attributes,
+        impacts_attributes,
         // eslint-disable-next-line no-underscore-dangle
         project_bmes_attributes: project_bmes_attributes.filter(pbme => !pbme.id || pbme.edited || pbme._destroy),
         // eslint-disable-next-line no-underscore-dangle
-        external_sources_attributes: external_sources_attributes,
+        external_sources_attributes,
         operational_year: operationalDate
       },
       onSuccess: () => {
@@ -164,7 +164,7 @@ class EditStudyCasePage extends React.Component {
   @Autobind
   showImpactForm(evt, opts = {}) {
     evt.preventDefault();
-    let action = opts.edit ? this.onImpactEdit : this.onImpactCreate;
+    const action = opts.edit ? this.onImpactEdit : this.onImpactCreate;
     let values = {};
     const { external_sources_attributes } = this.state;
     values.external_sources_index = [];
@@ -172,7 +172,7 @@ class EditStudyCasePage extends React.Component {
     if (opts.edit) {
       values = this.state.impacts_attributes[opts.index];
 
-      if(values.external_sources_index) {
+      if (values.external_sources_index) {
         values.external_sources_index = values.external_sources_index;
       } else {
         values.external_sources_index = values.relationships.external_sources.data.map(source => source.id);

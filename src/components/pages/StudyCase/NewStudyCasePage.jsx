@@ -79,8 +79,8 @@ class NewStudyCasePage extends React.Component {
     operationalDate.setYear(operational_year);
 
     // removes unnecessary params
-    if(impacts_attributes) {
-      impacts_attributes.forEach(imp => { delete imp['category_parent_id'] })
+    if (impacts_attributes) {
+      impacts_attributes.forEach((imp) => { delete imp.category_parent_id; });
     }
 
     dispatch(createStudyCase({
