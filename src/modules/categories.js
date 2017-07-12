@@ -134,11 +134,15 @@ function getCategories({ type, id, tree, pageSize, pageNumber, sort, search }) {
   const endPoints = {
     detail: 'categories/',
     all: 'categories?',
-    bme: 'business-model-element-categories?',
-    enablings: 'enabling-categories?',
-    impact: 'impact-categories?',
-    solution: 'solution-categories?',
-    timing: 'timing-categories?'
+    // TODO None of '*-categories' endpoints exist for now. I decided to always
+    // show all categories. Not ideal, but unimpedes progress. I think the right
+    // call should be to remove these until we start implementing these
+    // features.
+    bme: 'categories?',
+    enablings: 'categories?',
+    impact: 'categories?',
+    solution: 'categories?',
+    timing: 'categories?'
   };
 
   const endPoint = tree ? `categories-tree?type=${type}` : endPoints[type];
