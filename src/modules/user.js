@@ -93,10 +93,8 @@ function login(userData) {
     dispatch(setLoading(true));
     post({
       url: `${config.API_URL}/login`,
-      body: {
-        auth: userData
-      },
-      onSuccess({ token }) {
+      body: {data: {type: "session", attributes: userData}},
+      onSuccess({data: {attributes: {token}}}) {
         localStorage.token = token;
         dispatch(setLogged(true));
         dispatch(setLoading(false));
