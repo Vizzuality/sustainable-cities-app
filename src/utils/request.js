@@ -3,7 +3,7 @@ function post({ url, body, headers, onSuccess, onError }) {
   request.open('POST', url);
 
   const customHeaders = { ...headers,
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/vnd.api+json',
     'SC-API-KEY': config['SC-API-KEY']
   };
 
@@ -38,7 +38,7 @@ function get({ url, headers, onSuccess, onError }) {
   request.open('GET', url);
 
   const customHeaders = { ...headers,
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/vnd.api+json',
     'SC-API-KEY': config['SC-API-KEY'],
     Authorization: `Bearer ${localStorage.token}`
   };
@@ -69,7 +69,7 @@ function _delete({ url, headers, onSuccess, onError }) {
   request.open('DELETE', url);
 
   const customHeaders = { ...headers,
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/vnd.api+json',
     'SC-API-KEY': config['SC-API-KEY'],
     Authorization: `Bearer ${localStorage.token}`
   };
@@ -99,7 +99,7 @@ function patch({ url, headers, body, onSuccess, onError }) {
   request.open('PATCH', url);
 
   const customHeaders = { ...headers,
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/vnd.api+json',
     'SC-API-KEY': config['SC-API-KEY'],
     Authorization: `Bearer ${localStorage.token}`
   };
