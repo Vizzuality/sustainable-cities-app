@@ -125,7 +125,7 @@ class EditBmePage extends React.Component {
       ],
       enabling_ids: enablings,
       // eslint-disable-next-line no-underscore-dangle
-      external_sources_attributes: external_sources_attributes.filter(es => !es.id || es.edited || es._destroy),
+      external_sources_attributes: external_sources_attributes.filter(es => !es.id || es.edited || es._destroy)
     };
 
     // Update BME
@@ -553,7 +553,7 @@ class EditBmePage extends React.Component {
                 );
               })}
             </ul>
-            <button type="button" className="button" onClick={(evt) => this.showSourceForm(evt)}>Add source</button>
+            <button type="button" className="button" onClick={evt => this.showSourceForm(evt)}>Add source</button>
           </div>
           {/* description */}
           <Textarea

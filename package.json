@@ -10,6 +10,9 @@
     "deploy-staging": "sh ./scripts/deploy-staging.sh",
     "deploy-production": "sh ./scripts/deploy-production.sh"
   },
+  "pre-commit": [
+    "test"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Vizzuality/sustainable-cities-app.git"
@@ -92,7 +95,8 @@
     "eslint-import-resolver-webpack": "^0.8.1",
     "eslint-plugin-import": "^2.3.0",
     "eslint-plugin-jsx-a11y": "^5.0.3",
-    "eslint-plugin-react": "^7.0.1"
+    "eslint-plugin-react": "^7.0.1",
+    "pre-commit": "^1.2.2"
   },
   "engines": {
     "node": "7.2.0"
