@@ -9,7 +9,6 @@ import BtnGroup from 'components/ui/BtnGroup';
 import SolutionSelector from 'components/solution/SolutionSelector';
 import SourceForm from 'components/sources/SourceForm';
 import getBmeDetail from 'selectors/bmeDetail';
-import { getIdRelations } from 'utils/relation';
 import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
 import { toastr } from 'react-redux-toastr';
@@ -218,74 +217,13 @@ class EditBmePage extends React.Component {
   }
 
   /* External sources methods */
-  @Autobind
-  showSourceForm(evt, opts = {}) {
-    evt.preventDefault();
-    let values = {};
-    let action = this.createSource;
-
-    if (opts.edit) {
-      values = this.state.external_sources_attributes[opts.index];
-      action = this.editSource;
-    }
-
-    dispatch(toggleModal(
-      true,
-      <SourceForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />
-    ));
-  }
-
-  @Autobind
-  createSource(data) {
-    this.setState({
-      external_sources_attributes: [...this.state.external_sources_attributes, data]
-    });
-    dispatch(toggleModal(false));
-  }
-
-  @Autobind
-  editSource(data, index) {
-    // eslint-disable-next-line camelcase
-    const external_sources_attributes = this.state.external_sources_attributes.slice();
-    external_sources_attributes[index] = {
-      ...external_sources_attributes[index],
-      ...data,
-      edited: true
-    };
-    this.setState({ external_sources_attributes });
-    dispatch(toggleModal(false));
-  }
-
-  @Autobind
-  deleteSource(index) {
-    const externalSources = this.props.bmes.included.filter(sc => sc.type === 'external_sources');
-    const sourceToDelete = this.state.external_sources_attributes[index];
-
-    const exists = externalSources.find(i => i.id === sourceToDelete.id);
-    const { external_sources_attributes } = this.state;
-
-    if (!exists) {
-      // Source still doesn't exist on database,
-      // just remove it from local array
-      external_sources_attributes.splice(index, 1);
-    } else {
-      // Source exists on database,
-      // we have to delete it from there
-      external_sources_attributes[index] = {
-        id: sourceToDelete.id,
-        _destroy: true
-      };
-    }
-
-    this.setState({ external_sources_attributes });
-  }
-
   setDefaultSolutions({ bmesDetail }) {
     const solutionsIds = bmesDetail.categories.filter(cat => cat.category_type === 'Solution').map(c => c.id);
     this.solutionIds = solutionsIds;
   }
 
   setDefaultSources({ bmes }) {
+    // eslint-disable-next-line camelcase
     const external_sources_attributes = bmes.included.filter(s => s.type === 'external_sources');
 
     this.setState({
@@ -418,6 +356,68 @@ class EditBmePage extends React.Component {
     this.setState({ categories: newState });
   }
 
+  @Autobind
+  deleteSource(index) {
+    const externalSources = this.props.bmes.included.filter(sc => sc.type === 'external_sources');
+    const sourceToDelete = this.state.external_sources_attributes[index];
+
+    const exists = externalSources.find(i => i.id === sourceToDelete.id);
+    const { external_sources_attributes } = this.state;
+
+    if (!exists) {
+      // Source still doesn't exist on database,
+      // just remove it from local array
+      external_sources_attributes.splice(index, 1);
+    } else {
+      // Source exists on database,
+      // we have to delete it from there
+      external_sources_attributes[index] = {
+        id: sourceToDelete.id,
+        _destroy: true
+      };
+    }
+
+    this.setState({ external_sources_attributes });
+  }
+
+  @Autobind
+  editSource(data, index) {
+    // eslint-disable-next-line camelcase
+    const external_sources_attributes = this.state.external_sources_attributes.slice();
+    external_sources_attributes[index] = {
+      ...external_sources_attributes[index],
+      ...data,
+      edited: true
+    };
+    this.setState({ external_sources_attributes });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  createSource(data) {
+    this.setState({
+      external_sources_attributes: [...this.state.external_sources_attributes, data]  // eslint-disable-line camelcase
+    });
+    dispatch(toggleModal(false));
+  }
+
+  @Autobind
+  showSourceForm(evt, opts = {}) {
+    evt.preventDefault();
+    let values = {};
+    let action = this.createSource;
+
+    if (opts.edit) {
+      values = this.state.external_sources_attributes[opts.index];
+      action = this.editSource;
+    }
+
+    dispatch(toggleModal(
+      true,
+      <SourceForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />
+    ));
+  }
+
   componentWillUnMount() {
     this.solutionIds = [];
   }
@@ -533,7 +533,7 @@ class EditBmePage extends React.Component {
             && this.state.categories.solution.map((sol, index) => (
               <SolutionSelector
                 index={index}
-                key={index}
+                key={sol.id}
                 solutionCategories={this.props.solutionCategories}
                 state={sol}
                 onChangeSelect={this.onChangeSolution}
@@ -550,7 +550,7 @@ class EditBmePage extends React.Component {
                 return (
                   <li
                     key={source.name || i}
-                    className={`${source._destroy ? 'hidden' : ''}`}
+                    className={`${source._destroy ? 'hidden' : ''}`} // eslint-disable-line no-underscore-dangle
                   >
                     <button onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</button>
                     <button type="button" className="button" onClick={() => this.deleteSource(i)}>Delete</button>

@@ -17,3 +17,5 @@
 
 # Compiled assets
 /dist
+
+.eslintcache
