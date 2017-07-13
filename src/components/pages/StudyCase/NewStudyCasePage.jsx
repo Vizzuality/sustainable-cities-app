@@ -79,7 +79,9 @@ class NewStudyCasePage extends React.Component {
     operationalDate.setYear(operational_year);
 
     // removes unnecessary params
+    // eslint-disable-next-line camelcase
     if (impacts_attributes) {
+      // eslint-disable-next-line no-param-reassign
       impacts_attributes.forEach((imp) => { delete imp.category_parent_id; });
     }
 

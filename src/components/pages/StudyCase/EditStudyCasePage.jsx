@@ -19,8 +19,6 @@ import Creator from 'components/creator/Creator';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
 
-import difference from 'lodash/difference';
-
 class EditStudyCasePage extends React.Component {
 
   /* Constructor */
@@ -116,8 +114,12 @@ class EditStudyCasePage extends React.Component {
     const operationalDate = new Date();
     operationalDate.setYear(operational_year);
 
+    // eslint-disable-next-line camelcase
     if (impacts_attributes) {
-      impacts_attributes.forEach(impact => delete impact.relationships);
+      // TODO this is confusing and hard to track. I'm not sure if this mutation
+      // is needed for other parts of the code when setState kicks in.
+      // eslint-disable-next-line no-param-reassign
+      impacts_attributes.forEach((o => delete o.relationships));
     }
 
 
@@ -184,7 +186,15 @@ class EditStudyCasePage extends React.Component {
       <ImpactForm
         text="Add"
         values={values}
-        sources={external_sources_attributes.filter(s => !s._destroy).map((source, i) => ({ index: i, id: source.id, name: source.name }))}
+        sources={
+          external_sources_attributes
+            .filter(s => !s._destroy) // eslint-disable-line no-underscore-dangle
+            .map((source, i) => ({
+              index: i,
+              id: source.id,
+              name: source.name
+            }))
+        }
         onSubmit={(...args) => action(...args, opts.index)}
       />
     ));
@@ -257,7 +267,7 @@ class EditStudyCasePage extends React.Component {
   deleteSource(index) {
     // retrieves sources of the project
     const externalSources = this.props.studyCases.included.filter(sc => sc.type === 'external_sources');
-    const { external_sources_attributes, impacts_attributes } = this.state;
+    const { external_sources_attributes } = this.state;
 
     // selects source will be deleted
     const sourceToDelete = external_sources_attributes[index];
@@ -409,6 +419,7 @@ class EditStudyCasePage extends React.Component {
               {this.state.external_sources_attributes.map((source, i) => {
                 return (
                   <li
+                    // eslint-disable-next-line react/no-array-index-key
                     key={`${source.name}-${i}`}
                     className={`${source._destroy ? 'hidden' : ''}`} // eslint-disable-line no-underscore-dangle
                   >

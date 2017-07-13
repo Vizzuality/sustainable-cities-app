@@ -179,18 +179,6 @@ class NewBmePage extends React.Component {
   }
 
   @Autobind
-  editSource(form, index) {
-    // eslint-disable-next-line camelcase
-    const sources = this.state.external_sources_attributes.slice();
-    external_sources_attributes[index] = {
-      ...external_sources_attributes[index],
-      ...form
-    };
-    this.setState({ external_sources_attributes });
-    dispatch(toggleModal(false));
-  }
-
-  @Autobind
   onDeleteSource(index) {
     const { external_sources_attributes } = this.state;
     external_sources_attributes.splice(index, 1);
@@ -235,13 +223,6 @@ class NewBmePage extends React.Component {
     dispatch(toggleModal(false));
   }
 
-  @Autobind
-  deleteSolution(index) {
-    const { solutions } = this.state;
-    solutions.splice(index, 1);
-    this.setState({ solutions });
-  }
-
   getFirstSelectOption(value, source, categoryGroupId) {
     const options = {
       children: {},
@@ -275,6 +256,25 @@ class NewBmePage extends React.Component {
     }
 
     return options;
+  }
+
+  @Autobind
+  deleteSolution(index) {
+    const { solutions } = this.state;
+    solutions.splice(index, 1);
+    this.setState({ solutions });
+  }
+
+  @Autobind
+  editSource(form, index) {
+    // eslint-disable-next-line camelcase
+    const external_sources_attributes = this.state.external_sources_attributes.slice();
+    external_sources_attributes[index] = {
+      ...external_sources_attributes[index],
+      ...form
+    };
+    this.setState({ external_sources_attributes });
+    dispatch(toggleModal(false));
   }
 
   loadMultiSelectOptions(categoryState, categoryGroupId) {
@@ -394,11 +394,17 @@ class NewBmePage extends React.Component {
               <ul>
                 {this.state.external_sources_attributes.map((source, i) => {
                   return (
-                    <li key={i}>
+                    <li key={source.name}>
                       <button onClick={evt => this.onAddSource(evt, { edit: true, index: i })}>
                         {source.name}
                       </button>
-                      <button type="button" className="button" onClick={() => this.onDeleteSource(i)}>Delete source</button>
+                      <button
+                        type="button"
+                        className="button"
+                        onClick={() => this.onDeleteSource(i)}
+                      >
+                        Delete source
+                      </button>
                     </li>
                   );
                 })}

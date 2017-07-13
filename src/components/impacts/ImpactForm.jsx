@@ -6,7 +6,6 @@ import { getCategories } from 'modules/categories';
 import { Form, Input, Button, Select } from 'components/form/Form';
 import { Autobind } from 'es-decorators';
 
-import compact from 'lodash/compact';
 import difference from 'lodash/difference';
 
 class ImpactForm extends React.Component {
@@ -61,7 +60,7 @@ class ImpactForm extends React.Component {
     if (children) data.category_id = children;
     if (parent) data.category_parent_id = parent;
 
-    data.external_sources_index = external_sources_index;
+    data.external_sources_index = external_sources_index; // eslint-disable-line camelcase
 
     // add ids to remove
     if (this.external_sources_id.length) {
@@ -115,17 +114,17 @@ class ImpactForm extends React.Component {
     this.setState({ categories });
   }
 
-  loadFirstChildrenOption(parentId) {
-    const parentCategory = this.props.impactCategories.find(cat => cat.id === parentId);
-    return parentCategory && parentCategory.children ? parentCategory.children[0].id : null;
-  }
-
   getSources(sourceIds) {
     const { sources } = this.props;
     return sourceIds.map((id) => {
       sources[id].index = id;
       return sources[id];
     });
+  }
+
+  loadFirstChildrenOption(parentId) {
+    const parentCategory = this.props.impactCategories.find(cat => cat.id === parentId);
+    return parentCategory && parentCategory.children ? parentCategory.children[0].id : null;
   }
 
   render() {
@@ -163,7 +162,7 @@ class ImpactForm extends React.Component {
               <Select
                 multi
                 name="sources"
-                value={external_sources_index}
+                value={external_sources_index} // eslint-disable-line camelcase
                 onChange={val => this.onSelectChange('external_sources_index', val)}
                 label="Sources"
                 options={this.props.sources.map((source, index) => ({ value: source.id || index, label: source.name }))}
