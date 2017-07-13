@@ -100,7 +100,7 @@ function setStudyCaseDetail(id) {
 function getStudyCases(paramsConfig = {}) {
   return (dispatch) => {
     let { pageSize, pageNumber, sort } = paramsConfig;
-    const { search, onSuccess, id, concat } = paramsConfig;
+    const { search, onSuccess, id, concat, include } = paramsConfig;
 
     pageSize = pageSize || DEFAULT_PAGINATION_SIZE;
     pageNumber = pageNumber || DEFAULT_PAGINATION_NUMBER;
@@ -109,12 +109,13 @@ function getStudyCases(paramsConfig = {}) {
     const queryS = queryString.stringify({
       'page[size]': pageSize,
       'page[number]': pageNumber,
+      include: include ? include.join(',') : undefined,
       sort,
       search
     });
 
     const url = id ?
-      `${config.API_URL}/study-cases/${id}` :
+      `${config.API_URL}/study-cases/${id}?${queryS}` :
       `${config.API_URL}/study-cases?${queryS}`;
 
     dispatch(setStudyCasesLoading(true));
@@ -131,7 +132,7 @@ function getStudyCases(paramsConfig = {}) {
 
         const studyCasesData = {
           list: deserialize(parsedData),
-          itemCount: meta.total_items
+          itemCount: meta ? meta['record-count'] : parsedData.length,
         };
 
         if (included) {

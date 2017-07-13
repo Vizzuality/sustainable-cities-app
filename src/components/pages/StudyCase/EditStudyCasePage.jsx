@@ -41,11 +41,24 @@ class EditStudyCasePage extends React.Component {
   }
 
   componentWillMount() {
-    dispatch(getStudyCases({ id: this.props.studyCases.detailId }));
+    dispatch(getStudyCases({
+      id: this.props.studyCases.detailId,
+      include: [
+        'category',
+        'cities',
+        'comments',
+        'country',
+        'documents',
+        'external-sources',
+        'impacts',
+        'photos',
+        'project-bmes',
+      ],
+    }));
     dispatch(getCategories({ type: 'solution' }));
     dispatch(getBmes({
-      pageSize: 9999,
-      pageNumber: 1
+      pageSize: 999,
+      include: ['categories', 'enablings'],
     }));
   }
 
@@ -119,7 +132,6 @@ class EditStudyCasePage extends React.Component {
     if (impacts_attributes) {
       impacts_attributes.forEach(impact => delete impact.relationships);
     }
-
 
     dispatch(updateStudyCase({
       id: this.props.studyCaseDetail.id,
