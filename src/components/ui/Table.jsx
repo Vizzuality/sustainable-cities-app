@@ -93,6 +93,7 @@ export default class Table extends React.Component {
 
     return items.map((item, index) => {
       return (
+        // eslint-disable-next-line react/no-array-index-key
         <tr key={`${item}-${index}`}>
           {fields.map(field => <td key={field.value}>{item[field.value]}</td>)}
           <td>

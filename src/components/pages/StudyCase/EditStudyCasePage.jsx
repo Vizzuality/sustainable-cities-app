@@ -19,8 +19,6 @@ import Creator from 'components/creator/Creator';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
 
-import difference from 'lodash/difference';
-
 class EditStudyCasePage extends React.Component {
 
   /* Constructor */
@@ -116,8 +114,12 @@ class EditStudyCasePage extends React.Component {
     const operationalDate = new Date();
     operationalDate.setYear(operational_year);
 
-    if(impacts_attributes) {
-      impacts_attributes.forEach(impact => delete impact['relationships']);
+    // eslint-disable-next-line camelcase
+    if (impacts_attributes) {
+      // TODO this is confusing and hard to track. I'm not sure if this mutation
+      // is needed for other parts of the code when setState kicks in.
+      // eslint-disable-next-line no-param-reassign
+      impacts_attributes.forEach((o => delete o.relationships));
     }
 
 
@@ -128,11 +130,11 @@ class EditStudyCasePage extends React.Component {
         city_ids: [city.value],
         category_id,
         // eslint-disable-next-line no-underscore-dangle
-        impacts_attributes: impacts_attributes,
+        impacts_attributes,
         // eslint-disable-next-line no-underscore-dangle
         project_bmes_attributes: project_bmes_attributes.filter(pbme => !pbme.id || pbme.edited || pbme._destroy),
         // eslint-disable-next-line no-underscore-dangle
-        external_sources_attributes: external_sources_attributes,
+        external_sources_attributes,
         operational_year: operationalDate
       },
       onSuccess: () => {
@@ -164,7 +166,7 @@ class EditStudyCasePage extends React.Component {
   @Autobind
   showImpactForm(evt, opts = {}) {
     evt.preventDefault();
-    let action = opts.edit ? this.onImpactEdit : this.onImpactCreate;
+    const action = opts.edit ? this.onImpactEdit : this.onImpactCreate;
     let values = {};
     const { external_sources_attributes } = this.state;
     values.external_sources_index = [];
@@ -172,7 +174,7 @@ class EditStudyCasePage extends React.Component {
     if (opts.edit) {
       values = this.state.impacts_attributes[opts.index];
 
-      if(values.external_sources_index) {
+      if (values.external_sources_index) {
         values.external_sources_index = values.external_sources_index;
       } else {
         values.external_sources_index = values.relationships.external_sources.data.map(source => source.id);
@@ -184,7 +186,15 @@ class EditStudyCasePage extends React.Component {
       <ImpactForm
         text="Add"
         values={values}
-        sources={external_sources_attributes.filter(s => !s._destroy).map((source, i) => ({ index: i, id: source.id, name: source.name }))}
+        sources={
+          external_sources_attributes
+            .filter(s => !s._destroy) // eslint-disable-line no-underscore-dangle
+            .map((source, i) => ({
+              index: i,
+              id: source.id,
+              name: source.name
+            }))
+        }
         onSubmit={(...args) => action(...args, opts.index)}
       />
     ));
@@ -257,7 +267,7 @@ class EditStudyCasePage extends React.Component {
   deleteSource(index) {
     // retrieves sources of the project
     const externalSources = this.props.studyCases.included.filter(sc => sc.type === 'external_sources');
-    const { external_sources_attributes, impacts_attributes } = this.state;
+    const { external_sources_attributes } = this.state;
 
     // selects source will be deleted
     const sourceToDelete = external_sources_attributes[index];
@@ -409,6 +419,7 @@ class EditStudyCasePage extends React.Component {
               {this.state.external_sources_attributes.map((source, i) => {
                 return (
                   <li
+                    // eslint-disable-next-line react/no-array-index-key
                     key={`${source.name}-${i}`}
                     className={`${source._destroy ? 'hidden' : ''}`} // eslint-disable-line no-underscore-dangle
                   >
