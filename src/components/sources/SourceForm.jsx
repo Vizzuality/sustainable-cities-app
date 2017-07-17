@@ -1,39 +1,51 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Form, Input, Button, Textarea } from 'components/form/Form';
-import { Autobind } from 'es-decorators';
 
 export default class SourceForm extends React.Component {
+  static propTypes = {
+    onSubmit: PropTypes.func.isRequired,
+    values: PropTypes.object,
+    text: PropTypes.string
+  };
 
-  constructor(props) {
-    super(props);
-    this.form = {};
+  static defaultProps = {
+    values: {},
+    tect: "Add"
+  };
+
+  state = {
+    form: {}
   }
 
-  @Autobind
-  onInputChange(evt) {
-    this.form[evt.target.name] = evt.target.value;
+  onInputChange = (evt) => {
+    this.setState({
+      form: {
+        ...this.state.form,
+        [evt.target.name]: evt.target.value,
+      }
+    })
   }
 
-  @Autobind
-  submit(evt) {
+  submit = (evt) => {
     evt.preventDefault();
-    if (this.props.onSubmit) {
-      this.props.onSubmit(this.form);
-    }
+
+    this.props.onSubmit(this.state.form);
   }
 
   render() {
-    const { values, text } = this.props;
     const {
-      name,
-      source_type,
-      description,
-      publication_year,
-      institution,
-      author,
-      web_url
-    } = values;
+      text,
+      values: {
+        name,
+        sourceType,
+        description,
+        publicationYear,
+        institution,
+        author,
+        webUrl
+      },
+    } = this.props;
 
     return (
       <div className="c-source-form">
@@ -44,7 +56,7 @@ export default class SourceForm extends React.Component {
               <Input
                 id="name"
                 label="Name"
-                defaultValue={name}
+                value={name}
                 type="text"
                 name="name"
                 validations={['required']}
@@ -55,7 +67,7 @@ export default class SourceForm extends React.Component {
               <Input
                 id="type"
                 label="Type"
-                defaultValue={source_type} // eslint-disable-line camelcase
+                value={sourceType}
                 type="text"
                 name="source_type"
                 validations={[]}
@@ -66,7 +78,7 @@ export default class SourceForm extends React.Component {
               <Textarea
                 id="description"
                 label="Description"
-                defaultValue={description}
+                value={description || ''}
                 name="description"
                 validations={[]}
                 onChange={this.onInputChange}
@@ -76,7 +88,7 @@ export default class SourceForm extends React.Component {
               <Input
                 id="publication_year"
                 label="Publication year"
-                defaultValue={publication_year} // eslint-disable-line camelcase
+                value={publicationYear}
                 type="text"
                 name="publication_year"
                 validations={[]}
@@ -87,7 +99,7 @@ export default class SourceForm extends React.Component {
               <Input
                 id="institution"
                 label="Institution"
-                defaultValue={institution}
+                value={institution}
                 type="text"
                 name="institution"
                 validations={[]}
@@ -98,7 +110,7 @@ export default class SourceForm extends React.Component {
               <Input
                 id="author"
                 label="Author"
-                defaultValue={author}
+                value={author}
                 type="text"
                 name="author"
                 validations={[]}
@@ -109,7 +121,7 @@ export default class SourceForm extends React.Component {
               <Input
                 id="web_url"
                 label="Web url"
-                defaultValue={web_url} // eslint-disable-line camelcase
+                value={webUrl}
                 type="text"
                 name="web_url"
                 validations={[]}
@@ -123,15 +135,3 @@ export default class SourceForm extends React.Component {
     );
   }
 }
-
-/* Prop types */
-SourceForm.propTypes = {
-  onSubmit: PropTypes.func,
-  values: PropTypes.object,
-  text: PropTypes.string
-};
-
-/* Default props */
-SourceForm.defaultProps = {
-  values: {}
-};

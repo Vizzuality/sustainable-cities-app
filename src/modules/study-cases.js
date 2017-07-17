@@ -1,7 +1,7 @@
 import { get, post, _delete, patch } from 'utils/request';
 import { DEFAULT_SORT_FIELD } from 'constants/bmes';
 import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
-import { deserialize } from 'utils/json-api';
+import { deserializeJsona } from 'utils/json-api';
 import * as queryString from 'query-string';
 
 /* Constants */
@@ -15,7 +15,6 @@ const CONCAT_STUDY_CASES = 'CONCAT_STUDY_CASES';
 const initialState = {
   loading: false,
   list: [],
-  included: [],
   itemCount: null,
   detailId: null,
   filters: {},
@@ -29,8 +28,8 @@ const initialState = {
 function studyCasesReducer(state = initialState, action) {
   switch (action.type) {
     case SET_STUDY_CASES: {
-      const { list, included, itemCount } = action.payload;
-      return { ...state, list, included, itemCount };
+      const { list, itemCount } = action.payload;
+      return { ...state, list, itemCount };
     }
     case CONCAT_STUDY_CASES:
       return {
@@ -123,26 +122,15 @@ function getStudyCases(paramsConfig = {}) {
     get({
       url,
       onSuccess({ data, meta, included }) {
-        let parsedData = data;
-
-        // Parse data to json api format
-        if (!Array.isArray(parsedData)) {
-          parsedData = [data];
-        }
-
-        const studyCasesData = {
-          list: deserialize(parsedData),
-          itemCount: meta ? meta['record-count'] : parsedData.length,
-        };
-
-        if (included) {
-          studyCasesData.included = deserialize(included);
-        }
+        const studyCasesData = deserializeJsona({ data, meta, included })
 
         const action = concat ? concatStudyCases : setStudyCases;
 
         dispatch(setStudyCasesLoading(false));
-        dispatch(action(studyCasesData));
+        dispatch(action({
+          list: _.castArray(studyCasesData),
+          itemCount: meta ? meta['record-count'] : studyCasesData.length
+        }));
         if (onSuccess) onSuccess();
       }
     });

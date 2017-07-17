@@ -49,6 +49,7 @@
     "html-webpack-plugin": "^2.24.1",
     "install": "^0.8.7",
     "json-loader": "^0.5.4",
+    "jsona": "^1.0.9",
     "leaflet": "^1.0.2",
     "lodash": "^4.17.2",
     "mocha": "^3.0.0",

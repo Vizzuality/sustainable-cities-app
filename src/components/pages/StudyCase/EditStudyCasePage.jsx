@@ -23,7 +23,6 @@ import difference from 'lodash/difference';
 
 class EditStudyCasePage extends React.Component {
 
-  /* Constructor */
   constructor(props) {
     super(props);
 
@@ -51,11 +50,13 @@ class EditStudyCasePage extends React.Component {
         'documents',
         'external-sources',
         'impacts',
+        'impacts.external-sources',
+        'impacts.category',
         'photos',
         'project-bmes',
       ],
     }));
-    dispatch(getCategories({ type: 'solution' }));
+    dispatch(getCategories({ type: 'Solution' }));
     dispatch(getBmes({
       pageSize: 999,
       include: ['categories', 'enablings'],
@@ -64,25 +65,22 @@ class EditStudyCasePage extends React.Component {
 
   /* Component lifecycle */
   componentWillReceiveProps(nextProps) {
-    // Includes arrived! So, we can populate sub-entities
-    if ((!this.props.studyCases.included || !this.props.studyCases.included.length)
-      && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
-      this.setState({
-        city: nextProps.studyCases.included
-          .filter(sc => sc.type === 'cities')
-          .map(c => ({ label: c.name, value: c.id }))[0],
-        project_bmes_attributes: nextProps.studyCases.included
-          .filter(sc => sc.type === 'project_bmes')
-          .filter(pBme => !!pBme.relationships.bme.data)
-          .map(pBme => ({ id: pBme.id, bme_id: pBme.relationships.bme.data.id, description: pBme.description })),
-        impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
-        external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources')
-      });
-    }
-
     if (this.props.studyCaseDetail !== nextProps.studyCaseDetail) {
-      const category_id = `${nextProps.studyCaseDetail.category_id}`; // eslint-disable-line camelcase
-      this.setState({ category_id });
+      const sc = nextProps.studyCaseDetail;
+      this.setState({
+        city: {
+          label: sc.cities[0].name,
+          value: sc.cities[0].id
+        },
+        project_bmes_attributes: sc.projectBmes.map(b => ({
+          id: b.id,
+          bme_id: b.bmeId,
+          description: b.description
+        })),
+        impacts_attributes: sc.impacts,
+        external_sources_attributes: sc.externalSources,
+        category_id: sc.categoryId
+      });
     }
   }
 
@@ -111,7 +109,6 @@ class EditStudyCasePage extends React.Component {
     dispatch(toggleModal(false));
   }
 
-  /* Methods */
   @Autobind
   submit(evt) {
     evt.preventDefault();
@@ -176,21 +173,18 @@ class EditStudyCasePage extends React.Component {
   @Autobind
   showImpactForm(evt, opts = {}) {
     evt.preventDefault();
-    const action = opts.edit ? this.onImpactEdit : this.onImpactCreate;
-    let values = {};
-    const { external_sources_attributes } = this.state;
-    values.external_sources_index = [];
 
+    let values = {external_sources_index: []};
     if (opts.edit) {
       values = this.state.impacts_attributes[opts.index];
 
-      if (values.external_sources_index) {
-        values.external_sources_index = values.external_sources_index;
-      } else {
-        values.external_sources_index = values.relationships.external_sources.data.map(source => source.id);
+      if (!values.external_sources_index) {
+        values.external_sources_index = values.externalSources.map(source => source.id);
       }
     }
 
+    const { external_sources_attributes } = this.state;
+    const action = opts.edit ? this.onImpactEdit : this.onImpactCreate;
     dispatch(toggleModal(
       true,
       <ImpactForm
@@ -204,11 +198,11 @@ class EditStudyCasePage extends React.Component {
 
   @Autobind
   deleteImpact(index) {
-    const impacts = this.props.studyCases.included.filter(sc => sc.type === 'impacts');
-    const impactToDelete = this.state.impacts_attributes[index];
-
-    const exists = impacts.find(i => i.id === impactToDelete.id);
+    const impacts = this.props.studyCases.impacts;
     const { impacts_attributes } = this.state;
+
+    const impactToDelete = impacts_attributes[index];
+    const exists = impacts.find(i => i.id === impactToDelete.id);
 
     if (!exists) {
       // Impact still doesn't exist on database,
@@ -230,6 +224,7 @@ class EditStudyCasePage extends React.Component {
   @Autobind
   showSourceForm(evt, opts = {}) {
     evt.preventDefault();
+
     let values = {};
     let action = this.createSource;
 
@@ -240,7 +235,11 @@ class EditStudyCasePage extends React.Component {
 
     dispatch(toggleModal(
       true,
-      <SourceForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />
+      <SourceForm
+        text="Add"
+        values={values}
+        onSubmit={(...args) => action(...args, opts.index)}
+      />
     ));
   }
 
@@ -380,7 +379,7 @@ class EditStudyCasePage extends React.Component {
               {/* Year */}
               <Input
                 type="number"
-                value={operationalYear}
+                value={operationalYear || 1}
                 name="operational_year"
                 onChange={this.onInputChange}
                 label="Year"
@@ -393,7 +392,7 @@ class EditStudyCasePage extends React.Component {
             clearable={false}
             label="Category"
             validations={['required']}
-            value={this.state.category_id}
+            value={(this.state.category_id || '').toString()}
             onChange={item => this.setState({ category_id: item.value })}
             options={this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }))}
           />

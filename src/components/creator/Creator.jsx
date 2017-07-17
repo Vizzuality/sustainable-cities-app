@@ -23,7 +23,7 @@ export default function Creator(props) {
             onDelete={onDelete}
             options={options}
             hidden={!!item._destroy} // eslint-disable-line no-underscore-dangle
-            selected={item[selectedField]}
+            selected={(item[selectedField] || '').toString()}
             description={item.description}
             selectedField={selectedField}
           />

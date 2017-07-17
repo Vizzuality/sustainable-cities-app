@@ -6,6 +6,7 @@ export { impactReducer as impacts } from './impacts';
 export { categoriesReducer as categories } from './categories';
 export { modalReducer as modal } from './modal';
 export { studyCasesReducer as studyCases } from './study-cases';
+export { externalSourcesReducer as externalSources } from './external-sources';
 // NOTE: cites state is no needed
 // export { citiesReducer as cities } from './cities';
 

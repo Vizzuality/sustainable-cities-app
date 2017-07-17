@@ -1,5 +1,5 @@
 import { get, post, patch, _delete } from 'utils/request';
-import { deserialize } from 'utils/json-api';
+import { deserializeJsona } from 'utils/json-api';
 import * as queryString from 'query-string';
 
 import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
@@ -130,45 +130,38 @@ function createCategory({ data, onSuccess }) {
   };
 }
 
-function getCategories({ type, id, tree, pageSize, pageNumber, sort, search }) {
-  const endPoints = {
-    detail: 'categories/',
-    all: 'categories?',
-    // TODO None of '*-categories' endpoints exist for now. I decided to always
-    // show all categories. Not ideal, but unimpedes progress. I think the right
-    // call should be to remove these until we start implementing these
-    // features.
-    bme: 'categories?',
-    enablings: 'categories?',
-    impact: 'categories?',
-    solution: 'categories?',
-    timing: 'categories?'
-  };
+function getCategories({ type, id, tree, pageSize, pageNumber, sort, search, include, level}) {
+  let queryS;
+  if (id) {
+    queryS = id
+  } else {
+    let args = {
+      'page[size]': pageSize || DEFAULT_PAGINATION_SIZE,
+      'page[number]': pageNumber || DEFAULT_PAGINATION_NUMBER,
+      include: include ? include.join(',') : undefined,
+      sort,
+      search
+    };
 
-  const endPoint = tree ? `categories-tree?type=${type}` : endPoints[type];
-  const queryS = id || `&${queryString.stringify({
-    'page[size]': pageSize || DEFAULT_PAGINATION_SIZE,
-    'page[number]': pageNumber || DEFAULT_PAGINATION_NUMBER,
-    sort,
-    search
-  })}`;
+    if (type) {
+      args['filter[category_type]'] = type;
+    }
 
+    if (level !== undefined) {
+      args['filter[level]'] = level;
+    }
+
+    queryS = `?${queryString.stringify(args)}`;
+  }
 
   return (dispatch) => {
     dispatch(setCategoriesLoading(true));
     get({
-      url: `${config.API_URL}/${endPoint}${queryS}`,
-      onSuccess({ data, meta }) {
-        let parsedData = data;
-
-        // Parse data to json api format
-        if (!Array.isArray(parsedData)) {
-          parsedData = [data];
-        }
-
+      url: `${config.API_URL}/categories/${queryS}`,
+      onSuccess(resp) {
         const categoryData = {
-          list: deserialize(parsedData),
-          itemCount: meta.total_items
+          list: _.castArray(deserializeJsona(resp)),
+          itemCount: resp.meta.total_items
         };
 
         dispatch(setCategoriesLoading(false));
