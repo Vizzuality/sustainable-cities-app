@@ -53,8 +53,6 @@ class EditStudyCasePage extends React.Component {
     if ((!this.props.studyCases.included || !this.props.studyCases.included.length)
       && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
 
-      console.log(nextProps.studyCaseDetail);
-
       this.setState({
         city: nextProps.studyCases.included
           .filter(sc => sc.type === 'cities')
