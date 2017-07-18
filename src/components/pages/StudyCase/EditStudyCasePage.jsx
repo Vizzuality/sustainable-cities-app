@@ -68,7 +68,7 @@ class EditStudyCasePage extends React.Component {
     }
 
     if (this.props.studyCaseDetail !== nextProps.studyCaseDetail) {
-      const { name, tagline } = nextProps.studyCaseDetail;
+      const { name, tagline, operational_year, solution, situation } = nextProps.studyCaseDetail;
       const category_id = `${nextProps.studyCaseDetail.category_id}`; // eslint-disable-line camelcase
       this.setState({
         name,
