@@ -380,7 +380,6 @@ class EditStudyCasePage extends React.Component {
           };
         }
 
-
         /* eslint-enable camelcase */
         let photos_attributes = [photoParams];
 
@@ -390,7 +389,16 @@ class EditStudyCasePage extends React.Component {
     });
   }
 
-  /* Render */
+  @Autobind
+  onDeleteImage() {
+    this.setState({
+      photos_attributes: [{
+        id: this.state.photos_attributes[0].id,
+        _destroy: true
+      }]
+    });
+  }
+
   render() {
     // Study case initial values
     const { name, city, tagline, operational_year, solution, situation, photos_attributes } = this.state || {};
@@ -513,13 +521,14 @@ class EditStudyCasePage extends React.Component {
               <DropZone
                 title="Images"
                 accept={'image/png, image/jpg, image/jpeg'}
-                files={this.state.photos_attributes.map(photo => ({
+                files={this.state.photos_attributes.filter(p => !p._destroy).map(photo => ({
                   id: photo.id,
                   name: photo.name,
                   attachment: photo.attachment.url ?
                     `${config['API_URL']}${photo.attachment.url}` : photo.attachment
                 }))}
                 onDrop={this.onImageDrop}
+                onDelete={this.onDeleteImage}
                 withImage
                 multiple={false}
               />
