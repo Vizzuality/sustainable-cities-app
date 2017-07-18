@@ -124,7 +124,7 @@ function setBmesSearch(term) {
 function getBmes(paramsConfig = {}) {
   return (dispatch) => {
     let { pageSize, pageNumber, sort } = paramsConfig;
-    const { onSuccess, id, search } = paramsConfig;
+    const { onSuccess, id, search, include } = paramsConfig;
 
     pageSize = pageSize || DEFAULT_PAGINATION_SIZE;
     pageNumber = pageNumber || DEFAULT_PAGINATION_NUMBER;
@@ -133,13 +133,14 @@ function getBmes(paramsConfig = {}) {
     const queryS = queryString.stringify({
       'page[size]': pageSize,
       'page[number]': pageNumber,
+      include: include ? include.join(',') : undefined,
       sort,
       search
     });
 
     const url = id ?
-      `${config.API_URL}/business-model-elements/${id}` :
-      `${config.API_URL}/business-model-elements?${queryS}`;
+      `${config.API_URL}/bmes/${id}` :
+      `${config.API_URL}/bmes?${queryS}`;
 
     dispatch(setBmesLoading(true));
 
@@ -154,7 +155,7 @@ function getBmes(paramsConfig = {}) {
 
         const bmeData = {
           list: deserialize(parsedData),
-          itemCount: meta.total_items
+          itemCount: meta ? meta['record-count'] : parsedData.length,
         };
 
         if (included) {
