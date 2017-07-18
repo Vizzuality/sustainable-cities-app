@@ -17,7 +17,7 @@ export default function Creator(props) {
       {items.map((item, i) => {
         return (
           <CreatorItem
-            key={item[selectedField]}
+            key={i}
             deleteable
             index={i}
             onEdit={onEdit}
