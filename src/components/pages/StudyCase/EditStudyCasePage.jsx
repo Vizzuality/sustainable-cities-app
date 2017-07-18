@@ -67,8 +67,7 @@ class EditStudyCasePage extends React.Component {
             is_featured: pBme.is_featured
           })),
         impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
-        external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources'),
-        operational_year: nextProps.studyCaseDetail.operational_year ? new Date(nextProps.studyCaseDetail.operational_year).getFullYear() : undefined
+        external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources')
       });
     }
 
@@ -79,9 +78,9 @@ class EditStudyCasePage extends React.Component {
         name,
         tagline,
         category_id,
-        operational_year,
         solution,
-        situation
+        situation,
+        operational_year: operational_year ? new Date(operational_year).getFullYear() : undefined
       });
     }
   }
@@ -340,9 +339,7 @@ class EditStudyCasePage extends React.Component {
   /* Render */
   render() {
     // Study case initial values
-    const { name, tagline, operational_year, solution, situation }  = this.state || {};
-    const parsedOperationalYear = operational_year ?
-      new Date(operational_year).getFullYear() : '';
+    const { name, city, tagline, operational_year, solution, situation } = this.state || {};
 
     return (
       <div>
@@ -376,7 +373,7 @@ class EditStudyCasePage extends React.Component {
               <CitySearch
                 name="city_ids"
                 label="City"
-                value={this.state.city}
+                value={city}
                 onChange={city => this.setState({ city })}
               />
             </div>
@@ -384,7 +381,7 @@ class EditStudyCasePage extends React.Component {
               {/* Year */}
               <Input
                 type="number"
-                value={parsedOperationalYear}
+                value={operational_year}
                 name="operational_year"
                 onChange={this.onInputChange}
                 label="Year"
