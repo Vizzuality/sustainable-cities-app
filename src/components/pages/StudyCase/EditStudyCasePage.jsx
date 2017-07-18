@@ -73,14 +73,23 @@ class EditStudyCasePage extends React.Component {
     }
 
     if (this.props.studyCaseDetail !== nextProps.studyCaseDetail) {
+      const { name, tagline, operational_year, solution, situation } = nextProps.studyCaseDetail;
       const category_id = `${nextProps.studyCaseDetail.category_id}`; // eslint-disable-line camelcase
-      this.setState({ category_id });
+      this.setState({
+        name,
+        tagline,
+        category_id,
+        operational_year,
+        solution,
+        situation
+      });
     }
   }
 
   @Autobind
   onInputChange(evt) {
     this.form[evt.target.name] = evt.target.value;
+    this.setState(this.form);
   }
 
   @Autobind
@@ -332,12 +341,9 @@ class EditStudyCasePage extends React.Component {
   /* Render */
   render() {
     // Study case initial values
-    const { studyCaseDetail } = this.props;
-    const name = studyCaseDetail ? studyCaseDetail.name : '';
-    const operationalYear = studyCaseDetail && studyCaseDetail.operational_year
-      ? new Date(studyCaseDetail.operational_year).getFullYear() : '';
-    const solution = studyCaseDetail ? studyCaseDetail.solution : '';
-    const situation = studyCaseDetail ? studyCaseDetail.situation : '';
+    const { name, tagline, operationalYear, solution, situation }  = this.state || {};
+    const parsedOperationalYear = operationalYear ?
+      new Date(studyCaseDetail.operational_year).getFullYear() : '';
 
     return (
       <div>
@@ -347,6 +353,7 @@ class EditStudyCasePage extends React.Component {
             <button type="button" className="button alert" onClick={this.showDeleteModal}>Delete</button>
             <Link to="/study-cases" className="button">Cancel</Link>
           </BtnGroup>
+          {/* Name */}
           <Input
             type="text"
             name="name"
@@ -354,6 +361,15 @@ class EditStudyCasePage extends React.Component {
             label="Study case title"
             validations={['required']}
             onChange={this.onInputChange}
+          />
+          {/* Tagline */}
+          <Input
+            type="text"
+            value={tagline}
+            name="tagline"
+            onChange={this.onInputChange}
+            label="Tagline"
+            validations={[]}
           />
           <div className="row expanded">
             <div className="column small-6">
@@ -369,7 +385,7 @@ class EditStudyCasePage extends React.Component {
               {/* Year */}
               <Input
                 type="number"
-                value={operationalYear}
+                value={parsedOperationalYear}
                 name="operational_year"
                 onChange={this.onInputChange}
                 label="Year"
