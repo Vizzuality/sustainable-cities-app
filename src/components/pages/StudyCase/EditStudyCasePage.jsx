@@ -501,14 +501,15 @@ class EditStudyCasePage extends React.Component {
                 files={this.state.photos_attributes.map(photo => ({
                   id: photo.id,
                   name: photo.name,
-                  attachment: `${config['API_URL']}${photo.attachment.url}`
+                  attachment: photo.attachment.url ?
+                    `${config['API_URL']}${photo.attachment.url}` : photo.attachment
                 }))}
                 onDrop={this.onImageDrop}
-                onDelete={this.onDeleteImage}
                 withImage
+                multiple={false}
               />
             </div>
-            <div className="column small-6">
+            {/* <div className="column small-6">
               <DropZone
                 title="Files"
                 files={this.state.documents_attributes}
@@ -516,7 +517,7 @@ class EditStudyCasePage extends React.Component {
                 onDrop={this.onFileDrop}
                 onDelete={this.onDeleteFile}
               />
-            </div>
+            </div> */}
           </div>
         </Form>
       </div>
