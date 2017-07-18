@@ -61,7 +61,7 @@ class ImpactForm extends React.Component {
     if (children) data.category_id = children;
     if (parent) data.category_parent_id = parent;
 
-    data.external_sources_index = external_sources_index;
+    data.external_sources_index = this.sourceIndexes;
 
     // add ids to remove
     if (this.external_sources_id.length) {
@@ -88,7 +88,14 @@ class ImpactForm extends React.Component {
     }
 
     // gets the sources id removed
+    this.sourceIndexes = [];
     this.external_sources_id = difference(this.state.external_sources_index, val);
+    val.forEach(v => {
+      const source = this.props.sources.find(s => s.id === v);
+      if(source) {
+        this.sourceIndexes.push(source.index);
+      }
+    });
 
     this.setState({
       [field]: val
