@@ -14,12 +14,9 @@ export default class CreatorItem extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if(this.props.is_featured !== nextProps.is_featured) {
-      console.log(nextProps.is_featured);
-      this.setState({
-        is_featured: nextProps.is_featured
-      });
-    }
+    this.setState({
+      is_featured: nextProps.is_featured
+    });
   }
 
   clearDescription() {
