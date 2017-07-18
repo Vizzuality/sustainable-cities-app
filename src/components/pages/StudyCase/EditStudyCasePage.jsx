@@ -19,8 +19,6 @@ import Creator from 'components/creator/Creator';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
 
-import difference from 'lodash/difference';
-
 class EditStudyCasePage extends React.Component {
 
   /* Constructor */
@@ -54,6 +52,9 @@ class EditStudyCasePage extends React.Component {
     // Includes arrived! So, we can populate sub-entities
     if ((!this.props.studyCases.included || !this.props.studyCases.included.length)
       && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
+
+      console.log(nextProps.studyCaseDetail);
+
       this.setState({
         city: nextProps.studyCases.included
           .filter(sc => sc.type === 'cities')
@@ -63,7 +64,8 @@ class EditStudyCasePage extends React.Component {
           .filter(pBme => !!pBme.relationships.bme.data)
           .map(pBme => ({ id: pBme.id, bme_id: pBme.relationships.bme.data.id, description: pBme.description })),
         impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
-        external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources')
+        external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources'),
+        operational_year: nextProps.studyCaseDetail.operational_year ? new Date(nextProps.studyCaseDetail.operational_year).getFullYear() : undefined
       });
     }
 
@@ -108,13 +110,9 @@ class EditStudyCasePage extends React.Component {
       category_id,
       impacts_attributes,
       project_bmes_attributes,
-      external_sources_attributes
+      external_sources_attributes,
+      operational_year
     } = this.state;
-
-    const { operational_year } = this.form;
-    delete this.form.operational_year;
-    const operationalDate = new Date();
-    operationalDate.setYear(operational_year);
 
     if (impacts_attributes) {
       impacts_attributes.forEach(impact => delete impact.relationships);
@@ -133,7 +131,7 @@ class EditStudyCasePage extends React.Component {
         project_bmes_attributes: project_bmes_attributes.filter(pbme => !pbme.id || pbme.edited || pbme._destroy),
         // eslint-disable-next-line no-underscore-dangle
         external_sources_attributes,
-        operational_year: operationalDate
+        operational_year: new Date(this.form.operational_year || operational_year, 0, 2)
       },
       onSuccess: () => {
         toastr.success('The study case has been edited');
