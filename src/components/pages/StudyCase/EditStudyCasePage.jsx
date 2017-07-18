@@ -61,7 +61,12 @@ class EditStudyCasePage extends React.Component {
         project_bmes_attributes: nextProps.studyCases.included
           .filter(sc => sc.type === 'project_bmes')
           .filter(pBme => !!pBme.relationships.bme.data)
-          .map(pBme => ({ id: pBme.id, bme_id: pBme.relationships.bme.data.id, description: pBme.description })),
+          .map(pBme => ({
+            id: pBme.id,
+            bme_id: pBme.relationships.bme.data.id,
+            description: pBme.description,
+            featured: bme.featured
+          })),
         impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
         external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources')
       });
@@ -397,7 +402,7 @@ class EditStudyCasePage extends React.Component {
             title="BMEs"
             onAdd={this.addProjectBme}
             onEdit={this.editProjectBme}
-            options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))}
+            options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id, featured: bme.featured }))}
             items={this.state.project_bmes_attributes}
             onDelete={this.deleteProjectBme}
             selectedField="bme_id"
