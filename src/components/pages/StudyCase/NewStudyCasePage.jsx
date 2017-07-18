@@ -321,6 +321,15 @@ class NewStudyCasePage extends React.Component {
           label="Study case title"
           validations={['required']}
         />
+        {/* Tagline */}
+        <Input
+          type="text"
+          value=""
+          name="tagline"
+          onChange={this.onInputChange}
+          label="Tagline"
+          validations={[]}
+        />
         <Select
           name="category_id"
           clearable={false}
