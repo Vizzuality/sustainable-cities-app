@@ -79,8 +79,8 @@ class NewStudyCasePage extends React.Component {
     operationalDate.setYear(operational_year);
 
     // removes unnecessary params
-    if(impacts_attributes) {
-      impacts_attributes.forEach(imp => { delete imp['category_parent_id'] })
+    if (impacts_attributes) {
+      impacts_attributes.forEach((imp) => { delete imp.category_parent_id; });
     }
 
     dispatch(createStudyCase({
@@ -90,8 +90,11 @@ class NewStudyCasePage extends React.Component {
         photos_attributes,
         documents_attributes,
         impacts_attributes,
-        project_bmes_attributes: this.state.bmes.map(bme => ({ bme_id: bme.id,
-          description: bme.description })),
+        project_bmes_attributes: this.state.bmes.map(bme => ({
+          bme_id: bme.id,
+          description: bme.description,
+          is_featured: bme.is_featured
+        })),
         external_sources_attributes,
         city_ids: [city.value],
         operational_year: operationalDate
@@ -280,6 +283,7 @@ class NewStudyCasePage extends React.Component {
       ...this.state.bmes,
       bme
     ];
+
     this.setState({ bmes });
   }
 
@@ -353,7 +357,7 @@ class NewStudyCasePage extends React.Component {
         <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
         <Creator
           title="BMEs"
-          options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))}
+          options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id, is_featured: bme.is_featured }))}
           items={this.state.bmes}
           onAdd={this.addProjectBme}
           onEdit={(...args) => this.editProjectBme(...args)}

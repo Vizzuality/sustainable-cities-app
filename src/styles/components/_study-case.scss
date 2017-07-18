@@ -16,6 +16,9 @@
     transition: all $animation-time linear;
     height: 170px;
     background-color: palette(gray, light);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
     margin-bottom: $space-1;
   }
 }

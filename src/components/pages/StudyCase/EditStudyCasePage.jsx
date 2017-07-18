@@ -19,8 +19,6 @@ import Creator from 'components/creator/Creator';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
 
-import difference from 'lodash/difference';
-
 class EditStudyCasePage extends React.Component {
 
   /* Constructor */
@@ -54,6 +52,7 @@ class EditStudyCasePage extends React.Component {
     // Includes arrived! So, we can populate sub-entities
     if ((!this.props.studyCases.included || !this.props.studyCases.included.length)
       && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
+
       this.setState({
         city: nextProps.studyCases.included
           .filter(sc => sc.type === 'cities')
@@ -61,9 +60,15 @@ class EditStudyCasePage extends React.Component {
         project_bmes_attributes: nextProps.studyCases.included
           .filter(sc => sc.type === 'project_bmes')
           .filter(pBme => !!pBme.relationships.bme.data)
-          .map(pBme => ({ id: pBme.id, bme_id: pBme.relationships.bme.data.id, description: pBme.description })),
+          .map(pBme => ({
+            id: pBme.id,
+            bme_id: pBme.relationships.bme.data.id,
+            description: pBme.description,
+            is_featured: pBme.is_featured
+          })),
         impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
-        external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources')
+        external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources'),
+        operational_year: nextProps.studyCaseDetail.operational_year ? new Date(nextProps.studyCaseDetail.operational_year).getFullYear() : undefined
       });
     }
 
@@ -108,16 +113,12 @@ class EditStudyCasePage extends React.Component {
       category_id,
       impacts_attributes,
       project_bmes_attributes,
-      external_sources_attributes
+      external_sources_attributes,
+      operational_year
     } = this.state;
 
-    const { operational_year } = this.form;
-    delete this.form.operational_year;
-    const operationalDate = new Date();
-    operationalDate.setYear(operational_year);
-
-    if(impacts_attributes) {
-      impacts_attributes.forEach(impact => delete impact['relationships']);
+    if (impacts_attributes) {
+      impacts_attributes.forEach(impact => delete impact.relationships);
     }
 
 
@@ -128,12 +129,12 @@ class EditStudyCasePage extends React.Component {
         city_ids: [city.value],
         category_id,
         // eslint-disable-next-line no-underscore-dangle
-        impacts_attributes: impacts_attributes,
+        impacts_attributes,
         // eslint-disable-next-line no-underscore-dangle
         project_bmes_attributes: project_bmes_attributes.filter(pbme => !pbme.id || pbme.edited || pbme._destroy),
         // eslint-disable-next-line no-underscore-dangle
-        external_sources_attributes: external_sources_attributes,
-        operational_year: operationalDate
+        external_sources_attributes,
+        operational_year: new Date(this.form.operational_year || operational_year, 0, 2)
       },
       onSuccess: () => {
         toastr.success('The study case has been edited');
@@ -164,7 +165,7 @@ class EditStudyCasePage extends React.Component {
   @Autobind
   showImpactForm(evt, opts = {}) {
     evt.preventDefault();
-    let action = opts.edit ? this.onImpactEdit : this.onImpactCreate;
+    const action = opts.edit ? this.onImpactEdit : this.onImpactCreate;
     let values = {};
     const { external_sources_attributes } = this.state;
     values.external_sources_index = [];
@@ -172,7 +173,7 @@ class EditStudyCasePage extends React.Component {
     if (opts.edit) {
       values = this.state.impacts_attributes[opts.index];
 
-      if(values.external_sources_index) {
+      if (values.external_sources_index) {
         values.external_sources_index = values.external_sources_index;
       } else {
         values.external_sources_index = values.relationships.external_sources.data.map(source => source.id);
@@ -397,7 +398,7 @@ class EditStudyCasePage extends React.Component {
             title="BMEs"
             onAdd={this.addProjectBme}
             onEdit={this.editProjectBme}
-            options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))}
+            options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id, is_featured: bme.is_featured }))}
             items={this.state.project_bmes_attributes}
             onDelete={this.deleteProjectBme}
             selectedField="bme_id"
