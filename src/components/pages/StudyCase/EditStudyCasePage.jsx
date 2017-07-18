@@ -361,14 +361,29 @@ class EditStudyCasePage extends React.Component {
 
     acceptedImgs.forEach((file, i) => {
       toBase64(file, (parsedFile) => {
-        parsedPhotos.push({
+        // there is already a picture in the database
+        const exists = !!this.state.photos_attributes[0];
+        let photoParams = {
           name: file.name,
-          id: this.state.photos_attributes[0].id,
           attachment: parsedFile
-        });
+        };
+
+        if(exists) {
+          photoParams = {
+            ...photoParams,
+            id: this.state.photos_attributes[0].id
+          }
+        } else {
+          photoParams = {
+            ...photoParams,
+            is_active: true
+          };
+        }
+
 
         /* eslint-enable camelcase */
-        let photos_attributes = [...parsedPhotos];
+        let photos_attributes = [photoParams];
+
         /* eslint-enable camelcase */
         this.setState({ photos_attributes });
       });
