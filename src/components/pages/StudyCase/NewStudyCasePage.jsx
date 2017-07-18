@@ -93,7 +93,7 @@ class NewStudyCasePage extends React.Component {
         project_bmes_attributes: this.state.bmes.map(bme => ({
           bme_id: bme.id,
           description: bme.description,
-          featured: bme.featured
+          is_featured: bme.is_featured
         })),
         external_sources_attributes,
         city_ids: [city.value],
@@ -283,6 +283,7 @@ class NewStudyCasePage extends React.Component {
       ...this.state.bmes,
       bme
     ];
+
     this.setState({ bmes });
   }
 
@@ -356,7 +357,7 @@ class NewStudyCasePage extends React.Component {
         <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
         <Creator
           title="BMEs"
-          options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))}
+          options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id, is_featured: bme.is_featured }))}
           items={this.state.bmes}
           onAdd={this.addProjectBme}
           onEdit={(...args) => this.editProjectBme(...args)}

@@ -5,8 +5,38 @@ import classNames from 'classnames';
 
 export default class CreatorItem extends React.Component {
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      is_featured: props.is_featured
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(this.props.is_featured !== nextProps.is_featured) {
+      console.log(nextProps.is_featured);
+      this.setState({
+        is_featured: nextProps.is_featured
+      });
+    }
+  }
+
   clearDescription() {
     this.input.value = '';
+  }
+
+  onChangeInput(field, value) {
+    this.state = {
+      ...this.state,
+      [field]: value
+    };
+
+    this.setState(this.state);
+
+    if(this.props.onEdit) {
+      this.props.onEdit(this.state, this.props.index);
+    }
   }
 
   render() {
@@ -17,12 +47,13 @@ export default class CreatorItem extends React.Component {
       onDelete,
       selected,
       description,
-      featured,
       index,
       deleteable,
       hidden,
       selectedField
     } = this.props;
+
+    const { is_featured } = this.state;
 
     const customOnAdd = (...args) => {
       onAdd(...args);
@@ -38,21 +69,15 @@ export default class CreatorItem extends React.Component {
     return (
       <div className={cNames}>
         <div className="row expanded">
-          <div className="small-2 column">
-          {/* <label htmlFor="featured">Featured</label> */}
-            <input
-              type="checkbox"
-              name="featured"
-              value={featured}
-              onChange={evt => action({ featured: evt.target.value === 'on' }, index)}
-            />
-          </div>
           <div className="small-5 column">
             <Select
               value={selected}
               clearable={false}
               options={options}
-              onChange={item => action({ [selectedField]: item.value, description: this.input.value }, index)}
+              onChange={item => action({
+                ...this.state,
+                [selectedField]: item.value, description: this.input.value
+              }, index)}
             />
           </div>
           <div className="small-5 column">
@@ -65,6 +90,14 @@ export default class CreatorItem extends React.Component {
 
             {deleteable &&
               <button type="button" className="button" onClick={() => onDelete && onDelete(index)}>Delete</button>}
+          </div>
+          <div className="small-2 column">
+            <input
+              type="checkbox"
+              name="is_featured"
+              checked={is_featured}
+              onChange={evt => this.onChangeInput('is_featured', evt.target.checked)} 
+            />
           </div>
         </div>
       </div>
@@ -79,11 +112,13 @@ CreatorItem.propTypes = {
   selected: PropTypes.string,
   selectedField: PropTypes.string,
   index: PropTypes.number,
+  is_featured: PropTypes.bool,
   description: PropTypes.string,
   deleteable: PropTypes.bool,
   hidden: PropTypes.bool
 };
 
 CreatorItem.defaultProps = {
-  options: []
+  options: [],
+  is_featured: false
 };

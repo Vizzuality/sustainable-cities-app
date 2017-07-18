@@ -65,7 +65,7 @@ class EditStudyCasePage extends React.Component {
             id: pBme.id,
             bme_id: pBme.relationships.bme.data.id,
             description: pBme.description,
-            featured: bme.featured
+            is_featured: pBme.is_featured
           })),
         impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
         external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources')
@@ -402,7 +402,7 @@ class EditStudyCasePage extends React.Component {
             title="BMEs"
             onAdd={this.addProjectBme}
             onEdit={this.editProjectBme}
-            options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id, featured: bme.featured }))}
+            options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id, is_featured: bme.is_featured }))}
             items={this.state.project_bmes_attributes}
             onDelete={this.deleteProjectBme}
             selectedField="bme_id"
