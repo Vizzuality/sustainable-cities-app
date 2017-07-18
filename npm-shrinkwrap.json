@@ -7017,9 +7017,6 @@
           "integrity": "sha1-MvxLn82vhF/N9+c7uXysImHwqwo="
         }
       }
-    },
-    "zone.js": {
-      "version": "git://github.com/jahtalab/zone.js.git#1e065c75189130886722608709aade7a799880d0"
     }
   }
 }
