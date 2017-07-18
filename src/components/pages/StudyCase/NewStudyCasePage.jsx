@@ -20,6 +20,7 @@ import SourceForm from 'components/sources/SourceForm';
 import { toggleModal } from 'modules/modal';
 
 import debounce from 'lodash/debounce';
+import { MAX_IMAGES_ACCEPTED } from 'constants/study-case';
 
 /* Utils */
 function toBase64(file, cb) {
@@ -41,7 +42,8 @@ class NewStudyCasePage extends React.Component {
       photos_attributes: [],
       documents_attributes: [],
       impacts_attributes: [],
-      external_sources_attributes: []
+      external_sources_attributes: [],
+      total_images: 0
     };
 
     this.form = {
@@ -112,11 +114,16 @@ class NewStudyCasePage extends React.Component {
   }
 
   @Autobind
-  onImageDrop(acceptedImgs,
-    rejectedImgs) {
+  onImageDrop(acceptedImgs, rejectedImgs) {
     const parsedPhotos = [];
 
     rejectedImgs.forEach(file => toastr.error(`The image "${file.name}" hast not a valid extension`));
+
+    if(this.state.photos_attributes.length >= MAX_IMAGES_ACCEPTED) {
+      toastr.warning('Max number of images reached!');
+      return;
+    }
+
 
     acceptedImgs.forEach((file, i) => {
       toBase64(file, (parsedFile) => {
@@ -276,7 +283,6 @@ class NewStudyCasePage extends React.Component {
   }
 
   /* ProjectBmes methods */
-
   @Autobind
   addProjectBme(bme) {
     const bmes = [
@@ -407,6 +413,7 @@ class NewStudyCasePage extends React.Component {
               onDrop={this.onImageDrop}
               onDelete={this.onDeleteImage}
               withImage
+              multiple={false}
             />
           </div>
           <div className="column small-6">
@@ -416,6 +423,7 @@ class NewStudyCasePage extends React.Component {
               accept={'application/pdf, application/json, application/msword, application/excel'}
               onDrop={this.onFileDrop}
               onDelete={this.onDeleteFile}
+              multiple={false}
             />
           </div>
         </div>
