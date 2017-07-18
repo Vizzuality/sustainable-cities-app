@@ -22,5 +22,6 @@ const Input = withWrapper(Validation.components.Input);
 const Textarea = withWrapper(Validation.components.Textarea);
 const Select = withWrapper(ReactSelect);
 const AsyncSelect = withWrapper(ReactSelect.Async);
+const Checkbox = withWrapper(Validation.components.Input);
 
-export { Input, Button, Form, Textarea, Select, AsyncSelect };
+export { Input, Button, Form, Textarea, Select, AsyncSelect , Checkbox};

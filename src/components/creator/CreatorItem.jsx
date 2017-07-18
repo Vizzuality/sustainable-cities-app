@@ -17,6 +17,7 @@ export default class CreatorItem extends React.Component {
       onDelete,
       selected,
       description,
+      featured,
       index,
       deleteable,
       hidden,
@@ -37,7 +38,16 @@ export default class CreatorItem extends React.Component {
     return (
       <div className={cNames}>
         <div className="row expanded">
-          <div className="small-6 column">
+          <div className="small-2 column">
+          {/* <label htmlFor="featured">Featured</label> */}
+            <input
+              type="checkbox"
+              name="featured"
+              value={featured}
+              onChange={evt => action({ featured: evt.target.value === 'on' }, index)}
+            />
+          </div>
+          <div className="small-5 column">
             <Select
               value={selected}
               clearable={false}
@@ -45,17 +55,17 @@ export default class CreatorItem extends React.Component {
               onChange={item => action({ [selectedField]: item.value, description: this.input.value }, index)}
             />
           </div>
-          <div className="small-6 column">
+          <div className="small-5 column">
             <input
               ref={(node) => { this.input = node; }}
               defaultValue={description}
               type="text"
               onChange={evt => onEdit && onEdit({ description: evt.target.value }, index)}
             />
+
             {deleteable &&
               <button type="button" className="button" onClick={() => onDelete && onDelete(index)}>Delete</button>}
           </div>
-          <div className="small-6 column" />
         </div>
       </div>
     );

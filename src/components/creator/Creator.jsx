@@ -9,14 +9,15 @@ export default function Creator(props) {
     <section className="c-creator">
       <h1 className="creator-title">{title}</h1>
       <div className="row expanded">
-        <div className="column small-6">Bme</div>
-        <div className="column small-6">Description</div>
+        <div className="column small-2">Featured</div>
+        <div className="column small-5">Bme</div>
+        <div className="column small-5">Description</div>
       </div>
       {/* One CreatorItem per item filled with its data */}
       {items.map((item, i) => {
         return (
           <CreatorItem
-            key={item[selectedField]}
+            key={i}
             deleteable
             index={i}
             onEdit={onEdit}
