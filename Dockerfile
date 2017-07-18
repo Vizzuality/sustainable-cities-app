@@ -5,7 +5,7 @@ ENV NODE_ENV production
 RUN apt-get update && \
     apt-get install -y bash git build-essential \
     automake autoconf make g++ libtool libcairo2-dev
-RUN npm install -g node-gyp --loglevel warn
+RUN npm install -g node-gyp@3.6.2 --loglevel warn
 
 # Create app directory
 RUN mkdir -p /usr/src/app && mkdir -p /usr/src/app

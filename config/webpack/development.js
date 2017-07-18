@@ -15,10 +15,6 @@ module.exports = merge(sharedConfig, {
     pathinfo: true
   },
 
-  module: {
-    rules: []
-  },
-
   plugins: [
     new webpack.LoaderOptionsPlugin({
       debug: true
