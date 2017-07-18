@@ -11,6 +11,7 @@ import BtnGroup from 'components/ui/BtnGroup';
 import { Link } from 'react-router';
 import { Autobind } from 'es-decorators';
 import { toastr } from 'react-redux-toastr';
+import DropZone from 'components/dropzone/DropZone';
 import CitySearch from 'components/cities/CitySearch';
 import { toggleModal } from 'modules/modal';
 import Confirm from 'components/confirm/Confirm';
@@ -18,6 +19,18 @@ import { push } from 'react-router-redux';
 import Creator from 'components/creator/Creator';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
+
+import { MAX_IMAGES_ACCEPTED } from 'constants/study-case';
+
+/* Utils */
+function toBase64(file, cb) {
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    if (cb) cb(event.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
 
 class EditStudyCasePage extends React.Component {
 
@@ -34,7 +47,8 @@ class EditStudyCasePage extends React.Component {
       city: {},
       project_bmes_attributes: [],
       impacts_attributes: [],
-      external_sources_attributes: []
+      external_sources_attributes: [],
+      photos_attributes: []
     };
   }
 
@@ -67,7 +81,8 @@ class EditStudyCasePage extends React.Component {
             is_featured: pBme.is_featured
           })),
         impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
-        external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources')
+        external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources'),
+        photos_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'photos')
       });
     }
 
@@ -122,7 +137,8 @@ class EditStudyCasePage extends React.Component {
       impacts_attributes,
       project_bmes_attributes,
       external_sources_attributes,
-      operational_year
+      operational_year,
+      photos_attributes
     } = this.state;
 
     if (impacts_attributes) {
@@ -141,7 +157,8 @@ class EditStudyCasePage extends React.Component {
         project_bmes_attributes: project_bmes_attributes.filter(pbme => !pbme.id || pbme.edited || pbme._destroy),
         // eslint-disable-next-line no-underscore-dangle
         external_sources_attributes,
-        operational_year: new Date(this.form.operational_year || operational_year, 0, 2)
+        operational_year: new Date(this.form.operational_year || operational_year, 0, 2),
+        photos_attributes
       },
       onSuccess: () => {
         toastr.success('The study case has been edited');
@@ -336,10 +353,32 @@ class EditStudyCasePage extends React.Component {
     this.setState({ project_bmes_attributes });
   }
 
+  @Autobind
+  onImageDrop(acceptedImgs, rejectedImgs) {
+    const parsedPhotos = [];
+
+    rejectedImgs.forEach(file => toastr.error(`The image "${file.name}" hast not a valid extension`));
+
+    acceptedImgs.forEach((file, i) => {
+      toBase64(file, (parsedFile) => {
+        parsedPhotos.push({
+          name: file.name,
+          id: this.state.photos_attributes[0].id,
+          attachment: parsedFile
+        });
+
+        /* eslint-enable camelcase */
+        let photos_attributes = [...parsedPhotos];
+        /* eslint-enable camelcase */
+        this.setState({ photos_attributes });
+      });
+    });
+  }
+
   /* Render */
   render() {
     // Study case initial values
-    const { name, city, tagline, operational_year, solution, situation } = this.state || {};
+    const { name, city, tagline, operational_year, solution, situation, photos_attributes } = this.state || {};
 
     return (
       <div>
@@ -452,6 +491,32 @@ class EditStudyCasePage extends React.Component {
                 );
               })}
             </ul>
+          </div>
+          {/* Images */}
+          <div className="row expanded">
+            <div className="column small-6">
+              <DropZone
+                title="Images"
+                accept={'image/png, image/jpg, image/jpeg'}
+                files={this.state.photos_attributes.map(photo => ({
+                  id: photo.id,
+                  name: photo.name,
+                  attachment: `${config['API_URL']}${photo.attachment.url}`
+                }))}
+                onDrop={this.onImageDrop}
+                onDelete={this.onDeleteImage}
+                withImage
+              />
+            </div>
+            <div className="column small-6">
+              <DropZone
+                title="Files"
+                files={this.state.documents_attributes}
+                accept={'application/pdf, application/json, application/msword, application/excel'}
+                onDrop={this.onFileDrop}
+                onDelete={this.onDeleteFile}
+              />
+            </div>
           </div>
         </Form>
       </div>
