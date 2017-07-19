@@ -197,15 +197,28 @@ class EditStudyCasePage extends React.Component {
     if (opts.edit) {
       values = this.state.impacts_attributes[opts.index];
 
-      if (values.addedSources) {
-        values.addedSources = values.addedSources;
-      } else {
+      if(!values.addedSources || !values.addedSources.length) {
         values.addedSources = values.relationships.external_sources.data.map((source, index) => ({
           id: source.id,
+          name: source.name,
           index
         }));
+      } else {
+        values.addedSources = values.addedSources;
       }
+
+      // if (values.addedSources) {
+      //   values.addedSources = values.addedSources;
+      // } else {
+      //   values.addedSources = values.relationships.external_sources.data.map((source, index) => ({
+      //     id: source.id,
+      //     name: source.name,
+      //     index
+      //   }));
+      // }
     }
+
+    console.log(values.addedSources)
 
     dispatch(toggleModal(
       true,
