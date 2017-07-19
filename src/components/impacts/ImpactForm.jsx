@@ -176,6 +176,7 @@ class ImpactForm extends React.Component {
               <div className="column small-12">
                 <Select
                   multi
+                  required
                   name="sources"
                   value={external_sources_ids}
                   onChange={val => this.onSelectChange('external_sources_ids', val)}
@@ -185,6 +186,7 @@ class ImpactForm extends React.Component {
               </div>}
             <div className="small-6 columns">
               <Select
+                required
                 name="categories"
                 value={parent}
                 onChange={val => this.onCategoryChange('parent', val)}
@@ -194,6 +196,7 @@ class ImpactForm extends React.Component {
             </div>
             <div className="small-6 columns">
               <Select
+                required
                 name="categories"
                 value={children}
                 onChange={val => this.onCategoryChange('children', val)}
@@ -207,7 +210,7 @@ class ImpactForm extends React.Component {
                 label="Value"
                 value={impact_value || ''} // eslint-disable-line camelcase
                 name="impact_value"
-                validations={[]}
+                validations={['required']}
                 onChange={this.onInputChange}
               />
             </div>
