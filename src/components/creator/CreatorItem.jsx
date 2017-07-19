@@ -80,7 +80,7 @@ export default class CreatorItem extends React.Component {
           <div className="small-5 column">
             <input
               ref={(node) => { this.input = node; }}
-              value={description}
+              value={description || ''}
               type="text"
               onChange={evt => onEdit && onEdit({ description: evt.target.value }, index)}
             />
@@ -92,7 +92,7 @@ export default class CreatorItem extends React.Component {
             <input
               type="checkbox"
               name="is_featured"
-              checked={is_featured}
+              checked={is_featured || false}
               onChange={evt => this.onChangeInput('is_featured', evt.target.checked)} 
             />
           </div>
