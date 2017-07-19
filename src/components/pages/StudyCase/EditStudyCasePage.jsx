@@ -415,7 +415,7 @@ class EditStudyCasePage extends React.Component {
           <Input
             type="text"
             name="name"
-            value={name}
+            value={name || ''}
             label="Study case title"
             validations={['required']}
             onChange={this.onInputChange}
@@ -423,7 +423,7 @@ class EditStudyCasePage extends React.Component {
           {/* Tagline */}
           <Input
             type="text"
-            value={tagline}
+            value={tagline || ''}
             name="tagline"
             onChange={this.onInputChange}
             label="Tagline"
@@ -443,7 +443,7 @@ class EditStudyCasePage extends React.Component {
               {/* Year */}
               <Input
                 type="number"
-                value={operational_year}
+                value={operational_year || ''}
                 name="operational_year"
                 onChange={this.onInputChange}
                 label="Year"
@@ -463,7 +463,7 @@ class EditStudyCasePage extends React.Component {
           <Textarea name="solution" value={solution} label="Solution" validations={[]} onChange={this.onInputChange} />
           <Textarea
             name="situation"
-            value={situation}
+            value={situation || ''}
             label="situation"
             validations={[]}
             onChange={this.onInputChange}
