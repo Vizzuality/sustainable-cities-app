@@ -20,7 +20,7 @@ import Creator from 'components/creator/Creator';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
 
-import { MAX_IMAGES_ACCEPTED } from 'constants/study-case';
+import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/study-case';
 
 /* Utils */
 function toBase64(file, cb) {
@@ -357,7 +357,7 @@ class EditStudyCasePage extends React.Component {
   onImageDrop(acceptedImgs, rejectedImgs) {
     const parsedPhotos = [];
 
-    rejectedImgs.forEach(file => toastr.error(`The image "${file.name}" hast not a valid extension`));
+    rejectedImgs.forEach(file => toastr.error(`The image "${file.name}" hast not a valid extension or is larger than 1MB`));
 
     acceptedImgs.forEach((file, i) => {
       toBase64(file, (parsedFile) => {
@@ -530,6 +530,7 @@ class EditStudyCasePage extends React.Component {
                 onDrop={this.onImageDrop}
                 onDelete={this.onDeleteImage}
                 withImage
+                maxSize={MAX_SIZE_IMAGE}
                 multiple={false}
               />
             </div>

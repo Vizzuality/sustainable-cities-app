@@ -20,7 +20,7 @@ import SourceForm from 'components/sources/SourceForm';
 import { toggleModal } from 'modules/modal';
 
 import debounce from 'lodash/debounce';
-import { MAX_IMAGES_ACCEPTED } from 'constants/study-case';
+import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/study-case';
 
 /* Utils */
 function toBase64(file, cb) {
@@ -117,7 +117,7 @@ class NewStudyCasePage extends React.Component {
   onImageDrop(acceptedImgs, rejectedImgs) {
     const parsedPhotos = [];
 
-    rejectedImgs.forEach(file => toastr.error(`The image "${file.name}" hast not a valid extension`));
+    rejectedImgs.forEach(file => toastr.error(`The image "${file.name}" hast not a valid extension or is larger than 1MB`));
 
     if(this.state.photos_attributes.length >= MAX_IMAGES_ACCEPTED) {
       toastr.warning('Max number of images reached!');
@@ -414,6 +414,7 @@ class NewStudyCasePage extends React.Component {
               onDelete={this.onDeleteImage}
               withImage
               multiple={false}
+              maxSize={MAX_SIZE_IMAGE}
             />
           </div>
           <div className="column small-6">
