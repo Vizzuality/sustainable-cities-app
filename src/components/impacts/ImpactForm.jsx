@@ -158,7 +158,7 @@ class ImpactForm extends React.Component {
               <Input
                 id="name"
                 label="Name"
-                defaultValue={name}
+                value={name}
                 type="text"
                 name="name"
                 validations={['required']}
@@ -198,7 +198,7 @@ class ImpactForm extends React.Component {
               <Input
                 type="text"
                 label="Value"
-                defaultValue={impact_value} // eslint-disable-line camelcase
+                value={impact_value} // eslint-disable-line camelcase
                 name="impact_value"
                 validations={[]}
                 onChange={this.onInputChange}
@@ -208,7 +208,7 @@ class ImpactForm extends React.Component {
               <Input
                 type="text"
                 label="Unit"
-                defaultValue={impact_unit} // eslint-disable-line camelcase
+                value={impact_unit} // eslint-disable-line camelcase
                 name="impact_unit"
                 validations={[]}
                 onChange={this.onInputChange}
