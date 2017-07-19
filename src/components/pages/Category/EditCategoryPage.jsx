@@ -66,7 +66,7 @@ class EditCategoryPage extends React.Component {
 
   onSelectChange(field, val) {
     this.setState({
-      [field]: val.value
+      [field]: val ? val.value : null
     });
   }
 
@@ -144,6 +144,8 @@ class EditCategoryPage extends React.Component {
           <div className="row expanded">
             <div className="small-12 columns">
               <Select
+                required
+                clearable={false}
                 name="category_type"
                 value={this.state.category_type}
                 onChange={val => this.onSelectCategoryType('category_type', val)}

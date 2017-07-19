@@ -126,6 +126,8 @@ class NewCategoryPage extends React.Component {
                 validations={['required']}
               />
               <Select
+                required
+                clearable={false}
                 name="category_type"
                 value={this.state.category_type}
                 onChange={val => this.onSelectCategoryType('category_type', val)}
