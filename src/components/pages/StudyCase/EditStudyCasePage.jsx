@@ -192,15 +192,15 @@ class EditStudyCasePage extends React.Component {
     const action = opts.edit ? this.onImpactEdit : this.onImpactCreate;
     let values = {};
     const { external_sources_attributes } = this.state;
-    values.external_sources_index = [];
 
     if (opts.edit) {
       values = this.state.impacts_attributes[opts.index];
 
-      if (values.external_sources_index) {
-        values.external_sources_index = values.external_sources_index;
+      if (values.external_sources_ids) {
+        values.external_sources_ids = values.external_sources_ids || [];
       } else {
-        values.external_sources_index = values.relationships.external_sources.data.map(source => source.id);
+        values.external_sources_ids = values.relationships.external_sources ?
+          values.relationships.external_sources.data.map(source => source.id) : [];
       }
     }
 
@@ -209,7 +209,7 @@ class EditStudyCasePage extends React.Component {
       <ImpactForm
         text="Add"
         values={values}
-        sources={external_sources_attributes.filter(s => !s._destroy).map((source, i) => ({ index: i, id: source.id, name: source.name }))}
+        sources={external_sources_attributes.filter(s => !s._destroy && s.id).map((source, i) => ({ index: i, id: source.id, name: source.name }))}
         onSubmit={(...args) => action(...args, opts.index)}
       />
     ));
