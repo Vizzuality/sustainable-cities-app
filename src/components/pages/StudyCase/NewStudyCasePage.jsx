@@ -269,6 +269,7 @@ class NewStudyCasePage extends React.Component {
       <ImpactForm
         text="Add"
         values={values}
+        showSources={false}
         sources={this.state.external_sources_attributes.map((source, i) => ({ id: i, name: source.name }))}
         onSubmit={(...args) => action(...args, opts.index)}
       />
