@@ -16,13 +16,15 @@ class ImpactForm extends React.Component {
 
     this.form = {};
     this.state = {
-      categories: {},
-      // used to add new sources
-      external_sources_index: []
+      addedSources: [],
+      categories: {}
     };
 
-    // used to remove sources already added in the database
-    this.external_sources_id = [];
+    // used to save ids will be linked with impacts
+    this.external_sources_index = [];
+
+    // used to remove sources in the database
+    this.remove_external_sources = [];
   }
 
   /* lifecycle */
@@ -30,11 +32,10 @@ class ImpactForm extends React.Component {
     const { sources, values } = this.props;
     dispatch(getCategories({ type: 'Impact', tree: true, pageSize: 9999, sort: 'name' }));
 
-    // for editing...
     if (sources && Object.keys(values).length) {
       this.setState({
-        external_sources_index: values.external_sources_index.map(sourceId => sourceId)
-      });
+        addedSources: values.addedSources
+      }, () => { console.log(this.state); });
     }
   }
 
@@ -55,20 +56,31 @@ class ImpactForm extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
     const { parent, children } = this.state.categories;
-    const { external_sources_index } = this.state;
+    const { addedSources } = this.state;
     const data = { ...this.form };
 
     if (children) data.category_id = children;
     if (parent) data.category_parent_id = parent;
 
-    data.external_sources_index = this.sourceIndexes;
+    data.addedSources = addedSources;
 
-    // add ids to remove
-    if (this.external_sources_id.length) {
-      data.remove_external_sources = this.external_sources_id;
+    // attachs sources to impact through their indexes
+    this.external_sources_index = addedSources.map(addedSource => addedSource.index);
+    data.external_sources_index = this.external_sources_index;
+
+    // gets the difference between the incoming sources and the current values
+    // in order to know which one to remove
+    const allSourceIds = this.props.sources.map(source => source.id);
+    const currentSourceIds = addedSources.map(addedSource => addedSource.id);
+    this.remove_external_sources = difference(currentSourceIds, allSourceIds);
+
+    // if there are, adds ids to remove
+    if (this.remove_external_sources.length) {
+      data.remove_external_sources = this.remove_external_sources;
     }
 
     if (this.props.onSubmit) {
+      console.log(data);
       this.props.onSubmit(data);
     }
   }
@@ -87,18 +99,19 @@ class ImpactForm extends React.Component {
       val = val.map(v => v.value);
     }
 
-    // gets the sources id removed
-    this.sourceIndexes = [];
-    this.external_sources_id = difference(this.state.external_sources_index, val);
-    val.forEach(v => {
-      const source = this.props.sources.find(s => s.id === v);
-      if(source) {
-        this.sourceIndexes.push(source.index);
+    const addedSources = val.map(sourceId => {
+      const foundSource = this.props.sources.find(s => s.id === sourceId);
+
+      if(foundSource) {
+        return {
+          id: sourceId,
+          index: foundSource.index
+        }
       }
     });
 
     this.setState({
-      [field]: val
+      [field]: addedSources
     });
   }
 
@@ -138,7 +151,7 @@ class ImpactForm extends React.Component {
   render() {
     const { values, text } = this.props;
     const { name, impact_value, impact_unit } = values;
-    const { external_sources_index, categories } = this.state;
+    const { addedSources, categories } = this.state;
     const { parent, children } = categories;
 
     let childrenOptions = [];
@@ -170,8 +183,8 @@ class ImpactForm extends React.Component {
               <Select
                 multi
                 name="sources"
-                value={external_sources_index}
-                onChange={val => this.onSelectChange('external_sources_index', val)}
+                value={addedSources.map(addedSource => addedSource.id)}
+                onChange={val => this.onSelectChange('addedSources', val)}
                 label="Sources"
                 options={this.props.sources.map((source, index) => ({ value: source.id || index, label: source.name }))}
               />

@@ -192,17 +192,33 @@ class EditStudyCasePage extends React.Component {
     const action = opts.edit ? this.onImpactEdit : this.onImpactCreate;
     let values = {};
     const { external_sources_attributes } = this.state;
-    values.external_sources_index = [];
+    values.addedSources = [];
 
     if (opts.edit) {
       values = this.state.impacts_attributes[opts.index];
 
-      if (values.external_sources_index) {
-        values.external_sources_index = values.external_sources_index;
+      if(!values.addedSources || !values.addedSources.length) {
+        values.addedSources = values.relationships.external_sources.data.map((source, index) => ({
+          id: source.id,
+          name: source.name,
+          index
+        }));
       } else {
-        values.external_sources_index = values.relationships.external_sources.data.map(source => source.id);
+        values.addedSources = values.addedSources;
       }
+
+      // if (values.addedSources) {
+      //   values.addedSources = values.addedSources;
+      // } else {
+      //   values.addedSources = values.relationships.external_sources.data.map((source, index) => ({
+      //     id: source.id,
+      //     name: source.name,
+      //     index
+      //   }));
+      // }
     }
+
+    console.log(values.addedSources)
 
     dispatch(toggleModal(
       true,
