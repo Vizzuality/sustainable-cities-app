@@ -169,7 +169,7 @@ class EditCategoryPage extends React.Component {
                 name="parent_id"
                 value={categoryOption}
                 onChange={val => this.onSelectChange('parent_id', val)}
-                label="Category"
+                label="Parent category"
                 options={categoryOptions}
               />
             </div>
