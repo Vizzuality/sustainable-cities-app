@@ -485,7 +485,7 @@ class EditStudyCasePage extends React.Component {
           />
           {/* Sources */}
           <div>
-            <button type="button" className="button" onClick={this.showSourceForm}>Add source</button>
+            <button type="button" className="add button" onClick={this.showSourceForm}>Add source</button>
             <ul>
               {this.state.external_sources_attributes.map((source, i) => {
                 return (
@@ -502,7 +502,7 @@ class EditStudyCasePage extends React.Component {
           </div>
           {/* Impacts */}
           <div>
-            <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
+            <button type="button" className="add button" onClick={this.showImpactForm}>Add Impact</button>
             <ul>
               {this.state.impacts_attributes.map((impact, i) => {
                 return (
