@@ -21,17 +21,10 @@ function fetchPage(pageNumber, search, concat) {
 }
 
 class StudyCasesPage extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      page: 1,
-      search: ''
-    };
-
-    // Bindings
-    this.scrollListener = this.scrollListener.bind(this);
-  }
+  state = {
+    page: 1,
+    search: ''
+  };
 
   componentWillMount() {
     fetchPage();
@@ -53,12 +46,12 @@ class StudyCasesPage extends React.Component {
     this.removeScrollListener();
   }
 
-  setScrollListener() {
-    this.scrollListener = debounce(this.scrollListener, 100);
-    window.addEventListener('scroll', this.scrollListener, { passive: true });
+  setScrollListener = () => {
+    this.registeredScrollListener = debounce(this.scrollListener, 100);
+    window.addEventListener('scroll', this.registeredScrollListener, { passive: true });
   }
 
-  scrollListener() {
+  scrollListener = () => {
     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
       if (this.props.studyCases.list.length === this.props.studyCases.itemCount) {
         // We have already get all items, return
@@ -83,9 +76,9 @@ class StudyCasesPage extends React.Component {
     });
   }
 
-  removeScrollListener() {
-    window.removeEventListener('scroll', this.scrollListener);
-    this.scrollListener = null;
+  removeScrollListener = () => {
+    window.removeEventListener('scroll', this.registeredScrollListener);
+    this.registeredScrollListener = null;
   }
 
   render() {
