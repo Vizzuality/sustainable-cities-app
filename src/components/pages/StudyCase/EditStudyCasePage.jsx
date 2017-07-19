@@ -204,6 +204,12 @@ class EditStudyCasePage extends React.Component {
       }
     }
 
+    if (Object.keys(values).length) {
+      // assigns children category id to values
+      values.category_id = values.category_id ? values.category_id : values.relationships && values.relationships.category ?
+        values.relationships.category.data.id : null;
+    }
+
     dispatch(toggleModal(
       true,
       <ImpactForm

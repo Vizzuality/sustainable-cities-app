@@ -39,13 +39,18 @@ class ImpactForm extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.values && nextProps.values) {
-      const { category_parent_id, category_id } = nextProps.values;
+
+    if (nextProps.impactCategories.length) {
+      let parent = null;
+      nextProps.impactCategories.forEach(parentCategory => {
+        const exists = parentCategory.children.find(child => child.id === this.props.values.category_id);
+        if (exists) parent = parentCategory.id;
+      });
 
       this.setState({
         categories: {
-          parent: category_parent_id,
-          children: category_id
+          parent,
+          children: this.props.values.category_id
         }
       });
     }
