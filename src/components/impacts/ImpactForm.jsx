@@ -16,10 +16,14 @@ class ImpactForm extends React.Component {
 
     this.form = {};
     this.state = {
+      addedSources: [],
       categories: {},
       // used to add new sources
       external_sources_index: []
     };
+
+    // saves ids will be linked with impacts
+    this.external_sources_index = [];
 
     // used to remove sources already added in the database
     this.external_sources_id = [];
@@ -33,7 +37,7 @@ class ImpactForm extends React.Component {
     // for editing...
     if (sources && Object.keys(values).length) {
       this.setState({
-        external_sources_index: values.external_sources_index.map(sourceId => sourceId)
+        addedSources: values.addedSources
       });
     }
   }
@@ -55,13 +59,30 @@ class ImpactForm extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
     const { parent, children } = this.state.categories;
-    const { external_sources_index } = this.state;
+    const { addedSources } = this.state;
     const data = { ...this.form };
 
     if (children) data.category_id = children;
     if (parent) data.category_parent_id = parent;
 
-    data.external_sources_index = this.sourceIndexes;
+    data.addedSources = addedSources;
+
+    addedSources.forEach(addedSource => {
+      const existsOnRemote = this.props.sources.find(source => source.id === addedSource.id);
+
+      if(!existsOnRemote) {
+        this.external_sources_index.push(source.index);
+      }
+    });
+
+
+    // data.external_sources_index = this.sourceIndexes;
+    // data.external_sources_ids = this.sourceIndexes.map(sourceIndex => {
+    //   const source = this.props.sources.find(source => source.index === sourceIndex);
+    //   if (source) {
+    //     return source.index;
+    //   }
+    // });
 
     // add ids to remove
     if (this.external_sources_id.length) {
@@ -87,18 +108,23 @@ class ImpactForm extends React.Component {
       val = val.map(v => v.value);
     }
 
-    // gets the sources id removed
-    this.sourceIndexes = [];
-    this.external_sources_id = difference(this.state.external_sources_index, val);
-    val.forEach(v => {
-      const source = this.props.sources.find(s => s.id === v);
-      if(source) {
-        this.sourceIndexes.push(source.index);
-      }
-    });
+    const addedSources = val.map((v, index) => ({
+      id: v,
+      index
+    }));
+
+    // // gets the sources id removed
+    // this.sourceIndexes = [];
+    // this.external_sources_id = difference(this.state.external_sources_index, val);
+    // val.forEach(v => {
+    //   const source = this.props.sources.find(s => s.id === v);
+    //   if(source) {
+    //     this.sourceIndexes.push(source.index);
+    //   }
+    // });
 
     this.setState({
-      [field]: val
+      [field]: addedSources
     });
   }
 
@@ -138,7 +164,7 @@ class ImpactForm extends React.Component {
   render() {
     const { values, text } = this.props;
     const { name, impact_value, impact_unit } = values;
-    const { external_sources_index, categories } = this.state;
+    const { addedSources, categories } = this.state;
     const { parent, children } = categories;
 
     let childrenOptions = [];
@@ -170,8 +196,8 @@ class ImpactForm extends React.Component {
               <Select
                 multi
                 name="sources"
-                value={external_sources_index}
-                onChange={val => this.onSelectChange('external_sources_index', val)}
+                value={addedSources.map(addedSource => addedSource.id)}
+                onChange={val => this.onSelectChange('addedSources', val)}
                 label="Sources"
                 options={this.props.sources.map((source, index) => ({ value: source.id || index, label: source.name }))}
               />
