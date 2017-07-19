@@ -522,8 +522,8 @@ class EditStudyCasePage extends React.Component {
             </ul>
           </div>
           {/* Images */}
-          <div className="row expanded">
-            <div className="column small-6">
+          <div className="row">
+            <div className="column small-2">
               <DropZone
                 title="Images"
                 accept={'image/png, image/jpg, image/jpeg'}
