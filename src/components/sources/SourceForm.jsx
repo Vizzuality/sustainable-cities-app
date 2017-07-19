@@ -44,7 +44,7 @@ export default class SourceForm extends React.Component {
               <Input
                 id="name"
                 label="Name"
-                defaultValue={name}
+                value={name}
                 type="text"
                 name="name"
                 validations={['required']}
@@ -55,7 +55,7 @@ export default class SourceForm extends React.Component {
               <Input
                 id="type"
                 label="Type"
-                defaultValue={source_type} // eslint-disable-line camelcase
+                value={source_type} // eslint-disable-line camelcase
                 type="text"
                 name="source_type"
                 validations={[]}
@@ -66,7 +66,7 @@ export default class SourceForm extends React.Component {
               <Textarea
                 id="description"
                 label="Description"
-                defaultValue={description}
+                value={description}
                 name="description"
                 validations={[]}
                 onChange={this.onInputChange}
@@ -76,7 +76,7 @@ export default class SourceForm extends React.Component {
               <Input
                 id="publication_year"
                 label="Publication year"
-                defaultValue={publication_year} // eslint-disable-line camelcase
+                value={publication_year} // eslint-disable-line camelcase
                 type="text"
                 name="publication_year"
                 validations={[]}
@@ -87,7 +87,7 @@ export default class SourceForm extends React.Component {
               <Input
                 id="institution"
                 label="Institution"
-                defaultValue={institution}
+                value={institution}
                 type="text"
                 name="institution"
                 validations={[]}
@@ -98,7 +98,7 @@ export default class SourceForm extends React.Component {
               <Input
                 id="author"
                 label="Author"
-                defaultValue={author}
+                value={author}
                 type="text"
                 name="author"
                 validations={[]}
@@ -109,7 +109,7 @@ export default class SourceForm extends React.Component {
               <Input
                 id="web_url"
                 label="Web url"
-                defaultValue={web_url} // eslint-disable-line camelcase
+                value={web_url} // eslint-disable-line camelcase
                 type="text"
                 name="web_url"
                 validations={[]}

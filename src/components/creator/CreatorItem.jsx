@@ -80,7 +80,7 @@ export default class CreatorItem extends React.Component {
           <div className="small-5 column">
             <input
               ref={(node) => { this.input = node; }}
-              defaultValue={description}
+              value={description}
               type="text"
               onChange={evt => onEdit && onEdit({ description: evt.target.value }, index)}
             />
