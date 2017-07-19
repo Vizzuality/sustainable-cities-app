@@ -22,3 +22,10 @@
     margin-bottom: $space-1;
   }
 }
+
+.c-sc-edit,
+.c-sc-new {
+  .delete.button {
+    margin-left: 10px;
+  }
+}

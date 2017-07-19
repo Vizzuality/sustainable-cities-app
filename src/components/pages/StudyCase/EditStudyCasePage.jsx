@@ -410,7 +410,7 @@ class EditStudyCasePage extends React.Component {
     const { name, city, tagline, operational_year, solution, situation, photos_attributes } = this.state || {};
 
     return (
-      <div>
+      <div className="c-sc-edit">
         <Form onSubmit={this.submit}>
           <BtnGroup>
             <Button type="submit" className="button success">Edit</Button>
@@ -494,7 +494,7 @@ class EditStudyCasePage extends React.Component {
                     className={`${source._destroy ? 'hidden' : ''}`} // eslint-disable-line no-underscore-dangle
                   >
                     <button onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</button>
-                    <button type="button" className="button" onClick={() => this.deleteSource(i)}>Delete</button>
+                    <button type="button" className="delete button" onClick={() => this.deleteSource(i)}>Delete</button>
                   </li>
                 );
               })}
@@ -515,7 +515,7 @@ class EditStudyCasePage extends React.Component {
                     >
                       {impact.name || 'No name'}
                     </button>
-                    <button type="button" className="button" onClick={() => this.deleteImpact(i)}>Delete</button>
+                    <button type="button" className="delete button" onClick={() => this.deleteImpact(i)}>Delete</button>
                   </li>
                 );
               })}
