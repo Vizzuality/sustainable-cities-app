@@ -6,4 +6,7 @@ const BME_TABLE_FIELDS = [
   { label: 'Description', value: 'description' }
 ];
 
-export { DEFAULT_SORT_FIELD, BME_TABLE_FIELDS };
+const MAX_SIZE_IMAGE = 1048576; // 1MB
+const MAX_IMAGES_ACCEPTED = 1;
+
+export { DEFAULT_SORT_FIELD, BME_TABLE_FIELDS, MAX_SIZE_IMAGE, MAX_IMAGES_ACCEPTED };
