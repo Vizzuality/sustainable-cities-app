@@ -220,7 +220,7 @@ class ImpactForm extends React.Component {
                 label="Unit"
                 value={impact_unit || ''} // eslint-disable-line camelcase
                 name="impact_unit"
-                validations={[]}
+                validations={['required']}
                 onChange={this.onInputChange}
               />
             </div>

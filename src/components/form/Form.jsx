@@ -2,9 +2,9 @@ import React from 'react';
 import Validation from 'react-validation';
 import ReactSelect from 'react-select';
 
-const checkValidations = (props) =>  (props.validations || []).find(e => e === 'required');
+const checkValidations = props => (props.validations || []).find(e => e === 'required');
 
-const checkRequired = (props) =>  !!props.required;
+const checkRequired = props => !!props.required;
 
 function withWrapper(Component, requiredDecider) {
   return class extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -12,7 +12,7 @@ function withWrapper(Component, requiredDecider) {
       const { label, ...props } = this.props; // eslint-disable-line react/prop-types
 
       const required = requiredDecider(props);
-      const suffix = required ? ' *': '';
+      const suffix = required ? ' *' : '';
 
       return (
         <div className="form-control">
@@ -33,4 +33,4 @@ const Checkbox = withWrapper(Validation.components.Input, checkValidations);
 const Select = withWrapper(ReactSelect, checkRequired);
 const AsyncSelect = withWrapper(ReactSelect.Async, checkRequired);
 
-export { Input, Button, Form, Textarea, Select, AsyncSelect , Checkbox};
+export { Input, Button, Form, Textarea, Select, AsyncSelect, Checkbox };

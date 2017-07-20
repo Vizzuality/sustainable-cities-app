@@ -123,6 +123,7 @@ class EditCategoryPage extends React.Component {
   render() {
     let categoryOption = null;
     let categoryOptions = [];
+    const { label, description } = this.categoryDetail || {};
 
     if (this.state.category_type && this.props.categories[this.state.category_type].length) {
       const currentCategories = this.props.categories[this.state.category_type];
@@ -182,7 +183,7 @@ class EditCategoryPage extends React.Component {
               type="text"
               onChange={this.onInputChange}
               name="label"
-              value={this.categoryDetail ? this.categoryDetail.label : ''}
+              value={label || ''}
               label="Question"
               validations={['required']}
             />}
@@ -191,7 +192,7 @@ class EditCategoryPage extends React.Component {
             validations={[]}
             onChange={this.onInputChange}
             name="description"
-            value={this.categoryDetail ? this.categoryDetail.description || '' : ''}
+            value={description || ''}
             label="Description"
           />
         </Form>
