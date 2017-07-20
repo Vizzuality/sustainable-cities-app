@@ -88,7 +88,7 @@ class EditImpactPage extends React.Component {
     if (!childrenCategoryId) return;
 
     const parentCategory = childrenCategoryId ? impactCategories.find((cat) => {
-      return cat.children.find(c => c.id === childrenCategoryId);
+      return (cat.children || []).find(c => c.id === childrenCategoryId);
     }) : {};
 
     this.setState({
@@ -101,7 +101,7 @@ class EditImpactPage extends React.Component {
 
   loadFirstChildrenOption(parentId) {
     const parentCategory = this.props.impactCategories.find(cat => cat.id === parentId);
-    return parentCategory.children ? parentCategory.children[0].id : null;
+    return parentCategory ? parentCategory.children ? parentCategory.children[0].id : null : null;
   }
 
   render() {
@@ -113,7 +113,7 @@ class EditImpactPage extends React.Component {
 
     if (parent) {
       parentCategory = this.props.impactCategories.find(cat => cat.id === this.state.categories.parent);
-      childrenOptions = parentCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
+      childrenOptions = (parentCategory.children || []).map(cat => ({ value: cat.id, label: cat.name }));
     }
 
     return (
@@ -139,6 +139,7 @@ class EditImpactPage extends React.Component {
             <div className="small-6 columns">
               {/* parent category */}
               <Select
+                required
                 name="categories"
                 value={this.state.categories.parent}
                 onChange={val => this.onCategoryChange('parent', val)}
@@ -149,6 +150,7 @@ class EditImpactPage extends React.Component {
             <div className="small-6 columns">
               {/* children category */}
               <Select
+                required
                 name="categories"
                 value={this.state.categories.children}
                 onChange={val => this.onCategoryChange('children', val)}

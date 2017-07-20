@@ -138,9 +138,9 @@ class EditBmePage extends React.Component {
             validations={['required']}
           />
           <Select
+            required
             name="category"
             label="Category"
-            validations={['required']}
             value={this.state.category_id}
             onChange={val => this.onSelectChange('category_id', val)}
             options={this.props.categories.enablings.map(cat => ({ value: cat.id, label: cat.name }))}
@@ -166,7 +166,7 @@ class EditBmePage extends React.Component {
             name="bme_ids"
             label="Affected business model elements"
             multi
-            validations={['required']}
+            required
             value={this.state.bme_ids}
             onChange={val => this.onSelectChange('bme_ids', val)}
             options={this.props.bmes.list.map(bme => ({ value: bme.id, label: bme.name }))}

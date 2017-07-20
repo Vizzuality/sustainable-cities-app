@@ -341,7 +341,7 @@ class NewStudyCasePage extends React.Component {
           name="category_id"
           clearable={false}
           label="Category"
-          validations={['required']}
+          required
           value={this.state.category_id}
           onChange={item => this.setState({ category_id: item.value })}
           options={this.props.categories.solution.map(cat => ({ value: cat.id, label: cat.name }))}
