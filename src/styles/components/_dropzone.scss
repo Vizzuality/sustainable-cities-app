@@ -38,4 +38,25 @@
     top: 0; bottom: 0; right: -20px;
     margin: auto;
   }
+
+  .dropzone {
+    min-height: 200px;
+    min-width: 200px;
+    border-width: 2px;
+    border-color: #666;
+    border-style: dashed;
+    border-radius: 5px;
+
+    &.active {
+      border-style: solid;
+      border-color: #6c6;
+      background-color: #eee;
+    }
+
+    &.reject {
+      border-style: solid;
+      border-color: #c66;
+      background-color: #eee;
+    }
+  }
 }
