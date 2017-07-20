@@ -4,10 +4,12 @@ import PropTypes from 'prop-types';
 import Icon from 'components/ui/Icon';
 
 export default function DropZone({ withImage, title, files, onDelete, ...props }) {
-  const localOnDelete = (i) => (e) => {
+  const localOnDelete = i => (e) => {
     e.stopPropagation();
-    onDelete && onDelete(i)
-  }
+    if (onDelete) {
+      onDelete(i);
+    }
+  };
 
   return (
     <div className="c-dropzone">

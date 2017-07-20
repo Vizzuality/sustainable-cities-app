@@ -81,7 +81,9 @@ class NewStudyCasePage extends React.Component {
     operationalDate.setYear(operational_year);
 
     // removes unnecessary params
+    // eslint-disable-next-line camelcase
     if (impacts_attributes) {
+      // eslint-disable-next-line no-param-reassign
       impacts_attributes.forEach((imp) => { delete imp.category_parent_id; });
     }
 
@@ -117,9 +119,11 @@ class NewStudyCasePage extends React.Component {
   onImageDrop(acceptedImgs, rejectedImgs) {
     const parsedPhotos = [];
 
-    rejectedImgs.forEach(file => toastr.error(`The image "${file.name}" hast not a valid extension or is larger than 1MB`));
+    rejectedImgs.forEach(file =>
+      toastr.error(`The image "${file.name}" hast not a valid extension or is larger than 1MB`)
+    );
 
-    if(this.state.photos_attributes.length >= MAX_IMAGES_ACCEPTED) {
+    if (this.state.photos_attributes.length >= MAX_IMAGES_ACCEPTED) {
       toastr.warning('Max number of images reached!');
       return;
     }
