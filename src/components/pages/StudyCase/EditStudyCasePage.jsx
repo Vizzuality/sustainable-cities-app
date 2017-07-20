@@ -11,6 +11,7 @@ import BtnGroup from 'components/ui/BtnGroup';
 import { Link } from 'react-router';
 import { Autobind } from 'es-decorators';
 import { toastr } from 'react-redux-toastr';
+import DropZone from 'components/dropzone/DropZone';
 import CitySearch from 'components/cities/CitySearch';
 import { toggleModal } from 'modules/modal';
 import Confirm from 'components/confirm/Confirm';
@@ -18,6 +19,18 @@ import { push } from 'react-router-redux';
 import Creator from 'components/creator/Creator';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
+
+import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/study-case';
+
+/* Utils */
+function toBase64(file, cb) {
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    if (cb) cb(event.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
 
 class EditStudyCasePage extends React.Component {
 
@@ -34,7 +47,8 @@ class EditStudyCasePage extends React.Component {
       city: {},
       project_bmes_attributes: [],
       impacts_attributes: [],
-      external_sources_attributes: []
+      external_sources_attributes: [],
+      photos_attributes: []
     };
   }
 
@@ -52,6 +66,7 @@ class EditStudyCasePage extends React.Component {
     // Includes arrived! So, we can populate sub-entities
     if ((!this.props.studyCases.included || !this.props.studyCases.included.length)
       && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
+
       this.setState({
         city: nextProps.studyCases.included
           .filter(sc => sc.type === 'cities')
@@ -59,21 +74,36 @@ class EditStudyCasePage extends React.Component {
         project_bmes_attributes: nextProps.studyCases.included
           .filter(sc => sc.type === 'project_bmes')
           .filter(pBme => !!pBme.relationships.bme.data)
-          .map(pBme => ({ id: pBme.id, bme_id: pBme.relationships.bme.data.id, description: pBme.description })),
+          .map(pBme => ({
+            id: pBme.id,
+            bme_id: pBme.relationships.bme.data.id,
+            description: pBme.description,
+            is_featured: pBme.is_featured
+          })),
         impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
-        external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources')
+        external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources'),
+        photos_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'photos')
       });
     }
 
     if (this.props.studyCaseDetail !== nextProps.studyCaseDetail) {
+      const { name, tagline, operational_year, solution, situation } = nextProps.studyCaseDetail;
       const category_id = `${nextProps.studyCaseDetail.category_id}`; // eslint-disable-line camelcase
-      this.setState({ category_id });
+      this.setState({
+        name,
+        tagline,
+        category_id,
+        solution,
+        situation,
+        operational_year: operational_year ? new Date(operational_year).getFullYear() : undefined
+      });
     }
   }
 
   @Autobind
   onInputChange(evt) {
     this.form[evt.target.name] = evt.target.value;
+    this.setState(this.form);
   }
 
   @Autobind
@@ -106,22 +136,17 @@ class EditStudyCasePage extends React.Component {
       category_id,
       impacts_attributes,
       project_bmes_attributes,
-      external_sources_attributes
+      external_sources_attributes,
+      operational_year,
+      photos_attributes
     } = this.state;
 
-    const { operational_year } = this.form;
-    delete this.form.operational_year;
-    const operationalDate = new Date();
-    operationalDate.setYear(operational_year);
-
-    // eslint-disable-next-line camelcase
     if (impacts_attributes) {
       // TODO this is confusing and hard to track. I'm not sure if this mutation
       // is needed for other parts of the code when setState kicks in.
       // eslint-disable-next-line no-param-reassign
       impacts_attributes.forEach((o => delete o.relationships));
     }
-
 
     dispatch(updateStudyCase({
       id: this.props.studyCaseDetail.id,
@@ -135,7 +160,8 @@ class EditStudyCasePage extends React.Component {
         project_bmes_attributes: project_bmes_attributes.filter(pbme => !pbme.id || pbme.edited || pbme._destroy),
         // eslint-disable-next-line no-underscore-dangle
         external_sources_attributes,
-        operational_year: operationalDate
+        operational_year: new Date(this.form.operational_year || operational_year, 0, 2),
+        photos_attributes
       },
       onSuccess: () => {
         toastr.success('The study case has been edited');
@@ -169,16 +195,22 @@ class EditStudyCasePage extends React.Component {
     const action = opts.edit ? this.onImpactEdit : this.onImpactCreate;
     let values = {};
     const { external_sources_attributes } = this.state;
-    values.external_sources_index = [];
 
     if (opts.edit) {
       values = this.state.impacts_attributes[opts.index];
 
-      if (values.external_sources_index) {
-        values.external_sources_index = values.external_sources_index;
+      if (values.external_sources_ids) {
+        values.external_sources_ids = values.external_sources_ids || [];
       } else {
-        values.external_sources_index = values.relationships.external_sources.data.map(source => source.id);
+        values.external_sources_ids = values.relationships.external_sources ?
+          values.relationships.external_sources.data.map(source => source.id) : [];
       }
+    }
+
+    if (Object.keys(values).length) {
+      // assigns children category id to values
+      values.category_id = values.category_id ? values.category_id : values.relationships && values.relationships.category ?
+        values.relationships.category.data.id : null;
     }
 
     dispatch(toggleModal(
@@ -186,15 +218,7 @@ class EditStudyCasePage extends React.Component {
       <ImpactForm
         text="Add"
         values={values}
-        sources={
-          external_sources_attributes
-            .filter(s => !s._destroy) // eslint-disable-line no-underscore-dangle
-            .map((source, i) => ({
-              index: i,
-              id: source.id,
-              name: source.name
-            }))
-        }
+        sources={external_sources_attributes.filter(s => !s._destroy && s.id).map((source, i) => ({ index: i, id: source.id, name: source.name }))}
         onSubmit={(...args) => action(...args, opts.index)}
       />
     ));
@@ -338,31 +362,81 @@ class EditStudyCasePage extends React.Component {
     this.setState({ project_bmes_attributes });
   }
 
-  /* Render */
+  @Autobind
+  onImageDrop(acceptedImgs, rejectedImgs) {
+    const parsedPhotos = [];
+
+    rejectedImgs.forEach(file => toastr.error(`The image "${file.name}" hast not a valid extension or is larger than 1MB`));
+
+    acceptedImgs.forEach((file, i) => {
+      toBase64(file, (parsedFile) => {
+        // there is already a picture in the database
+        const exists = !!this.state.photos_attributes[0];
+        let photoParams = {
+          name: file.name,
+          attachment: parsedFile
+        };
+
+        if(exists) {
+          photoParams = {
+            ...photoParams,
+            id: this.state.photos_attributes[0].id
+          }
+        } else {
+          photoParams = {
+            ...photoParams,
+            is_active: true
+          };
+        }
+
+        /* eslint-enable camelcase */
+        let photos_attributes = [photoParams];
+
+        /* eslint-enable camelcase */
+        this.setState({ photos_attributes });
+      });
+    });
+  }
+
+  @Autobind
+  onDeleteImage() {
+    this.setState({
+      photos_attributes: [{
+        id: this.state.photos_attributes[0].id,
+        _destroy: true
+      }]
+    });
+  }
+
   render() {
     // Study case initial values
-    const { studyCaseDetail } = this.props;
-    const name = studyCaseDetail ? studyCaseDetail.name : '';
-    const operationalYear = studyCaseDetail && studyCaseDetail.operational_year
-      ? new Date(studyCaseDetail.operational_year).getFullYear() : '';
-    const solution = studyCaseDetail ? studyCaseDetail.solution : '';
-    const situation = studyCaseDetail ? studyCaseDetail.situation : '';
+    const { name, city, tagline, operational_year, solution, situation, photos_attributes } = this.state || {};
 
     return (
-      <div>
+      <div className="c-sc-edit">
         <Form onSubmit={this.submit}>
           <BtnGroup>
             <Button type="submit" className="button success">Edit</Button>
             <button type="button" className="button alert" onClick={this.showDeleteModal}>Delete</button>
             <Link to="/study-cases" className="button">Cancel</Link>
           </BtnGroup>
+          {/* Name */}
           <Input
             type="text"
             name="name"
-            value={name}
+            value={name || ''}
             label="Study case title"
             validations={['required']}
             onChange={this.onInputChange}
+          />
+          {/* Tagline */}
+          <Input
+            type="text"
+            value={tagline || ''}
+            name="tagline"
+            onChange={this.onInputChange}
+            label="Tagline"
+            validations={[]}
           />
           <div className="row expanded">
             <div className="column small-6">
@@ -370,7 +444,7 @@ class EditStudyCasePage extends React.Component {
               <CitySearch
                 name="city_ids"
                 label="City"
-                value={this.state.city}
+                value={city}
                 onChange={city => this.setState({ city })}
               />
             </div>
@@ -378,7 +452,7 @@ class EditStudyCasePage extends React.Component {
               {/* Year */}
               <Input
                 type="number"
-                value={operationalYear}
+                value={operational_year || ''}
                 name="operational_year"
                 onChange={this.onInputChange}
                 label="Year"
@@ -398,7 +472,7 @@ class EditStudyCasePage extends React.Component {
           <Textarea name="solution" value={solution} label="Solution" validations={[]} onChange={this.onInputChange} />
           <Textarea
             name="situation"
-            value={situation}
+            value={situation || ''}
             label="situation"
             validations={[]}
             onChange={this.onInputChange}
@@ -407,14 +481,14 @@ class EditStudyCasePage extends React.Component {
             title="BMEs"
             onAdd={this.addProjectBme}
             onEdit={this.editProjectBme}
-            options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id }))}
+            options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id, is_featured: bme.is_featured }))}
             items={this.state.project_bmes_attributes}
             onDelete={this.deleteProjectBme}
             selectedField="bme_id"
           />
           {/* Sources */}
           <div>
-            <button type="button" className="button" onClick={this.showSourceForm}>Add source</button>
+            <button type="button" className="add button" onClick={this.showSourceForm}>Add source</button>
             <ul>
               {this.state.external_sources_attributes.map((source, i) => {
                 return (
@@ -424,7 +498,7 @@ class EditStudyCasePage extends React.Component {
                     className={`${source._destroy ? 'hidden' : ''}`} // eslint-disable-line no-underscore-dangle
                   >
                     <button onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</button>
-                    <button type="button" className="button" onClick={() => this.deleteSource(i)}>Delete</button>
+                    <button type="button" className="delete button" onClick={() => this.deleteSource(i)}>Delete</button>
                   </li>
                 );
               })}
@@ -432,7 +506,7 @@ class EditStudyCasePage extends React.Component {
           </div>
           {/* Impacts */}
           <div>
-            <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
+            <button type="button" className="add button" onClick={this.showImpactForm}>Add Impact</button>
             <ul>
               {this.state.impacts_attributes.map((impact, i) => {
                 return (
@@ -445,11 +519,40 @@ class EditStudyCasePage extends React.Component {
                     >
                       {impact.name || 'No name'}
                     </button>
-                    <button type="button" className="button" onClick={() => this.deleteImpact(i)}>Delete</button>
+                    <button type="button" className="delete button" onClick={() => this.deleteImpact(i)}>Delete</button>
                   </li>
                 );
               })}
             </ul>
+          </div>
+          {/* Images */}
+          <div className="row">
+            <div className="column small-2">
+              <DropZone
+                title="Images"
+                accept={'image/png, image/jpg, image/jpeg'}
+                files={this.state.photos_attributes.filter(p => !p._destroy).map(photo => ({
+                  id: photo.id,
+                  name: photo.name,
+                  attachment: photo.attachment.url ?
+                    `${config['API_URL']}${photo.attachment.url}` : photo.attachment
+                }))}
+                onDrop={this.onImageDrop}
+                onDelete={this.onDeleteImage}
+                withImage
+                maxSize={MAX_SIZE_IMAGE}
+                multiple={false}
+              />
+            </div>
+            {/* <div className="column small-6">
+              <DropZone
+                title="Files"
+                files={this.state.documents_attributes}
+                accept={'application/pdf, application/json, application/msword, application/excel'}
+                onDrop={this.onFileDrop}
+                onDelete={this.onDeleteFile}
+              />
+            </div> */}
           </div>
         </Form>
       </div>

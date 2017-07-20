@@ -115,6 +115,8 @@ class EditBmePage extends React.Component {
   }
 
   render() {
+    const { name, description } = this.props.enablingDetail || {};
+
     return (
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
@@ -126,21 +128,21 @@ class EditBmePage extends React.Component {
             type="text"
             onChange={this.onInputChange}
             name="name"
-            value={this.props.enablingDetail ? this.props.enablingDetail.name : ''}
+            value={name || ''}
             label="Enabling condition title"
             validations={['required']}
           />
           <Textarea
             onChange={this.onInputChange}
             name="description"
-            value={this.props.enablingDetail ? this.props.enablingDetail.description : ''}
+            value={description || ''}
             label="Description"
             validations={['required']}
           />
           <Select
+            required
             name="category"
             label="Category"
-            validations={['required']}
             value={this.state.category_id}
             onChange={val => this.onSelectChange('category_id', val)}
             options={this.props.categories.enablings.map(cat => ({ value: cat.id, label: cat.name }))}
@@ -166,7 +168,7 @@ class EditBmePage extends React.Component {
             name="bme_ids"
             label="Affected business model elements"
             multi
-            validations={['required']}
+            required
             value={this.state.bme_ids}
             onChange={val => this.onSelectChange('bme_ids', val)}
             options={this.props.bmes.list.map(bme => ({ value: bme.id, label: bme.name }))}

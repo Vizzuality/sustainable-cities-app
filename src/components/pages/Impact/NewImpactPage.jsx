@@ -109,7 +109,7 @@ class NewImpactPage extends React.Component {
 
     if (parent) {
       parentCategory = this.props.impactCategories.find(cat => cat.id === this.state.categories.parent);
-      childrenOptions = parentCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
+      childrenOptions = (parentCategory.children || []).map(cat => ({ value: cat.id, label: cat.name }));
     }
 
     return (
@@ -134,6 +134,7 @@ class NewImpactPage extends React.Component {
             </div>
             <div className="small-6 columns">
               <Select
+                required
                 name="categories"
                 value={this.state.categories.parent}
                 onChange={val => this.onCategoryChange('parent', val)}
@@ -143,6 +144,7 @@ class NewImpactPage extends React.Component {
             </div>
             <div className="small-6 columns">
               <Select
+                required
                 name="categories"
                 value={this.state.categories.children}
                 onChange={val => this.onCategoryChange('children', val)}

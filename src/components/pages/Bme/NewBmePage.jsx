@@ -322,6 +322,7 @@ class NewBmePage extends React.Component {
           <div className="row expanded">
             <div className="small-4 columns">
               <Select
+                required
                 name="categories"
                 value={this.state.categories.bme.parent}
                 onChange={val => this.onCategoryChange('bme', 'parent', val)}
@@ -331,6 +332,7 @@ class NewBmePage extends React.Component {
             </div>
             <div className="small-4 columns">
               <Select
+                required
                 name="categories"
                 value={this.state.categories.bme.children}
                 onChange={val => this.onCategoryChange('bme', 'children', val)}
@@ -340,6 +342,7 @@ class NewBmePage extends React.Component {
             </div>
             <div className="small-4 columns">
               <Select
+                required
                 name="categories"
                 value={this.state.categories.bme.nephew}
                 onChange={val => this.onCategoryChange('bme', 'nephew', val)}
@@ -351,6 +354,7 @@ class NewBmePage extends React.Component {
           {/* Enabling conditions */}
           <Select
             multi
+            required
             name="enablings"
             value={this.state.enablings}
             onChange={val => this.onSelectChange('enablings', val)}
@@ -362,6 +366,7 @@ class NewBmePage extends React.Component {
           <Select
             multi
             name="timing"
+            required
             value={this.state.timing}
             onChange={val => this.onSelectChange('timing', val)}
             label="Timing"

@@ -7,11 +7,9 @@ module.exports = merge(sharedConfig, {
 
   output: { filename: '[name]-[hash].js' },
 
-  module: {
-    rules: []
-  },
-
   plugins: [
+    new webpack.optimize.UglifyJsPlugin(),
+    new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.LoaderOptionsPlugin({
       minimize: true,
       debug: false

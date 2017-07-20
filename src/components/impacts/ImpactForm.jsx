@@ -17,11 +17,11 @@ class ImpactForm extends React.Component {
     this.state = {
       categories: {},
       // used to add new sources
-      external_sources_index: []
+      external_sources_ids: []
     };
 
     // used to remove sources already added in the database
-    this.external_sources_id = [];
+    this.remove_ids = [];
   }
 
   /* lifecycle */
@@ -32,19 +32,24 @@ class ImpactForm extends React.Component {
     // for editing...
     if (sources && Object.keys(values).length) {
       this.setState({
-        external_sources_index: values.external_sources_index.map(sourceId => sourceId)
+        external_sources_ids: values.external_sources_ids
       });
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.values && nextProps.values) {
-      const { category_parent_id, category_id } = nextProps.values;
+
+    if (nextProps.impactCategories.length) {
+      let parent = null;
+      nextProps.impactCategories.forEach(parentCategory => {
+        const exists = parentCategory.children.find(child => child.id === this.props.values.category_id);
+        if (exists) parent = parentCategory.id;
+      });
 
       this.setState({
         categories: {
-          parent: category_parent_id,
-          children: category_id
+          parent,
+          children: this.props.values.category_id
         }
       });
     }
@@ -54,17 +59,18 @@ class ImpactForm extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
     const { parent, children } = this.state.categories;
-    const { external_sources_index } = this.state;
+    const { external_sources_ids } = this.state;
     const data = { ...this.form };
 
     if (children) data.category_id = children;
     if (parent) data.category_parent_id = parent;
 
-    data.external_sources_index = external_sources_index; // eslint-disable-line camelcase
+    // links sources ids to impact
+    data.external_sources_ids = external_sources_ids;
 
     // add ids to remove
-    if (this.external_sources_id.length) {
-      data.remove_external_sources = this.external_sources_id;
+    if (this.remove_ids.length) {
+      data.remove_external_sources = this.remove_ids;
     }
 
     if (this.props.onSubmit) {
@@ -87,7 +93,14 @@ class ImpactForm extends React.Component {
     }
 
     // gets the sources id removed
-    this.external_sources_id = difference(this.state.external_sources_index, val);
+    this.sourceIndexes = [];
+    this.remove_ids = difference(this.state.external_sources_ids, val);
+    val.forEach(v => {
+      const source = this.props.sources.find(s => s.id === v);
+      if(source) {
+        this.sourceIndexes.push(source.index);
+      }
+    });
 
     this.setState({
       [field]: val
@@ -130,7 +143,7 @@ class ImpactForm extends React.Component {
   render() {
     const { values, text } = this.props;
     const { name, impact_value, impact_unit } = values;
-    const { external_sources_index, categories } = this.state;
+    const { external_sources_ids, categories } = this.state;
     const { parent, children } = categories;
 
     let childrenOptions = [];
@@ -150,7 +163,7 @@ class ImpactForm extends React.Component {
               <Input
                 id="name"
                 label="Name"
-                defaultValue={name}
+                value={name || ''}
                 type="text"
                 name="name"
                 validations={['required']}
@@ -158,18 +171,21 @@ class ImpactForm extends React.Component {
               />
             </div>
             {/* Sources */}
-            <div className="column small-12">
-              <Select
-                multi
-                name="sources"
-                value={external_sources_index} // eslint-disable-line camelcase
-                onChange={val => this.onSelectChange('external_sources_index', val)}
-                label="Sources"
-                options={this.props.sources.map((source, index) => ({ value: source.id || index, label: source.name }))}
-              />
-            </div>
+            {this.props.showSources &&
+              <div className="column small-12">
+                <Select
+                  multi
+                  required
+                  name="sources"
+                  value={external_sources_ids}
+                  onChange={val => this.onSelectChange('external_sources_ids', val)}
+                  label="Sources"
+                  options={this.props.sources.map((source, index) => ({ value: source.id || index, label: source.name }))}
+                />
+              </div>}
             <div className="small-6 columns">
               <Select
+                required
                 name="categories"
                 value={parent}
                 onChange={val => this.onCategoryChange('parent', val)}
@@ -179,6 +195,7 @@ class ImpactForm extends React.Component {
             </div>
             <div className="small-6 columns">
               <Select
+                required
                 name="categories"
                 value={children}
                 onChange={val => this.onCategoryChange('children', val)}
@@ -190,9 +207,9 @@ class ImpactForm extends React.Component {
               <Input
                 type="text"
                 label="Value"
-                defaultValue={impact_value} // eslint-disable-line camelcase
+                value={impact_value || ''} // eslint-disable-line camelcase
                 name="impact_value"
-                validations={[]}
+                validations={['required']}
                 onChange={this.onInputChange}
               />
             </div>
@@ -200,9 +217,9 @@ class ImpactForm extends React.Component {
               <Input
                 type="text"
                 label="Unit"
-                defaultValue={impact_unit} // eslint-disable-line camelcase
+                value={impact_unit || ''} // eslint-disable-line camelcase
                 name="impact_unit"
-                validations={[]}
+                validations={['required']}
                 onChange={this.onInputChange}
               />
             </div>
@@ -219,12 +236,14 @@ ImpactForm.propTypes = {
   sources: PropTypes.array,
   values: PropTypes.object,
   text: PropTypes.string,
-  onSubmit: PropTypes.func
+  onSubmit: PropTypes.func,
+  showSources: PropTypes.bool
 };
 
 ImpactForm.defaultProps = {
   values: {},
-  sources: []
+  sources: [],
+  showSources: true
 };
 
 const mapStateToProps = ({ categories }) => ({

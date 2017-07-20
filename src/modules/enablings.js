@@ -159,7 +159,8 @@ function getEnablings(paramsConfig = {}) {
         }
 
         parsedData = deserialize(parsedData);
-        const parsedIncluded = included.map(incl => deserialize([incl])[0]);
+
+        const parsedIncluded = included ? included.map(incl => deserialize([incl])[0]) : [];
 
         dispatch(setEnablingsLoading(false));
         dispatch(setEnablings({

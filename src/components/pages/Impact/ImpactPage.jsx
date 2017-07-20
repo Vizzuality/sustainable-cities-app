@@ -10,7 +10,7 @@ import { Autobind } from 'es-decorators';
 import { getImpacts, deleteImpact, setFilters, setImpactSearch } from 'modules/impacts';
 import { getCategories } from 'modules/categories';
 import { toggleModal } from 'modules/modal';
-import { getIdRelations } from 'utils/relation';
+import { joinWithCategories } from 'utils/relation';
 
 import Confirm from 'components/confirm/Confirm';
 import Spinner from 'components/ui/Spinner';
@@ -40,17 +40,6 @@ class ImpactPage extends React.Component {
         search: nextProps.impacts.search
       }));
     }
-  }
-
-  setCategory() {
-    return this.props.impacts.list.map((imp) => {
-      if (!imp.relationships.category.data) return {};
-      const category = getIdRelations([imp.relationships.category.data], this.props.impactCategories, 'categories');
-      return {
-        ...imp,
-        ...{ category: category[0] ? category[0].name : '-' }
-      };
-    });
   }
 
   deleteImpact(impact) {
@@ -84,7 +73,10 @@ class ImpactPage extends React.Component {
     let impacts = [];
 
     if (this.props.impacts.list.length && this.props.impactCategories && this.props.impactCategories.length) {
-      impacts = this.setCategory();
+      impacts = joinWithCategories(
+        this.props.impacts.list,
+        this.props.impactCategories
+      );
     }
 
     return (

@@ -475,6 +475,7 @@ class EditBmePage extends React.Component {
             <div className="small-4 columns">
               { /* Parent Category */}
               <Select
+                required
                 name="categories"
                 value={this.state.categories.bme.parent}
                 onChange={val => this.onCategoryChange('bme', 'parent', val)}
@@ -485,6 +486,7 @@ class EditBmePage extends React.Component {
             { /* Children Category */}
             <div className="small-4 columns">
               <Select
+                required
                 name="categories"
                 value={this.state.categories.bme.children}
                 onChange={val => this.onCategoryChange('bme', 'children', val)}
@@ -495,6 +497,7 @@ class EditBmePage extends React.Component {
             <div className="small-4 columns">
               { /* Nephew Category */}
               <Select
+                required
                 name="categories"
                 value={this.state.categories.bme.nephew}
                 onChange={val => this.onCategoryChange('bme', 'nephew', val)}
@@ -506,6 +509,7 @@ class EditBmePage extends React.Component {
           {/* enabling conditions */}
           <Select
             multi
+            required
             name="enablings"
             value={this.state.enablings}
             onChange={val => this.onSelectChange('enablings', val)}
@@ -516,6 +520,7 @@ class EditBmePage extends React.Component {
           {/* timing */}
           <Select
             multi
+            required
             name="timing"
             value={this.state.timing}
             onChange={val => this.onSelectChange('timing', val)}

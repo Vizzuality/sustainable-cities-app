@@ -16,6 +16,19 @@
     transition: all $animation-time linear;
     height: 170px;
     background-color: palette(gray, light);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
     margin-bottom: $space-1;
+  }
+}
+
+.c-sc-edit,
+.c-sc-new {
+  .add.button {
+    margin-top: 10px;
+  }
+  .delete.button {
+    margin-left: 10px;
   }
 }
