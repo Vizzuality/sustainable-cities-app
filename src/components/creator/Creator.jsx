@@ -3,7 +3,7 @@ import CreatorItem from 'components/creator/CreatorItem';
 import PropTypes from 'prop-types';
 
 export default function Creator(props) {
-  const { title, items, onAdd, onEdit, onDelete, options, selectedField } = props;
+  const { title, items, onAdd, onDelete, options, selectedField } = props;
 
   return (
     <section className="c-creator">
@@ -14,25 +14,28 @@ export default function Creator(props) {
         <div className="column small-2">Featured</div>
       </div>
       {/* One CreatorItem per item filled with its data */}
-      {items.map((item, i) => {
+      {items.map((item) => {
         return (
           <CreatorItem
-            key={i}
+            key={item.index}
             deleteable
-            index={i}
-            onEdit={onEdit}
+            index={item.index}
             onDelete={onDelete}
+            onSubmit={onAdd}
             options={options}
             hidden={!!item._destroy} // eslint-disable-line no-underscore-dangle
             selected={item[selectedField]}
-            description={item.description}
-            is_featured={item.is_featured}
+            values={{
+              is_featured: item.is_featured,
+              description: item.description,
+              category_id: item.category_id
+            }}
             selectedField={selectedField}
           />
         );
       })}
       {/* CreatorItem for adding new items */}
-      <CreatorItem options={options} onAdd={(...args) => onAdd(...args)} selectedField={selectedField} />
+      <CreatorItem adder options={options} values={{}} onSubmit={onAdd} selectedField={selectedField} />
     </section>
   );
 }
@@ -40,8 +43,7 @@ export default function Creator(props) {
 Creator.propTypes = {
   title: PropTypes.string,
   items: PropTypes.array,
-  onAdd: PropTypes.func,
-  onEdit: PropTypes.func,
+  onAdd: PropTypes.func.isRequired,
   onDelete: PropTypes.func,
   options: PropTypes.array,
   selectedField: PropTypes.string

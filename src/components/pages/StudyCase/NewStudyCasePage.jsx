@@ -19,7 +19,6 @@ import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
 import { toggleModal } from 'modules/modal';
 
-import debounce from 'lodash/debounce';
 import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/study-case';
 
 /* Utils */
@@ -49,8 +48,6 @@ class NewStudyCasePage extends React.Component {
     this.form = {
       project_type: 'StudyCase'
     };
-
-    this.editProjectBme = debounce(this.editProjectBme, 300);
   }
 
   /* Lifecycle */
@@ -67,6 +64,7 @@ class NewStudyCasePage extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
     const {
+      bmes,
       city,
       photos_attributes,
       documents_attributes,
@@ -94,8 +92,8 @@ class NewStudyCasePage extends React.Component {
         photos_attributes,
         documents_attributes,
         impacts_attributes,
-        project_bmes_attributes: this.state.bmes.map(bme => ({
-          bme_id: bme.id,
+        project_bmes_attributes: bmes.map(bme => ({
+          bme_id: bme.category_id,
           description: bme.description,
           is_featured: bme.is_featured
         })),
@@ -119,9 +117,11 @@ class NewStudyCasePage extends React.Component {
   onImageDrop(acceptedImgs, rejectedImgs) {
     const parsedPhotos = [];
 
-    rejectedImgs.forEach(file => toastr.error(`The image "${file.name}" hast not a valid extension or is larger than 1MB`));
+    rejectedImgs.forEach(file =>
+      toastr.error(`The image "${file.name}" hast not a valid extension or is larger than 1MB`)
+    );
 
-    if(this.state.photos_attributes.length >= MAX_IMAGES_ACCEPTED) {
+    if (this.state.photos_attributes.length >= MAX_IMAGES_ACCEPTED) {
       toastr.warning('Max number of images reached!');
       return;
     }
@@ -287,21 +287,25 @@ class NewStudyCasePage extends React.Component {
 
   /* ProjectBmes methods */
   @Autobind
-  addProjectBme(bme) {
-    const bmes = [
-      ...this.state.bmes,
-      bme
-    ];
+  addProjectBme(bme, index) {
+    let bmes;
 
-    this.setState({ bmes });
-  }
+    if (!index) {
+      bmes = [
+        ...this.state.bmes,
+        { ...bme,
+          index: this.state.bmes.length
+        }
+      ];
+    // edits
+    } else {
+      bmes = this.state.bmes.slice();
+      bmes[index] = {
+        ...bmes[index],
+        ...bme
+      };
+    }
 
-  editProjectBme(data, index) {
-    const bmes = this.state.bmes.slice();
-    bmes[index] = {
-      ...bmes[index],
-      ...data
-    };
     this.setState({ bmes });
   }
 

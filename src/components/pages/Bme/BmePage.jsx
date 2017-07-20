@@ -44,7 +44,7 @@ class BmePage extends React.Component {
 
   setCategory() {
     return this.props.bmes.list.map((bme) => {
-      if (!bme.categories.length) return { bme };
+      if (!bme.categories.length) return bme;
       const category = bme.categories.find(cat => cat.category_type === 'Bme');
       return {
         ...bme,

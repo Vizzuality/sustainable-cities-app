@@ -26,9 +26,7 @@ import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/ta
 class CategoryPage extends React.Component {
 
   componentWillMount() {
-    if (!this.props.categoryEntities.length) {
-      dispatch(getCategories({ type: 'all' }));
-    }
+    dispatch(getCategories({ type: 'all' }));
   }
 
   componentWillReceiveProps(nextProps) {

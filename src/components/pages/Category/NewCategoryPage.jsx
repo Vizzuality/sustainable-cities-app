@@ -93,7 +93,7 @@ class NewCategoryPage extends React.Component {
             name="label"
             value=""
             label="Question"
-            validations={['required']}
+            validations={[]}
           />}
         {/* description */}
         <Textarea

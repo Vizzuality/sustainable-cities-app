@@ -354,7 +354,6 @@ class NewBmePage extends React.Component {
           {/* Enabling conditions */}
           <Select
             multi
-            required
             name="enablings"
             value={this.state.enablings}
             onChange={val => this.onSelectChange('enablings', val)}
@@ -366,7 +365,6 @@ class NewBmePage extends React.Component {
           <Select
             multi
             name="timing"
-            required
             value={this.state.timing}
             onChange={val => this.onSelectChange('timing', val)}
             label="Timing"

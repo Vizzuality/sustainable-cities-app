@@ -20,7 +20,7 @@ import Creator from 'components/creator/Creator';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
 
-import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/study-case';
+import { MAX_SIZE_IMAGE } from 'constants/study-case';
 
 /* Utils */
 function toBase64(file, cb) {
@@ -55,10 +55,7 @@ class EditStudyCasePage extends React.Component {
   componentWillMount() {
     dispatch(getStudyCases({ id: this.props.studyCases.detailId }));
     dispatch(getCategories({ type: 'solution' }));
-    dispatch(getBmes({
-      pageSize: 9999,
-      pageNumber: 1
-    }));
+    dispatch(getBmes({ pageSize: 9999, pageNumber: 1 }));
   }
 
   /* Component lifecycle */
@@ -66,7 +63,6 @@ class EditStudyCasePage extends React.Component {
     // Includes arrived! So, we can populate sub-entities
     if ((!this.props.studyCases.included || !this.props.studyCases.included.length)
       && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
-
       this.setState({
         city: nextProps.studyCases.included
           .filter(sc => sc.type === 'cities')
@@ -74,11 +70,12 @@ class EditStudyCasePage extends React.Component {
         project_bmes_attributes: nextProps.studyCases.included
           .filter(sc => sc.type === 'project_bmes')
           .filter(pBme => !!pBme.relationships.bme.data)
-          .map(pBme => ({
+          .map((pBme, index) => ({
             id: pBme.id,
-            bme_id: pBme.relationships.bme.data.id,
+            category_id: pBme.relationships.bme.data.id,
             description: pBme.description,
-            is_featured: pBme.is_featured
+            is_featured: pBme.is_featured,
+            index
           })),
         impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
         external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources'),
@@ -95,7 +92,11 @@ class EditStudyCasePage extends React.Component {
         category_id,
         solution,
         situation,
-        operational_year: operational_year ? new Date(operational_year).getFullYear() : undefined
+        operational_year: (
+          operational_year // eslint-disable-line camelcase
+          ? new Date(operational_year).getFullYear()
+          : undefined
+        )
       });
     }
   }
@@ -126,165 +127,109 @@ class EditStudyCasePage extends React.Component {
     dispatch(toggleModal(false));
   }
 
-  /* Methods */
   @Autobind
-  submit(evt) {
-    evt.preventDefault();
+  onImageDrop(acceptedImgs, rejectedImgs) {
+    rejectedImgs.forEach(file =>
+      toastr.error(`The image "${file.name}" hast not a valid extension or is larger than 1MB`)
+    );
 
-    const {
-      city,
-      category_id,
-      impacts_attributes,
-      project_bmes_attributes,
-      external_sources_attributes,
-      operational_year,
-      photos_attributes
-    } = this.state;
+    acceptedImgs.forEach((file) => {
+      toBase64(file, (parsedFile) => {
+        // there is already a picture in the database
+        const exists = !!this.state.photos_attributes[0];
+        let photoParams = {
+          name: file.name,
+          attachment: parsedFile
+        };
 
-    if (impacts_attributes) {
-      // TODO this is confusing and hard to track. I'm not sure if this mutation
-      // is needed for other parts of the code when setState kicks in.
-      // eslint-disable-next-line no-param-reassign
-      impacts_attributes.forEach((o => delete o.relationships));
-    }
+        if (exists) {
+          photoParams = {
+            ...photoParams,
+            id: this.state.photos_attributes[0].id
+          };
+        } else {
+          photoParams = {
+            ...photoParams,
+            is_active: true
+          };
+        }
 
-    dispatch(updateStudyCase({
-      id: this.props.studyCaseDetail.id,
-      data: {
-        ...this.form,
-        city_ids: [city.value],
-        category_id,
-        // eslint-disable-next-line no-underscore-dangle
-        impacts_attributes,
-        // eslint-disable-next-line no-underscore-dangle
-        project_bmes_attributes: project_bmes_attributes.filter(pbme => !pbme.id || pbme.edited || pbme._destroy),
-        // eslint-disable-next-line no-underscore-dangle
-        external_sources_attributes,
-        operational_year: new Date(this.form.operational_year || operational_year, 0, 2),
-        photos_attributes
-      },
-      onSuccess: () => {
-        toastr.success('The study case has been edited');
-        // updates detail after editing
-        dispatch(getStudyCases({ id: this.props.studyCases.detailId }));
-      }
-    }));
+        /* eslint-enable camelcase */
+        this.setState({ photos_attributes: [photoParams] });
+      });
+    });
   }
 
   @Autobind
-  showDeleteModal() {
-    const confirm = <Confirm text={'This study case will be deleted. Are you sure?'} onAccept={() => this.delete()} />;
-    dispatch(toggleModal(true, confirm));
-  }
-
-  delete() {
-    const { id } = this.props.studyCaseDetail;
-    dispatch(deleteStudyCase({
-      id,
-      onSuccess() {
-        toastr.success('The study case has been deleted');
-        dispatch(push('/study-cases'));
-      }
-    }));
-  }
-
-  /* Impact methods */
-  @Autobind
-  showImpactForm(evt, opts = {}) {
-    evt.preventDefault();
-    const action = opts.edit ? this.onImpactEdit : this.onImpactCreate;
-    let values = {};
-    const { external_sources_attributes } = this.state;
-
-    if (opts.edit) {
-      values = this.state.impacts_attributes[opts.index];
-
-      if (values.external_sources_ids) {
-        values.external_sources_ids = values.external_sources_ids || [];
-      } else {
-        values.external_sources_ids = values.relationships.external_sources ?
-          values.relationships.external_sources.data.map(source => source.id) : [];
-      }
-    }
-
-    if (Object.keys(values).length) {
-      // assigns children category id to values
-      values.category_id = values.category_id ? values.category_id : values.relationships && values.relationships.category ?
-        values.relationships.category.data.id : null;
-    }
-
-    dispatch(toggleModal(
-      true,
-      <ImpactForm
-        text="Add"
-        values={values}
-        sources={external_sources_attributes.filter(s => !s._destroy && s.id).map((source, i) => ({ index: i, id: source.id, name: source.name }))}
-        onSubmit={(...args) => action(...args, opts.index)}
-      />
-    ));
+  onDeleteImage() {
+    this.setState({
+      photos_attributes: [{
+        id: this.state.photos_attributes[0].id,
+        _destroy: true
+      }]
+    });
   }
 
   @Autobind
-  deleteImpact(index) {
-    const impacts = this.props.studyCases.included.filter(sc => sc.type === 'impacts');
-    const impactToDelete = this.state.impacts_attributes[index];
+  deleteProjectBme(index) {
+    // eslint-disable-next-line camelcase
+    const project_bmes_attributes = this.state.project_bmes_attributes.slice();
+    const bmeToDelete = project_bmes_attributes[index];
 
-    const exists = impacts.find(i => i.id === impactToDelete.id);
-    const { impacts_attributes } = this.state;
-
-    if (!exists) {
-      // Impact still doesn't exist on database,
+    if (!bmeToDelete.id) {
+      // Bme still doesn't exist on database,
       // just remove it from local array
-      impacts_attributes.splice(index, 1);
+      project_bmes_attributes.splice(index, 1);
     } else {
-      // Impact exists on database,
-      // we have to delete it from there
-      impacts_attributes[index] = {
-        id: impactToDelete.id,
+      // Bme exists on database,
+      // we have to delete it from there using rails way (_destroy: true)
+      project_bmes_attributes[index] = {
+        id: bmeToDelete.id,
         _destroy: true
       };
     }
 
-    this.setState({ impacts_attributes });
+    this.setState({ project_bmes_attributes });
   }
 
-  /* External sources methods */
   @Autobind
-  showSourceForm(evt, opts = {}) {
-    evt.preventDefault();
-    let values = {};
-    let action = this.createSource;
+  editProjectBme(data, index) {
+    // eslint-disable-next-line camelcase
+    const project_bmes_attributes = this.state.project_bmes_attributes.slice();
+    project_bmes_attributes[index] = {
+      ...project_bmes_attributes[index],
+      ...data
+    };
 
-    if (opts.edit) {
-      values = this.state.external_sources_attributes[opts.index];
-      action = this.editSource;
+    if (project_bmes_attributes[index].id) {
+      project_bmes_attributes[index].edited = true;
     }
 
-    dispatch(toggleModal(
-      true,
-      <SourceForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />
-    ));
+    this.setState({ project_bmes_attributes });
   }
 
   @Autobind
-  createSource(data) {
-    this.setState({
-      external_sources_attributes: [...this.state.external_sources_attributes, data]
-    });
-    dispatch(toggleModal(false));
-  }
+  addProjectBme(bme, index) {
+    let bmes;
 
-  @Autobind
-  editSource(data, index) {
-    // eslint-disable-next-line camelcase
-    const external_sources_attributes = this.state.external_sources_attributes.slice();
-    external_sources_attributes[index] = {
-      ...external_sources_attributes[index],
-      ...data,
-      edited: true
-    };
-    this.setState({ external_sources_attributes });
-    dispatch(toggleModal(false));
+    if (!index && index !== 0) {
+      bmes = [
+        ...this.state.project_bmes_attributes,
+        { ...bme,
+          index: this.state.project_bmes_attributes.length
+        }
+      ];
+    // edits
+    } else {
+      bmes = this.state.project_bmes_attributes.slice();
+      bmes[index] = {
+        ...bmes[index],
+        ...bme,
+        edited: true
+      };
+    }
+
+    this.setState({ project_bmes_attributes: bmes });
   }
 
   @Autobind
@@ -313,104 +258,179 @@ class EditStudyCasePage extends React.Component {
     this.setState({ external_sources_attributes });
   }
 
-  /* Project bmes methods */
   @Autobind
-  addProjectBme(pbme) {
+  editSource(data, index) {
     // eslint-disable-next-line camelcase
-    const project_bmes_attributes = [
-      ...this.state.project_bmes_attributes,
-      pbme
-    ];
-    this.setState({ project_bmes_attributes });
+    const external_sources_attributes = this.state.external_sources_attributes.slice();
+    external_sources_attributes[index] = {
+      ...external_sources_attributes[index],
+      ...data,
+      edited: true
+    };
+    this.setState({ external_sources_attributes });
+    dispatch(toggleModal(false));
   }
 
   @Autobind
-  editProjectBme(data, index) {
-    // eslint-disable-next-line camelcase
-    const project_bmes_attributes = this.state.project_bmes_attributes.slice();
-    project_bmes_attributes[index] = {
-      ...project_bmes_attributes[index],
-      ...data
-    };
+  createSource(data) {
+    this.setState({
+      external_sources_attributes: [...this.state.external_sources_attributes, data]
+    });
+    dispatch(toggleModal(false));
+  }
 
-    if (project_bmes_attributes[index].id) {
-      project_bmes_attributes[index].edited = true;
+  @Autobind
+  showSourceForm(evt, opts = {}) {
+    evt.preventDefault();
+    let values = {};
+    let action = this.createSource;
+
+    if (opts.edit) {
+      values = this.state.external_sources_attributes[opts.index];
+      action = this.editSource;
     }
 
-    this.setState({ project_bmes_attributes });
+    dispatch(toggleModal(
+      true,
+      <SourceForm text="Add" values={values} onSubmit={(...args) => action(...args, opts.index)} />
+    ));
   }
 
   @Autobind
-  deleteProjectBme(index) {
-    // eslint-disable-next-line camelcase
-    const project_bmes_attributes = this.state.project_bmes_attributes.slice();
-    const bmeToDelete = project_bmes_attributes[index];
+  deleteImpact(index) {
+    const impacts = this.props.studyCases.included.filter(sc => sc.type === 'impacts');
+    const impactToDelete = this.state.impacts_attributes[index];
 
-    if (!bmeToDelete.id) {
-      // Bme still doesn't exist on database,
+    const exists = impacts.find(i => i.id === impactToDelete.id);
+    const { impacts_attributes } = this.state;
+
+    if (!exists) {
+      // Impact still doesn't exist on database,
       // just remove it from local array
-      project_bmes_attributes.splice(index, 1);
+      impacts_attributes.splice(index, 1);
     } else {
-      // Bme exists on database,
-      // we have to delete it from there using rails way (_destroy: true)
-      project_bmes_attributes[index] = {
-        id: bmeToDelete.id,
+      // Impact exists on database,
+      // we have to delete it from there
+      impacts_attributes[index] = {
+        id: impactToDelete.id,
         _destroy: true
       };
     }
 
-    this.setState({ project_bmes_attributes });
+    this.setState({ impacts_attributes });
   }
 
   @Autobind
-  onImageDrop(acceptedImgs, rejectedImgs) {
-    const parsedPhotos = [];
+  showImpactForm(evt, opts = {}) {
+    evt.preventDefault();
+    const action = opts.edit ? this.onImpactEdit : this.onImpactCreate;
+    let values = {};
+    const { external_sources_attributes } = this.state;
 
-    rejectedImgs.forEach(file => toastr.error(`The image "${file.name}" hast not a valid extension or is larger than 1MB`));
+    if (opts.edit) {
+      values = this.state.impacts_attributes[opts.index];
 
-    acceptedImgs.forEach((file, i) => {
-      toBase64(file, (parsedFile) => {
-        // there is already a picture in the database
-        const exists = !!this.state.photos_attributes[0];
-        let photoParams = {
-          name: file.name,
-          attachment: parsedFile
-        };
+      if (values.external_sources_ids) {
+        values.external_sources_ids = values.external_sources_ids || [];
+      } else {
+        values.external_sources_ids = values.relationships.external_sources ?
+          values.relationships.external_sources.data.map(source => source.id) : [];
+      }
+    }
 
-        if(exists) {
-          photoParams = {
-            ...photoParams,
-            id: this.state.photos_attributes[0].id
-          }
-        } else {
-          photoParams = {
-            ...photoParams,
-            is_active: true
-          };
+    if (Object.keys(values).length) {
+      // assigns children category id to values
+      values.category_id =
+        values.category_id
+        || (values.relationships && values.relationships.category && values.relationships.category.data.id);
+    }
+
+    dispatch(toggleModal(
+      true,
+      <ImpactForm
+        text="Add"
+        values={values}
+        sources={
+          external_sources_attributes
+            .filter(s => !s._destroy && s.id) // eslint-disable-line no-underscore-dangle
+            .map((source, i) => ({ index: i, id: source.id, name: source.name }))
         }
+        onSubmit={(...args) => action(...args, opts.index)}
+      />
+    ));
+  }
 
-        /* eslint-enable camelcase */
-        let photos_attributes = [photoParams];
-
-        /* eslint-enable camelcase */
-        this.setState({ photos_attributes });
-      });
-    });
+  delete() {
+    const { id } = this.props.studyCaseDetail;
+    dispatch(deleteStudyCase({
+      id,
+      onSuccess() {
+        toastr.success('The study case has been deleted');
+        dispatch(push('/study-cases'));
+      }
+    }));
   }
 
   @Autobind
-  onDeleteImage() {
-    this.setState({
-      photos_attributes: [{
-        id: this.state.photos_attributes[0].id,
-        _destroy: true
-      }]
-    });
+  showDeleteModal() {
+    const confirm = <Confirm text={'This study case will be deleted. Are you sure?'} onAccept={() => this.delete()} />;
+    dispatch(toggleModal(true, confirm));
+  }
+
+  @Autobind
+  submit(evt) {
+    evt.preventDefault();
+
+    const {
+      city,
+      category_id,
+      impacts_attributes,
+      project_bmes_attributes,
+      external_sources_attributes,
+      operational_year,
+      photos_attributes
+    } = this.state;
+
+    // eslint-disable-next-line camelcase
+    if (impacts_attributes) {
+      // TODO this is confusing and hard to track. I'm not sure if this mutation
+      // is needed for other parts of the code when setState kicks in.
+      // eslint-disable-next-line no-param-reassign
+      impacts_attributes.forEach((o => delete o.relationships));
+    }
+
+    dispatch(updateStudyCase({
+      id: this.props.studyCaseDetail.id,
+      data: {
+        ...this.form,
+        city_ids: city && city.value ? [city.value] : [],
+        category_id,
+        // eslint-disable-next-line no-underscore-dangle
+        impacts_attributes,
+        // eslint-disable-next-line no-underscore-dangle
+        project_bmes_attributes: project_bmes_attributes // eslint-disable-next-line no-underscore-dangle
+          .filter(pbme => !pbme.id || pbme.edited || pbme._destroy)
+          .map(bme => ({
+            ...bme,
+            bme_id: bme.category_id
+          })),
+        // eslint-disable-next-line no-underscore-dangle
+        external_sources_attributes,
+        operational_year: new Date(this.form.operational_year
+          || operational_year, 0, 2), // eslint-disable-line camelcase
+        photos_attributes
+      },
+      onSuccess: () => {
+        toastr.success('The study case has been edited');
+        // updates detail after editing
+        dispatch(getStudyCases({ id: this.props.studyCases.detailId }));
+      }
+    }));
   }
 
   render() {
     // Study case initial values
-    const { name, city, tagline, operational_year, solution, situation, photos_attributes } = this.state || {};
+    const { name, city, tagline, operational_year, solution, situation } = this.state || {};
 
     return (
       <div className="c-sc-edit">
@@ -445,14 +465,14 @@ class EditStudyCasePage extends React.Component {
                 name="city_ids"
                 label="City"
                 value={city}
-                onChange={city => this.setState({ city })}
+                onChange={c => this.setState({ city: c })}
               />
             </div>
             <div className="column small-6">
               {/* Year */}
               <Input
                 type="number"
-                value={operational_year || ''}
+                value={operational_year || ''}  // eslint-disable-line camelcase
                 name="operational_year"
                 onChange={this.onInputChange}
                 label="Year"
@@ -469,10 +489,16 @@ class EditStudyCasePage extends React.Component {
             onChange={item => this.setState({ category_id: item.value })}
             options={this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }))}
           />
-          <Textarea name="solution" value={solution} label="Solution" validations={[]} onChange={this.onInputChange} />
+          <Textarea
+            name="solution"
+            value={solution !== null ? solution : ''}
+            label="Solution"
+            validations={[]}
+            onChange={this.onInputChange}
+          />
           <Textarea
             name="situation"
-            value={situation || ''}
+            value={situation !== null ? situation : ''}
             label="situation"
             validations={[]}
             onChange={this.onInputChange}
@@ -531,12 +557,16 @@ class EditStudyCasePage extends React.Component {
               <DropZone
                 title="Images"
                 accept={'image/png, image/jpg, image/jpeg'}
-                files={this.state.photos_attributes.filter(p => !p._destroy).map(photo => ({
-                  id: photo.id,
-                  name: photo.name,
-                  attachment: photo.attachment.url ?
-                    `${config['API_URL']}${photo.attachment.url}` : photo.attachment
-                }))}
+                files={
+                  this.state.photos_attributes
+                    .filter(p => !p._destroy) // eslint-disable-line no-underscore-dangle
+                    .map(photo => ({
+                      id: photo.id,
+                      name: photo.name,
+                      attachment: photo.attachment.url ?
+                        `${config.API_URL}${photo.attachment.url}` : photo.attachment
+                    }))
+                }
                 onDrop={this.onImageDrop}
                 onDelete={this.onDeleteImage}
                 withImage
