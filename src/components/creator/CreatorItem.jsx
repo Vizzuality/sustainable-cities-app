@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Autobind } from 'es-decorators';
+import { toastr } from 'react-redux-toastr';
 import isEqual from 'lodash/isEqual';
 
 // components
@@ -45,6 +46,10 @@ export default class CreatorItem extends React.Component {
   @Autobind
   onSubmit() {
     this.props.onSubmit(this.state, this.props.index);
+
+    if (!this.props.adder) {
+      toastr.success('BME added/edited successfully');
+    }
 
     if (this.props.adder) {
       // resets values
