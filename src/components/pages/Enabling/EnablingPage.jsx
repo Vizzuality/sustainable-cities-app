@@ -12,6 +12,8 @@ import Spinner from 'components/ui/Spinner';
 import Table from 'components/ui/Table';
 import Search from 'components/search/Search';
 import { Autobind } from 'es-decorators';
+import { joinWithCategories } from 'utils/relation';
+import { getCategories } from 'modules/categories';
 
 import { DEFAULT_SORT_FIELD, ENABLINGS_TABLE_FIELDS } from 'constants/enablings';
 import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
@@ -20,6 +22,7 @@ class EnablingPage extends React.Component {
 
   componentWillMount() {
     dispatch(getEnablings());
+    dispatch(getCategories({ type: 'enablings', pageSize: 9999, sort: 'name' }));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -67,12 +70,21 @@ class EnablingPage extends React.Component {
   }
 
   render() {
+    let enablings = [];
+
+    if (this.props.enablings.list.length && this.props.categories && this.props.categories.length) {
+      enablings = joinWithCategories(
+        this.props.enablings.list,
+        this.props.categories
+      );
+    }
+
     return (
       <div className="c-page">
         <Link className="button" to="/enabling-condition/new">New Enabling Condition</Link>
         <Search onChange={this.search} />
         <Table
-          items={this.props.enablings.list}
+          items={enablings}
           itemCount={this.props.enablings.itemCount}
           fields={ENABLINGS_TABLE_FIELDS}
           defaultSortField={DEFAULT_SORT_FIELD}
@@ -96,12 +108,14 @@ class EnablingPage extends React.Component {
 }
 
 EnablingPage.propTypes = {
-  enablings: PropTypes.object
+  enablings: PropTypes.object,
+  categories: PropTypes.array
 };
 
 // Map state to props
-const mapStateToProps = ({ enablings }) => ({
-  enablings
+const mapStateToProps = ({ enablings, categories }) => ({
+  enablings,
+  categories: categories.enablings
 });
 
 export default connect(mapStateToProps, null)(EnablingPage);
