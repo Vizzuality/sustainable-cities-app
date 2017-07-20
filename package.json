@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "build": "NODE_ENV=production webpack --config ./config/webpack/production.js --progress --colors -p",
-    "test": "eslint ./src --ext .js --ext .jsx",
+    "lint": "eslint ./src --ext .js --ext .jsx",
+    "test": "yarn run lint",
     "deploy-staging": "sh ./scripts/deploy-staging.sh",
     "deploy-production": "sh ./scripts/deploy-production.sh"
   },
