@@ -313,123 +313,125 @@ class NewStudyCasePage extends React.Component {
   /* Render */
   render() {
     return (
-      <Form onSubmit={this.onSubmit}>
-        {/* Submit buttons */}
-        <BtnGroup>
-          <Button className="button success" type="submit">Save</Button>
-          <Link className="button alert" to="/study-cases">Cancel</Link>
-        </BtnGroup>
-        {/* Name */}
-        <Input
-          type="text"
-          value=""
-          name="name"
-          onChange={this.onInputChange}
-          label="Study case title"
-          validations={['required']}
-        />
-        {/* Tagline */}
-        <Input
-          type="text"
-          value=""
-          name="tagline"
-          onChange={this.onInputChange}
-          label="Tagline"
-          validations={[]}
-        />
-        <Select
-          name="category_id"
-          clearable={false}
-          label="Category"
-          required
-          value={this.state.category_id}
-          onChange={item => this.setState({ category_id: item.value })}
-          options={this.props.categories.solution.map(cat => ({ value: cat.id, label: cat.name }))}
-        />
-        <div className="row expanded">
-          <div className="column small-6">
-            {/* City */}
-            <CitySearch
-              name="city"
-              label="City"
-              validations={['required']}
-              value={this.state.city}
-              onChange={city => this.setState({ city })}
-            />
+      <div className="c-sc-new">
+        <Form onSubmit={this.onSubmit}>
+          {/* Submit buttons */}
+          <BtnGroup>
+            <Button className="button success" type="submit">Save</Button>
+            <Link className="button alert" to="/study-cases">Cancel</Link>
+          </BtnGroup>
+          {/* Name */}
+          <Input
+            type="text"
+            value=""
+            name="name"
+            onChange={this.onInputChange}
+            label="Study case title"
+            validations={['required']}
+          />
+          {/* Tagline */}
+          <Input
+            type="text"
+            value=""
+            name="tagline"
+            onChange={this.onInputChange}
+            label="Tagline"
+            validations={[]}
+          />
+          <Select
+            name="category_id"
+            required
+            clearable={false}
+            label="Category"
+            value={this.state.category_id}
+            onChange={item => this.setState({ category_id: item.value })}
+            options={this.props.categories.solution.map(cat => ({ value: cat.id, label: cat.name }))}
+          />
+          <div className="row expanded">
+            <div className="column small-6">
+              {/* City */}
+              <CitySearch
+                name="city"
+                label="City"
+                validations={['required']}
+                value={this.state.city}
+                onChange={city => this.setState({ city })}
+              />
+            </div>
+            <div className="column small-6">
+              {/* Year */}
+              <Input
+                type="number"
+                value=""
+                name="operational_year"
+                onChange={this.onInputChange}
+                label="Year"
+                validations={['required']}
+              />
+            </div>
           </div>
-          <div className="column small-6">
-            {/* Year */}
-            <Input
-              type="number"
-              value=""
-              name="operational_year"
-              onChange={this.onInputChange}
-              label="Year"
-              validations={['required']}
-            />
-          </div>
-        </div>
-        <Textarea validations={[]} onChange={this.onInputChange} label="Solution" name="solution" />
-        <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
-        <Creator
-          title="BMEs"
-          options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id, is_featured: bme.is_featured }))}
-          items={this.state.bmes}
-          onAdd={this.addProjectBme}
-          onEdit={(...args) => this.editProjectBme(...args)}
-          onDelete={this.deleteProjectBme}
-        />
-        {/* Sources */}
-        <div>
-          <button type="button" className="button" onClick={this.showSourceForm}>Add Source</button>
-          {this.state.external_sources_attributes.map((source, i) => {
-            return (
-              <li key={source.name}>
-                <button onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</button>
-                <button className="button" onClick={() => this.deleteSource(i)}>Delete</button>
-              </li>
-            );
-          })}
-        </div>
-        {/* Impacts */}
-        <div>
-          <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
-          <ul>
-            {this.state.impacts_attributes.map((impact, i) => {
+          <Textarea validations={[]} onChange={this.onInputChange} label="Solution" name="solution" />
+          <Textarea validations={[]} onChange={this.onInputChange} label="Situation" name="situation" />
+          <Creator
+            title="BMEs"
+            options={this.props.bmes.map(bme => ({ label: bme.name, value: bme.id, is_featured: bme.is_featured }))}
+            items={this.state.bmes}
+            onAdd={this.addProjectBme}
+            onEdit={(...args) => this.editProjectBme(...args)}
+            onDelete={this.deleteProjectBme}
+          />
+          {/* Sources */}
+          <div>
+            <button type="button" className="button" onClick={this.showSourceForm}>Add Source</button>
+            {this.state.external_sources_attributes.map((source, i) => {
               return (
-                <li key={impact.name}>
-                  <button onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>{impact.name}</button>
-                  <button className="button" onClick={() => this.deleteImpact(i)}>Delete</button>
+                <li key={source.name}>
+                  <button onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</button>
+                  <button className="delete button" onClick={() => this.deleteSource(i)}>Delete</button>
                 </li>
               );
             })}
-          </ul>
-        </div>
-        <div className="row expanded">
-          <div className="column small-6">
-            <DropZone
-              title="Images"
-              accept={'image/png, image/jpg, image/jpeg'}
-              files={this.state.photos_attributes}
-              onDrop={this.onImageDrop}
-              onDelete={this.onDeleteImage}
-              withImage
-              multiple={false}
-              maxSize={MAX_SIZE_IMAGE}
-            />
           </div>
-          <div className="column small-6">
-            <DropZone
-              title="Files"
-              files={this.state.documents_attributes}
-              accept={'application/pdf, application/json, application/msword, application/excel'}
-              onDrop={this.onFileDrop}
-              onDelete={this.onDeleteFile}
-              multiple={false}
-            />
+          {/* Impacts */}
+          <div>
+            <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
+            <ul>
+              {this.state.impacts_attributes.map((impact, i) => {
+                return (
+                  <li key={impact.name}>
+                    <button onClick={evt => this.showImpactForm(evt, { edit: true, index: i })}>{impact.name}</button>
+                    <button className="delete button" onClick={() => this.deleteImpact(i)}>Delete</button>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
-        </div>
-      </Form>
+          <div className="row expanded">
+            <div className="column small-6">
+              <DropZone
+                title="Images"
+                accept={'image/png, image/jpg, image/jpeg'}
+                files={this.state.photos_attributes}
+                onDrop={this.onImageDrop}
+                onDelete={this.onDeleteImage}
+                withImage
+                multiple={false}
+                maxSize={MAX_SIZE_IMAGE}
+              />
+            </div>
+            <div className="column small-6">
+              <DropZone
+                title="Files"
+                files={this.state.documents_attributes}
+                accept={'application/pdf, application/json, application/msword, application/excel'}
+                onDrop={this.onFileDrop}
+                onDelete={this.onDeleteFile}
+                multiple={false}
+              />
+            </div>
+          </div>
+        </Form>
+      </div>
     );
   }
 }
