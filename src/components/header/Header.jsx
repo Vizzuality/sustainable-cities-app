@@ -8,18 +8,12 @@ import { logout } from 'modules/user';
 
 export default function Header(props) {
   return (
-    <header className="top-bar" role="banner">
-      <div className="l-app-wrapper">
-        <div className="top-bar-left">
-          <Link to="/" className="logo">Sustainable Cities</Link>
-        </div>
-        <div className="top-bar-right">
-          {props.user.logged ?
-            <button className="button" type="button" onClick={() => { dispatch(logout()); }}>Logout</button> :
-            <Nav links={links} />
-          }
-        </div>
-      </div>
+    <header className="c-header" role="banner">
+      <Link to="/" className="logo">Sustainable Cities</Link>
+      {props.user.logged ?
+        <button className="button" type="button" onClick={() => { dispatch(logout()); }}>Logout</button> :
+        <Nav links={links} />
+      }
     </header>
   );
 }

@@ -16,10 +16,10 @@ export default class App extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className="l-app-wrapper">
         <Header />
         <main role="main" className="l-main">
-          <div className="main-content l-app-wrapper">
+          <div className="main-content">
             {this.props.nav &&
               <div className="content-header">
                 {this.props.nav}
