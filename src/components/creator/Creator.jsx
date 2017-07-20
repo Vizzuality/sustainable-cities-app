@@ -17,7 +17,7 @@ export default function Creator(props) {
       {items.map((item, i) => {
         return (
           <CreatorItem
-            key={i}
+            key={i} // eslint-disable-line react/no-array-index-key
             deleteable
             index={i}
             onEdit={onEdit}

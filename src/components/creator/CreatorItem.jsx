@@ -19,10 +19,6 @@ export default class CreatorItem extends React.Component {
     });
   }
 
-  clearDescription() {
-    this.input.value = '';
-  }
-
   onChangeInput(field, value) {
     this.state = {
       ...this.state,
@@ -31,9 +27,13 @@ export default class CreatorItem extends React.Component {
 
     this.setState(this.state);
 
-    if(this.props.onEdit) {
+    if (this.props.onEdit) {
       this.props.onEdit(this.state, this.props.index);
     }
+  }
+
+  clearDescription() {
+    this.input.value = '';
   }
 
   render() {
@@ -73,7 +73,8 @@ export default class CreatorItem extends React.Component {
               options={options}
               onChange={item => action({
                 ...this.state,
-                [selectedField]: item.value, description: this.input.value
+                [selectedField]: item.value,
+                description: this.input.value
               }, index)}
             />
           </div>
@@ -92,8 +93,8 @@ export default class CreatorItem extends React.Component {
             <input
               type="checkbox"
               name="is_featured"
-              checked={is_featured || false}
-              onChange={evt => this.onChangeInput('is_featured', evt.target.checked)} 
+              checked={is_featured || false} // eslint-disable-line camelcase
+              onChange={evt => this.onChangeInput('is_featured', evt.target.checked)}
             />
           </div>
         </div>

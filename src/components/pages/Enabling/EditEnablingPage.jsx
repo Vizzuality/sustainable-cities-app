@@ -115,7 +115,7 @@ class EditBmePage extends React.Component {
   }
 
   render() {
-    const { name, description } = this.props.enablingDetail || {};
+    const { name, description } = this.props.enablingDetail || {};
 
     return (
       <section className="c-form">

@@ -38,10 +38,9 @@ class ImpactForm extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-
     if (nextProps.impactCategories.length) {
       let parent = null;
-      nextProps.impactCategories.forEach(parentCategory => {
+      nextProps.impactCategories.forEach((parentCategory) => {
         const exists = parentCategory.children.find(child => child.id === this.props.values.category_id);
         if (exists) parent = parentCategory.id;
       });
@@ -95,9 +94,9 @@ class ImpactForm extends React.Component {
     // gets the sources id removed
     this.sourceIndexes = [];
     this.remove_ids = difference(this.state.external_sources_ids, val);
-    val.forEach(v => {
+    val.forEach((v) => {
       const source = this.props.sources.find(s => s.id === v);
-      if(source) {
+      if (source) {
         this.sourceIndexes.push(source.index);
       }
     });
@@ -180,7 +179,12 @@ class ImpactForm extends React.Component {
                   value={external_sources_ids} // eslint-disable-line camelcase
                   onChange={val => this.onSelectChange('external_sources_ids', val)}
                   label="Sources"
-                  options={this.props.sources.map((source, index) => ({ value: source.id || index, label: source.name }))}
+                  options={
+                    this.props.sources.map((source, index) => ({
+                      value: source.id || index,
+                      label: source.name
+                    }))
+                  }
                 />
               </div>}
             <div className="small-6 columns">

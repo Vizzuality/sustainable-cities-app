@@ -119,9 +119,11 @@ class NewStudyCasePage extends React.Component {
   onImageDrop(acceptedImgs, rejectedImgs) {
     const parsedPhotos = [];
 
-    rejectedImgs.forEach(file => toastr.error(`The image "${file.name}" hast not a valid extension or is larger than 1MB`));
+    rejectedImgs.forEach(file =>
+      toastr.error(`The image "${file.name}" hast not a valid extension or is larger than 1MB`)
+    );
 
-    if(this.state.photos_attributes.length >= MAX_IMAGES_ACCEPTED) {
+    if (this.state.photos_attributes.length >= MAX_IMAGES_ACCEPTED) {
       toastr.warning('Max number of images reached!');
       return;
     }
