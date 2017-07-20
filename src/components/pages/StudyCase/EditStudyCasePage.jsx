@@ -55,10 +55,7 @@ class EditStudyCasePage extends React.Component {
   componentWillMount() {
     dispatch(getStudyCases({ id: this.props.studyCases.detailId }));
     dispatch(getCategories({ type: 'solution' }));
-    dispatch(getBmes({
-      pageSize: 9999,
-      pageNumber: 1
-    }));
+    dispatch(getBmes({ pageSize: 9999, pageNumber: 1 }));
   }
 
   /* Component lifecycle */
@@ -73,11 +70,12 @@ class EditStudyCasePage extends React.Component {
         project_bmes_attributes: nextProps.studyCases.included
           .filter(sc => sc.type === 'project_bmes')
           .filter(pBme => !!pBme.relationships.bme.data)
-          .map(pBme => ({
+          .map((pBme, index) => ({
             id: pBme.id,
-            bme_id: pBme.relationships.bme.data.id,
+            category_id: pBme.relationships.bme.data.id,
             description: pBme.description,
-            is_featured: pBme.is_featured
+            is_featured: pBme.is_featured,
+            index
           })),
         impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
         external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources'),
@@ -211,13 +209,27 @@ class EditStudyCasePage extends React.Component {
   }
 
   @Autobind
-  addProjectBme(pbme) {
-    // eslint-disable-next-line camelcase
-    const project_bmes_attributes = [
-      ...this.state.project_bmes_attributes,
-      pbme
-    ];
-    this.setState({ project_bmes_attributes });
+  addProjectBme(bme, index) {
+    let bmes;
+
+    if (!index && index !== 0) {
+      bmes = [
+        ...this.state.project_bmes_attributes,
+        { ...bme,
+          index: this.state.project_bmes_attributes.length
+        }
+      ];
+    // edits
+    } else {
+      bmes = this.state.project_bmes_attributes.slice();
+      bmes[index] = {
+        ...bmes[index],
+        ...bme,
+        edited: true
+      };
+    }
+
+    this.setState({ project_bmes_attributes: bmes });
   }
 
   @Autobind
@@ -391,19 +403,21 @@ class EditStudyCasePage extends React.Component {
       id: this.props.studyCaseDetail.id,
       data: {
         ...this.form,
-        city_ids: [city.value],
+        city_ids: city && city.value ? [city.value] : [],
         category_id,
         // eslint-disable-next-line no-underscore-dangle
         impacts_attributes,
         // eslint-disable-next-line no-underscore-dangle
-        project_bmes_attributes: project_bmes_attributes.filter(pbme => !pbme.id || pbme.edited || pbme._destroy),
+        project_bmes_attributes: project_bmes_attributes // eslint-disable-next-line no-underscore-dangle
+          .filter(pbme => !pbme.id || pbme.edited || pbme._destroy)
+          .map(bme => ({
+            ...bme,
+            bme_id: bme.category_id
+          })),
         // eslint-disable-next-line no-underscore-dangle
         external_sources_attributes,
-        operational_year: new Date(
-          this.form.operational_year || operational_year, // eslint-disable-line camelcase
-          0,
-          2
-        ),
+        operational_year: new Date(this.form.operational_year
+          || operational_year, 0, 2), // eslint-disable-line camelcase
         photos_attributes
       },
       onSuccess: () => {
@@ -475,10 +489,16 @@ class EditStudyCasePage extends React.Component {
             onChange={item => this.setState({ category_id: item.value })}
             options={this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }))}
           />
-          <Textarea name="solution" value={solution} label="Solution" validations={[]} onChange={this.onInputChange} />
+          <Textarea
+            name="solution"
+            value={solution !== null ? solution : ''}
+            label="Solution"
+            validations={[]}
+            onChange={this.onInputChange}
+          />
           <Textarea
             name="situation"
-            value={situation || ''}
+            value={situation !== null ? situation : ''}
             label="situation"
             validations={[]}
             onChange={this.onInputChange}

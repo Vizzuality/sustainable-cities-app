@@ -1,22 +1,36 @@
 import React from 'react';
-import { Select } from 'components/form/Form';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { Autobind } from 'es-decorators';
+import isEqual from 'lodash/isEqual';
+
+// components
+import { Select, Button } from 'components/form/Form';
 
 export default class CreatorItem extends React.Component {
 
   constructor(props) {
     super(props);
+    const { category_id, description, is_featured } = props.values || {};
 
     this.state = {
-      is_featured: props.is_featured
+      is_featured,
+      description,
+      category_id
     };
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      is_featured: nextProps.is_featured
-    });
+    const { values } = nextProps;
+
+    if (!isEqual(this.props.values, values)) {
+      const { category_id, is_featured, description } = values;
+      this.setState({
+        is_featured,
+        description,
+        category_id
+      });
+    }
   }
 
   onChangeInput(field, value) {
@@ -26,9 +40,19 @@ export default class CreatorItem extends React.Component {
     };
 
     this.setState(this.state);
+  }
 
-    if (this.props.onEdit) {
-      this.props.onEdit(this.state, this.props.index);
+  @Autobind
+  onSubmit() {
+    this.props.onSubmit(this.state, this.props.index);
+
+    if (this.props.adder) {
+      // resets values
+      this.setState({
+        is_featured: false,
+        description: '',
+        category_id: null
+      });
     }
   }
 
@@ -37,59 +61,37 @@ export default class CreatorItem extends React.Component {
   }
 
   render() {
-    const {
-      options,
-      onAdd,
-      onEdit,
-      onDelete,
-      selected,
-      description,
-      index,
-      deleteable,
-      hidden,
-      selectedField
-    } = this.props;
+    const { options, onDelete, index, deleteable, hidden } = this.props;
+    const { category_id, description, is_featured } = this.state;
 
-    const { is_featured } = this.state;
-
-    const customOnAdd = (...args) => {
-      onAdd(...args);
-      this.clearDescription();
-    };
-
-    const action = onEdit || customOnAdd;
-    const cNames = classNames('c-creator-item',
-      {
-        hidden: !!hidden
-      });
+    const cNames = classNames('c-creator-item', {
+      hidden: !!hidden
+    });
 
     return (
       <div className={cNames}>
         <div className="row expanded">
           <div className="small-5 column">
             <Select
-              value={selected}
+              value={category_id} // eslint-disable-line camelcase
               clearable={false}
               options={options}
-              onChange={item => action({
-                ...this.state,
-                [selectedField]: item.value,
-                description: this.input.value
-              }, index)}
+              onChange={evt => this.setState({ category_id: evt.value })}
             />
           </div>
           <div className="small-5 column">
             <input
               ref={(node) => { this.input = node; }}
               value={description || ''}
+              name="description"
               type="text"
-              onChange={evt => onEdit && onEdit({ description: evt.target.value }, index)}
+              onChange={evt => this.onChangeInput('description', evt.target.value)}
             />
 
             {deleteable &&
               <button type="button" className="button" onClick={() => onDelete && onDelete(index)}>Delete</button>}
           </div>
-          <div className="small-2 column">
+          <div className="small-1 column">
             <input
               type="checkbox"
               name="is_featured"
@@ -97,26 +99,34 @@ export default class CreatorItem extends React.Component {
               onChange={evt => this.onChangeInput('is_featured', evt.target.checked)}
             />
           </div>
+          <div className="small-1 column">
+            <Button
+              className="button"
+              type="button"
+              disabled={!this.state.category_id}
+              onClick={this.onSubmit}
+            >
+              Save
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 }
+
 CreatorItem.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
   options: PropTypes.array,
-  onAdd: PropTypes.func,
-  onEdit: PropTypes.func,
   onDelete: PropTypes.func,
-  selected: PropTypes.string,
-  selectedField: PropTypes.string,
   index: PropTypes.number,
-  is_featured: PropTypes.bool,
-  description: PropTypes.string,
   deleteable: PropTypes.bool,
-  hidden: PropTypes.bool
+  hidden: PropTypes.bool,
+  values: PropTypes.object,
+  adder: PropTypes.bool
 };
 
 CreatorItem.defaultProps = {
   options: [],
-  is_featured: false
+  values: {}
 };
