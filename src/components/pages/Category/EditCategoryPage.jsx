@@ -185,7 +185,7 @@ class EditCategoryPage extends React.Component {
               name="label"
               value={label || ''}
               label="Question"
-              validations={['required']}
+              validations={[]}
             />}
           {/* description */}
           <Textarea
