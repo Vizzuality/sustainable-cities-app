@@ -16,6 +16,7 @@ import { toastr } from 'react-redux-toastr';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import isEqual from 'lodash/isEqual';
+import { xhrErrorToast } from 'utils/toasts';
 
 class NewBmePage extends React.Component {
 
@@ -97,11 +98,12 @@ class NewBmePage extends React.Component {
     // Create Bme
     dispatch(createBme({
       data,
-      onSuccess() {
+      onSuccess: () => {
         // Redirect to bme list
         dispatch(push('/business-model-element'));
         toastr.success('Business model element created!');
-      }
+      },
+      onError: xhrErrorToast
     }));
   }
 

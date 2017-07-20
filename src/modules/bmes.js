@@ -180,7 +180,7 @@ function getBmes(paramsConfig = {}) {
   };
 }
 
-function createBme({ data, onSuccess }) {
+function createBme({ data, onSuccess, onError }) {
   return (dispatch) => {
     dispatch(setBmesLoading(true));
     post({
@@ -192,12 +192,16 @@ function createBme({ data, onSuccess }) {
       onSuccess() {
         dispatch(setBmesLoading(false));
         if (onSuccess) onSuccess();
+      },
+      onError(errorData) {
+        dispatch(setBmesLoading(false));
+        if (onError) onError(errorData);
       }
     });
   };
 }
 
-function updateBme({ id, data, onSuccess }) {
+function updateBme({ id, data, onSuccess, onError }) {
   return (dispatch) => {
     dispatch(setBmesLoading(true));
     patch({
@@ -208,6 +212,10 @@ function updateBme({ id, data, onSuccess }) {
       onSuccess() {
         dispatch(setBmesLoading(false));
         if (onSuccess) onSuccess(id);
+      },
+      onError(errorData) {
+        dispatch(setBmesLoading(false));
+        if (onError) onError(errorData);
       }
     });
   };
