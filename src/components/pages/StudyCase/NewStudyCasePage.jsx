@@ -45,6 +45,7 @@ class NewStudyCasePage extends React.Component {
   /* Lifecycle */
   componentWillMount() {
     dispatch(getCategories({ type: 'solution' }));
+    dispatch(getCategories({ type: 'impact' }));
     dispatch(getBmes({
       pageSize: 9999,
       pageNumber: 1
@@ -394,9 +395,7 @@ class NewStudyCasePage extends React.Component {
 
 // Map state to props
 const mapStateToProps = ({ categories, bmes }) => ({
-  categories: {
-    solution: categories.solution
-  },
+  categories,
   bmes: bmes.list
 });
 
@@ -405,7 +404,10 @@ NewStudyCasePage.defaultProps = {
 };
 
 NewStudyCasePage.propTypes = {
-  categories: PropTypes.array,
+  categories: PropTypes.shape({
+    impact: PropTypes.array,
+    solution: PropTypes.array
+  }).isRequired,
   bmes: PropTypes.array
 };
 

@@ -41,7 +41,7 @@ class ImpactForm extends React.Component {
     if (nextProps.impactCategories.length) {
       let parent = null;
       nextProps.impactCategories.forEach((parentCategory) => {
-        const exists = parentCategory.children.find(child => child.id === this.props.values.category_id);
+        const exists = (parentCategory.children || []).find(child => child.id === this.props.values.category_id);
         if (exists) parent = parentCategory.id;
       });
 
@@ -136,7 +136,7 @@ class ImpactForm extends React.Component {
 
   loadFirstChildrenOption(parentId) {
     const parentCategory = this.props.impactCategories.find(cat => cat.id === parentId);
-    return parentCategory && parentCategory.children ? parentCategory.children[0].id : null;
+    return parentCategory && parentCategory.children && parentCategory.children[0].id;
   }
 
   render() {
@@ -150,7 +150,7 @@ class ImpactForm extends React.Component {
 
     if (parent) {
       parentCategory = this.props.impactCategories.find(cat => cat.id === this.state.categories.parent);
-      childrenOptions = parentCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
+      childrenOptions = (parentCategory.children || []).map(cat => ({ value: cat.id, label: cat.name }));
     }
 
     return (
