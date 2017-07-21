@@ -16,6 +16,9 @@ import { toastr } from 'react-redux-toastr';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import isEqual from 'lodash/isEqual';
+import { xhrErrorToast } from 'utils/toasts';
+import DropZone from 'components/dropzone/DropZone';
+import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/bmes';
 
 class NewBmePage extends React.Component {
 
@@ -30,7 +33,8 @@ class NewBmePage extends React.Component {
         bme: {}
       },
       solutions: [],
-      external_sources_attributes: []
+      external_sources_attributes: [],
+      photos_attributes: []
     };
 
     this.categoryGroups = {
@@ -79,7 +83,8 @@ class NewBmePage extends React.Component {
       enablings,
       external_sources_attributes,
       solutions,
-      timing
+      timing,
+      photos_attributes
     } = this.state;
 
 
@@ -91,17 +96,19 @@ class NewBmePage extends React.Component {
         ...solutions.map(solution => solution.nephew.id)
       ],
       enabling_ids: enablings,
-      external_sources_attributes
+      external_sources_attributes,
+      photos_attributes
     };
 
     // Create Bme
     dispatch(createBme({
       data,
-      onSuccess() {
+      onSuccess: () => {
         // Redirect to bme list
         dispatch(push('/business-model-element'));
         toastr.success('Business model element created!');
-      }
+      },
+      onError: xhrErrorToast
     }));
   }
 
@@ -421,6 +428,21 @@ class NewBmePage extends React.Component {
             value=""
             label="Description"
           />
+          {/* Images */}
+          <div className="row">
+            <div className="column small-2">
+              <DropZone
+                title="Images"
+                accept={'image/png, image/jpg, image/jpeg'}
+                files={DropZone.defaultFilesFromPhotos(this)}
+                onDrop={DropZone.defaultPhotoDropOnNew(this, MAX_IMAGES_ACCEPTED)}
+                onDelete={DropZone.defaultPhotoDeleteOnNew(this)}
+                withImage
+                maxSize={MAX_SIZE_IMAGE}
+                multiple={false}
+              />
+            </div>
+          </div>
         </Form>
       </section>
     );

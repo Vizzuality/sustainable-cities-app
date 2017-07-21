@@ -15,6 +15,10 @@ import { toastr } from 'react-redux-toastr';
 import { toggleModal } from 'modules/modal';
 import { connect } from 'react-redux';
 import isEqual from 'lodash/isEqual';
+import { xhrErrorToast } from 'utils/toasts';
+import DropZone from 'components/dropzone/DropZone';
+
+import { MAX_SIZE_IMAGE } from 'constants/bmes';
 
 class EditBmePage extends React.Component {
 
@@ -30,7 +34,8 @@ class EditBmePage extends React.Component {
       },
       enablings: {},
       timing: {},
-      external_sources_attributes: []
+      external_sources_attributes: [],
+      photos_attributes: []
     };
 
     this.categoryGroups = {
@@ -83,6 +88,10 @@ class EditBmePage extends React.Component {
 
     if (!isEqual(bmes.included, nextProps.bmes.included)) {
       this.setDefaultSources(nextProps);
+
+      this.setState({
+        photos_attributes: nextProps.bmes.included.filter(sc => sc.type === 'photos')
+      });
     }
 
     // review this
@@ -112,7 +121,8 @@ class EditBmePage extends React.Component {
       categories,
       enablings,
       external_sources_attributes,
-      timing
+      timing,
+      photos_attributes
     } = this.state;
 
     const data = {
@@ -124,16 +134,18 @@ class EditBmePage extends React.Component {
       ],
       enabling_ids: enablings,
       // eslint-disable-next-line no-underscore-dangle
-      external_sources_attributes: external_sources_attributes.filter(es => !es.id || es.edited || es._destroy)
+      external_sources_attributes: external_sources_attributes.filter(es => !es.id || es.edited || es._destroy),
+      photos_attributes
     };
 
     // Update BME
     dispatch(updateBme({
       id: this.props.bmesDetail.id,
       data,
-      onSuccess() {
+      onSuccess: () => {
         toastr.success('Business model element edited!');
-      }
+      },
+      onError: xhrErrorToast
     }));
   }
 
@@ -567,6 +579,21 @@ class EditBmePage extends React.Component {
             value={this.props.bmesDetail && this.props.bmesDetail.description ? this.props.bmesDetail.description : ''}
             validations={[]}
           />
+          {/* Images */}
+          <div className="row">
+            <div className="column small-2">
+              <DropZone
+                title="Images"
+                accept={'image/png, image/jpg, image/jpeg'}
+                files={DropZone.defaultFilesFromPhotos(this)}
+                onDrop={DropZone.defaultPhotoDropOnEdit(this)}
+                onDelete={DropZone.defaultPhotoDeleteOnEdit(this)}
+                withImage
+                maxSize={MAX_SIZE_IMAGE}
+                multiple={false}
+              />
+            </div>
+          </div>
         </Form>
       </section>
     );
