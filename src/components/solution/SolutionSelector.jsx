@@ -78,8 +78,8 @@ export default class SolutionSelector extends React.Component {
       }
 
       // populates nephew selector based on children selection
-      const childrenCategory = parentCategory.children.find(child => child.id === options.children);
-      if (childrenCategory.children && childrenCategory.children.length) {
+      const childrenCategory = (parentCategory.children || []).find(child => child.id === options.children);
+      if (childrenCategory && childrenCategory.children && childrenCategory.children.length) {
         options.nephew = childrenCategory.children[0].id;
       }
     }
@@ -107,11 +107,11 @@ export default class SolutionSelector extends React.Component {
 
     if (parent) {
       const parentCategory = this.props.solutionCategories.find(cat => cat.id === parent);
-      options.children = parentCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
+      options.children = (parentCategory.children || []).map(cat => ({ value: cat.id, label: cat.name }));
 
       if (children) {
-        const childrenCategory = parentCategory.children.find(child => child.id === children);
-        options.nephew = childrenCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
+        const childrenCategory = (parentCategory.children || []).find(child => child.id === children);
+        options.nephew = childrenCategory && childrenCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
       }
     }
 
@@ -127,6 +127,7 @@ export default class SolutionSelector extends React.Component {
         <div className="row expanded">
           <div className="small-4 columns">
             <Select
+              required
               name="categories"
               value={parent}
               onChange={val => this.onCategoryChange('parent', val)}
@@ -136,6 +137,7 @@ export default class SolutionSelector extends React.Component {
           </div>
           <div className="small-4 columns">
             <Select
+              required
               name="categories"
               value={children}
               onChange={val => this.onCategoryChange('children', val)}
@@ -145,6 +147,7 @@ export default class SolutionSelector extends React.Component {
           </div>
           <div className="small-4 columns">
             <Select
+              required
               name="categories"
               value={nephew && nephew.id ? nephew.id : nephew}
               onChange={val => this.onCategoryChange('nephew', val)}
