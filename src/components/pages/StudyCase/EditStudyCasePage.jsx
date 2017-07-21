@@ -62,7 +62,7 @@ class EditStudyCasePage extends React.Component {
           .filter(pBme => !!pBme.relationships.bme.data)
           .map((pBme, index) => ({
             id: pBme.id,
-            category_id: pBme.relationships.bme.data.id,
+            bme_id: pBme.relationships.bme.data.id,
             description: pBme.description,
             is_featured: pBme.is_featured,
             index
@@ -359,7 +359,7 @@ class EditStudyCasePage extends React.Component {
           .filter(pbme => !pbme.id || pbme.edited || pbme._destroy)
           .map(bme => ({
             ...bme,
-            bme_id: bme.category_id
+            bme_id: bme.bme_id
           })),
         // eslint-disable-next-line no-underscore-dangle
         external_sources_attributes,

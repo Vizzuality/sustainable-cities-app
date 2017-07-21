@@ -84,10 +84,10 @@ class NewStudyCasePage extends React.Component {
         photos_attributes,
         documents_attributes,
         impacts_attributes,
-        project_bmes_attributes: bmes.map(bme => ({
-          bme_id: bme.category_id,
-          description: bme.description,
-          is_featured: bme.is_featured
+        project_bmes_attributes: bmes.map(pBme => ({
+          bme_id: pBme.bme_id,
+          description: pBme.description,
+          is_featured: pBme.is_featured
         })),
         external_sources_attributes,
         city_ids: [city.value],
