@@ -378,10 +378,10 @@ class NewBmePage extends React.Component {
             options={this.props.timingCategories.map(en => ({ value: en.id, label: en.name }))}
           />
           {/* Solutions */}
-          <div className="row expanded">
+          <div className="row expanded button-list">
             <div className="small-12 column">
               <label htmlFor="solutions">Solutions</label>
-              <button type="button" className="button" onClick={this.onAddSolution}>Add Solution</button>
+              <button type="button" className="add button" onClick={this.onAddSolution}>Add Solution</button>
               <ul>
                 {this.state.solutions.map((solution, i) => {
                   return (
@@ -389,7 +389,7 @@ class NewBmePage extends React.Component {
                       <button onClick={evt => this.onAddSolution(evt, { edit: true, index: i })}>
                         {`${solution.nephew.name} - ${solution.nephew.id}`}
                       </button>
-                      <button className="button" onClick={() => this.deleteSolution(i)}>Delete solution</button>
+                      <button className="delete button" onClick={() => this.deleteSolution(i)}>Delete solution</button>
                     </li>
                   );
                 })}
@@ -397,10 +397,10 @@ class NewBmePage extends React.Component {
             </div>
           </div>
           {/* Sources */}
-          <div className="row expanded">
+          <div className="row expanded button-list">
             <div className="small-12 column">
               <label htmlFor="sources">Sources</label>
-              <button type="button" className="button" onClick={this.onAddSource}>Add Source</button>
+              <button type="button" className="add button" onClick={this.onAddSource}>Add Source</button>
               <ul>
                 {this.state.external_sources_attributes.map((source, i) => {
                   return (
@@ -410,7 +410,7 @@ class NewBmePage extends React.Component {
                       </button>
                       <button
                         type="button"
-                        className="button"
+                        className="delete button"
                         onClick={() => this.onDeleteSource(i)}
                       >
                         Delete source
