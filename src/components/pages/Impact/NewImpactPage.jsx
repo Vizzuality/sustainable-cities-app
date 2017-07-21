@@ -50,20 +50,16 @@ class NewImpactPage extends React.Component {
     });
   }
 
-  onCategoryChange(level, initialVal) {
-    let val = initialVal;
-    if (val) {
-      val = Array.isArray(val) ?
-        val.map(i => i.value) : val.value;
-    }
+  onCategoryChange(level, val) {
+    const id = val && val.value;
 
     const categories = {
       ...this.state.categories,
-      [level]: val
+      [level]: id
     };
 
     if (level === 'parent') {
-      categories.children = this.loadFirstChildrenOption(val);
+      categories.children = this.loadFirstChildrenOption(id);
     }
 
     this.setState({ categories });
