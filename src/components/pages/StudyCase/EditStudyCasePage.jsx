@@ -22,16 +22,6 @@ import SourceForm from 'components/sources/SourceForm';
 
 import { MAX_SIZE_IMAGE } from 'constants/study-case';
 
-/* Utils */
-function toBase64(file, cb) {
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    if (cb) cb(event.target.result);
-  };
-  reader.readAsDataURL(file);
-}
-
-
 class EditStudyCasePage extends React.Component {
 
   /* Constructor */
@@ -125,49 +115,6 @@ class EditStudyCasePage extends React.Component {
     };
     this.setState({ impacts_attributes });
     dispatch(toggleModal(false));
-  }
-
-  @Autobind
-  onImageDrop(acceptedImgs, rejectedImgs) {
-    rejectedImgs.forEach(file =>
-      toastr.error(`The image "${file.name}" hast not a valid extension or is larger than 1MB`)
-    );
-
-    acceptedImgs.forEach((file) => {
-      toBase64(file, (parsedFile) => {
-        // there is already a picture in the database
-        const exists = !!this.state.photos_attributes[0];
-        let photoParams = {
-          name: file.name,
-          attachment: parsedFile
-        };
-
-        if (exists) {
-          photoParams = {
-            ...photoParams,
-            id: this.state.photos_attributes[0].id
-          };
-        } else {
-          photoParams = {
-            ...photoParams,
-            is_active: true
-          };
-        }
-
-        /* eslint-enable camelcase */
-        this.setState({ photos_attributes: [photoParams] });
-      });
-    });
-  }
-
-  @Autobind
-  onDeleteImage() {
-    this.setState({
-      photos_attributes: [{
-        id: this.state.photos_attributes[0].id,
-        _destroy: true
-      }]
-    });
   }
 
   @Autobind
@@ -557,18 +504,9 @@ class EditStudyCasePage extends React.Component {
               <DropZone
                 title="Images"
                 accept={'image/png, image/jpg, image/jpeg'}
-                files={
-                  this.state.photos_attributes
-                    .filter(p => !p._destroy) // eslint-disable-line no-underscore-dangle
-                    .map(photo => ({
-                      id: photo.id,
-                      name: photo.name,
-                      attachment: photo.attachment.url ?
-                        `${config.API_URL}${photo.attachment.url}` : photo.attachment
-                    }))
-                }
-                onDrop={this.onImageDrop}
-                onDelete={this.onDeleteImage}
+                files={DropZone.defaultFilesFromPhotos(this)}
+                onDrop={DropZone.defaultPhotoDropOnEdit(this)}
+                onDelete={DropZone.defaultPhotoDeleteOnEdit(this)}
                 withImage
                 maxSize={MAX_SIZE_IMAGE}
                 multiple={false}

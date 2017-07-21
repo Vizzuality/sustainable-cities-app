@@ -18,17 +18,9 @@ import CitySearch from 'components/cities/CitySearch';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
 import { toggleModal } from 'modules/modal';
+import { toBase64 } from 'utils/base64';
 
 import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/study-case';
-
-/* Utils */
-function toBase64(file, cb) {
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    if (cb) cb(event.target.result);
-  };
-  reader.readAsDataURL(file);
-}
 
 class NewStudyCasePage extends React.Component {
 
@@ -114,39 +106,6 @@ class NewStudyCasePage extends React.Component {
   }
 
   @Autobind
-  onImageDrop(acceptedImgs, rejectedImgs) {
-    const parsedPhotos = [];
-
-    rejectedImgs.forEach(file =>
-      toastr.error(`The image "${file.name}" hast not a valid extension or is larger than 1MB`)
-    );
-
-    if (this.state.photos_attributes.length >= MAX_IMAGES_ACCEPTED) {
-      toastr.warning('Max number of images reached!');
-      return;
-    }
-
-
-    acceptedImgs.forEach((file, i) => {
-      toBase64(file, (parsedFile) => {
-        parsedPhotos.push({
-          name: file.name,
-          is_active: true,
-          attachment: parsedFile
-        });
-
-        if (i === (acceptedImgs.length - 1)) {
-          /* eslint-disable camelcase */
-          let photos_attributes = this.state.photos_attributes.slice();
-          photos_attributes = [...photos_attributes, ...parsedPhotos];
-          /* eslint-enable camelcase */
-          this.setState({ photos_attributes });
-        }
-      });
-    });
-  }
-
-  @Autobind
   onFileDrop(acceptedFiles, rejectedFiles) {
     const parsedFiles = [];
 
@@ -169,15 +128,6 @@ class NewStudyCasePage extends React.Component {
         }
       });
     });
-  }
-
-  @Autobind
-  onDeleteImage(index) {
-    // eslint-disable-next-line camelcase
-    const photos_attributes = this.state.photos_attributes.slice();
-    window.URL.revokeObjectURL(photos_attributes[index].attachment);
-    photos_attributes.splice(index, 1);
-    this.setState({ photos_attributes });
   }
 
   @Autobind
@@ -418,8 +368,8 @@ class NewStudyCasePage extends React.Component {
                 title="Images"
                 accept={'image/png, image/jpg, image/jpeg'}
                 files={this.state.photos_attributes}
-                onDrop={this.onImageDrop}
-                onDelete={this.onDeleteImage}
+                onDrop={DropZone.defaultPhotoDropOnNew(this, MAX_IMAGES_ACCEPTED)}
+                onDelete={DropZone.defaultPhotoDeleteOnNew(this)}
                 withImage
                 multiple={false}
                 maxSize={MAX_SIZE_IMAGE}
