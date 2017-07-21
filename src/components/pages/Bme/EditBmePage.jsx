@@ -15,6 +15,7 @@ import { toastr } from 'react-redux-toastr';
 import { toggleModal } from 'modules/modal';
 import { connect } from 'react-redux';
 import isEqual from 'lodash/isEqual';
+import { xhrErrorToast } from 'utils/toasts';
 import DropZone from 'components/dropzone/DropZone';
 
 import { MAX_SIZE_IMAGE } from 'constants/bmes';
@@ -141,9 +142,10 @@ class EditBmePage extends React.Component {
     dispatch(updateBme({
       id: this.props.bmesDetail.id,
       data,
-      onSuccess() {
+      onSuccess: () => {
         toastr.success('Business model element edited!');
-      }
+      },
+      onError: xhrErrorToast
     }));
   }
 
