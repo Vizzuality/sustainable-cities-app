@@ -20,7 +20,7 @@ export default function DropZone({ withImage, title, files, onDelete, ...props }
         <ul className="dropzone-img-list">
           {files.map((file, i) => {
             return (
-              <li className="img-item" key={file.name}>
+              <li className="img-item" key={[file.id, file.name].join('-')}>
                 {withImage ? <img className="img" alt={file.name} src={file.attachment} /> : <span>{file.name}</span>}
                 <button className="item-btn" onClick={localOnDelete(i)}><Icon name="icon-cross" /></button>
               </li>
