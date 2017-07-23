@@ -508,7 +508,7 @@ class EditStudyCasePage extends React.Component {
               <DropZone
                 title="Images"
                 accept={'image/png, image/jpg, image/jpeg'}
-                files={DropZone.defaultFilesFromPhotos(this, 'photos_attributes')}
+                files={DropZone.defaultFileTransform(this, 'photos_attributes')}
                 onDrop={DropZone.defaultDropOnEdit(this, 'photos_attributes')}
                 onDelete={DropZone.defaultDeleteOnEdit(this, 'photos_attributes')}
                 multiple={false}
@@ -520,7 +520,7 @@ class EditStudyCasePage extends React.Component {
               <DropZone
                 title="Files"
                 accept={'application/pdf, application/json, application/msword, application/excel'}
-                files={DropZone.defaultFilesFromPhotos(this, 'documents_attributes')}
+                files={DropZone.defaultFileTransform(this, 'documents_attributes')}
                 onDrop={DropZone.defaultDropOnEdit(this, 'documents_attributes')}
                 onDelete={DropZone.defaultDeleteOnEdit(this, 'documents_attributes')}
                 multiple={false}

@@ -43,7 +43,7 @@ DropZone.defaultProps = {
   files: []
 };
 
-DropZone.defaultFilesFromPhotos = (self, field) =>
+DropZone.defaultFileTransform = (self, field) =>
   self.state[field]
     .filter(f => !f._destroy) // eslint-disable-line no-underscore-dangle
     .map(f => ({
