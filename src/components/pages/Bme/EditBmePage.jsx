@@ -35,7 +35,8 @@ class EditBmePage extends React.Component {
       enablings: {},
       timing: {},
       external_sources_attributes: [],
-      photos_attributes: []
+      photos_attributes: [],
+      documents_attributes: []
     };
 
     this.categoryGroups = {
@@ -90,7 +91,8 @@ class EditBmePage extends React.Component {
       this.setDefaultSources(nextProps);
 
       this.setState({
-        photos_attributes: nextProps.bmes.included.filter(sc => sc.type === 'photos')
+        photos_attributes: nextProps.bmes.included.filter(sc => sc.type === 'photos'),
+        documents_attributes: nextProps.bmes.included.filter(sc => sc.type === 'documents')
       });
     }
 
@@ -122,7 +124,8 @@ class EditBmePage extends React.Component {
       enablings,
       external_sources_attributes,
       timing,
-      photos_attributes
+      photos_attributes,
+      documents_attributes
     } = this.state;
 
     const data = {
@@ -135,7 +138,8 @@ class EditBmePage extends React.Component {
       enabling_ids: enablings,
       // eslint-disable-next-line no-underscore-dangle
       external_sources_attributes: external_sources_attributes.filter(es => !es.id || es.edited || es._destroy),
-      photos_attributes
+      photos_attributes,
+      documents_attributes
     };
 
     // Update BME
@@ -583,15 +587,25 @@ class EditBmePage extends React.Component {
           />
           {/* Images */}
           <div className="row">
-            <div className="column small-2">
+            <div className="column small-6">
               <DropZone
                 title="Images"
                 accept={'image/png, image/jpg, image/jpeg'}
                 files={DropZone.defaultFileTransform(this, 'photos_attributes')}
                 onDrop={DropZone.defaultDropOnEdit(this, 'photos_attributes')}
                 onDelete={DropZone.defaultDeleteOnEdit(this, 'photos_attributes')}
+                multiple={false}
                 withImage
                 maxSize={MAX_SIZE_IMAGE}
+              />
+            </div>
+            <div className="column small-6">
+              <DropZone
+                title="Files"
+                accept={'application/pdf, application/json, application/msword, application/excel'}
+                files={DropZone.defaultFileTransform(this, 'documents_attributes')}
+                onDrop={DropZone.defaultDropOnEdit(this, 'documents_attributes')}
+                onDelete={DropZone.defaultDeleteOnEdit(this, 'documents_attributes')}
                 multiple={false}
               />
             </div>
