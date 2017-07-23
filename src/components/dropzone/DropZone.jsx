@@ -43,93 +43,90 @@ DropZone.defaultProps = {
   files: []
 };
 
-DropZone.defaultFilesFromPhotos = self =>
-  self.state.photos_attributes
-    .filter(p => !p._destroy) // eslint-disable-line no-underscore-dangle
-    .map(photo => ({
-      id: photo.id,
-      name: photo.name,
-      attachment: photo.attachment.url ?
-        `${config.API_URL}${photo.attachment.url}` : photo.attachment
+DropZone.defaultFilesFromPhotos = (self, field) =>
+  self.state[field]
+    .filter(f => !f._destroy) // eslint-disable-line no-underscore-dangle
+    .map(f => ({
+      id: f.id,
+      name: f.name,
+      attachment: f.attachment.url ?
+        `${config.API_URL}${f.attachment.url}` : f.attachment
     }));
 
-DropZone.defaultPhotoDropOnEdit = self => (acceptedImgs, rejectedImgs) => {
+DropZone.defaultDropOnEdit = (self, field) => (acceptedImgs, rejectedImgs) => {
   rejectedImgs.forEach(file =>
-    toastr.error(`The image "${file.name}" hast not a valid extension or is larger than 1MB`)
+    toastr.error(`The file "${file.name}" hast not a valid extension or is larger than 1MB`)
   );
 
   acceptedImgs.forEach((file) => {
     toBase64(file, (parsedFile) => {
-      // there is already a picture in the database
-      const exists = !!self.state.photos_attributes[0];
-      let photoParams = {
+      let params = {
         name: file.name,
         attachment: parsedFile
       };
 
-      if (exists) {
-        photoParams = {
-          ...photoParams,
-          id: self.state.photos_attributes[0].id
+      if (self.state[field][0]) {
+        params = {
+          ...params,
+          id: self.state[field][0].id
         };
       } else {
-        photoParams = {
-          ...photoParams,
+        params = {
+          ...params,
           is_active: true
         };
       }
 
-      /* eslint-enable camelcase */
-      self.setState({ photos_attributes: [photoParams] });
+      self.setState({ [field]: [params] });
     });
   });
 };
 
-DropZone.defaultPhotoDeleteOnEdit = self => () => {
-  self.setState({
-    photos_attributes: [{
-      id: self.state.photos_attributes[0].id,
-      _destroy: true
-    }]
-  });
-};
-
-DropZone.defaultPhotoDropOnNew = (self, maxImagesAccepted) => (acceptedImgs, rejectedImgs) => {
-  const parsedPhotos = [];
-
+DropZone.defaultDropOnNew = (self, field, maxFilesAccepted = 1) => (acceptedImgs, rejectedImgs) => {
   rejectedImgs.forEach(file =>
-    toastr.error(`The image "${file.name}" hast not a valid extension or is larger than 1MB`)
+    toastr.error(`The file "${file.name}" hast not a valid extension or is larger than 1MB`)
   );
 
-  if (self.state.photos_attributes.length >= maxImagesAccepted) {
-    toastr.warning('Max number of images reached!');
+  if (self.state[field].length >= maxFilesAccepted) {
+    toastr.warning('Max number of files reached!');
     return;
   }
 
-
+  const parsedFiles = [];
   acceptedImgs.forEach((file, i) => {
     toBase64(file, (parsedFile) => {
-      parsedPhotos.push({
+      parsedFiles.push({
         name: file.name,
         is_active: true,
         attachment: parsedFile
       });
 
       if (i === (acceptedImgs.length - 1)) {
-        /* eslint-disable camelcase */
-        let photos_attributes = self.state.photos_attributes.slice();
-        photos_attributes = [...photos_attributes, ...parsedPhotos];
-        /* eslint-enable camelcase */
-        self.setState({ photos_attributes });
+        self.setState({
+          [field]: [
+            ...self.state[field],
+            ...parsedFiles
+          ]
+        });
       }
     });
   });
 };
 
-DropZone.defaultPhotoDeleteOnNew = self => (index) => {
-  // eslint-disable-next-line camelcase
-  const photos_attributes = self.state.photos_attributes.slice();
-  window.URL.revokeObjectURL(photos_attributes[index].attachment);
-  photos_attributes.splice(index, 1);
-  self.setState({ photos_attributes });
+DropZone.defaultDeleteOnEdit = (self, field) => () => {
+  self.setState({
+    [field]: [
+      {
+        id: self.state[field][0].id,
+        _destroy: true
+      }
+    ]
+  });
+};
+
+DropZone.defaultDeleteOnNew = (self, field) => (index) => {
+  const attributes = self.state[field].slice();
+  window.URL.revokeObjectURL(attributes[index].attachment);
+  attributes.splice(index, 1);
+  self.setState({ [field]: attributes });
 };

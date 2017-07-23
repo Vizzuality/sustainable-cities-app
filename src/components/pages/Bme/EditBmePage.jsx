@@ -587,9 +587,9 @@ class EditBmePage extends React.Component {
               <DropZone
                 title="Images"
                 accept={'image/png, image/jpg, image/jpeg'}
-                files={DropZone.defaultFilesFromPhotos(this)}
-                onDrop={DropZone.defaultPhotoDropOnEdit(this)}
-                onDelete={DropZone.defaultPhotoDeleteOnEdit(this)}
+                files={DropZone.defaultFilesFromPhotos(this, 'photos_attributes')}
+                onDrop={DropZone.defaultDropOnEdit(this, 'photos_attributes')}
+                onDelete={DropZone.defaultDeleteOnEdit(this, 'photos_attributes')}
                 withImage
                 maxSize={MAX_SIZE_IMAGE}
                 multiple={false}

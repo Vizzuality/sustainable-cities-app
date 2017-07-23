@@ -436,9 +436,9 @@ class NewBmePage extends React.Component {
               <DropZone
                 title="Images"
                 accept={'image/png, image/jpg, image/jpeg'}
-                files={DropZone.defaultFilesFromPhotos(this)}
-                onDrop={DropZone.defaultPhotoDropOnNew(this, MAX_IMAGES_ACCEPTED)}
-                onDelete={DropZone.defaultPhotoDeleteOnNew(this)}
+                files={DropZone.defaultFilesFromPhotos(this, 'photos_attributes')}
+                onDrop={DropZone.defaultDropOnNew(this, 'photos_attributes', MAX_IMAGES_ACCEPTED)}
+                onDelete={DropZone.defaultDeleteOnNew(this, 'photos_attributes')}
                 withImage
                 maxSize={MAX_SIZE_IMAGE}
                 multiple={false}
