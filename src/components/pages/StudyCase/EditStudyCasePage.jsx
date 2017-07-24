@@ -460,7 +460,7 @@ class EditStudyCasePage extends React.Component {
             selectedField="bme_id"
           />
           {/* Sources */}
-          <div>
+          <div className="button-list">
             <button type="button" className="add button" onClick={this.showSourceForm}>Add source</button>
             <ul>
               {this.state.external_sources_attributes.map((source, i) => {
@@ -478,7 +478,7 @@ class EditStudyCasePage extends React.Component {
             </ul>
           </div>
           {/* Impacts */}
-          <div>
+          <div className="button-list">
             <button type="button" className="add button" onClick={this.showImpactForm}>Add Impact</button>
             <ul>
               {this.state.impacts_attributes.map((impact, i) => {
