@@ -550,7 +550,9 @@ class EditBmePage extends React.Component {
                 onDeleteSelect={this.onDeleteSolution}
               />
           ))}
-          <button type="button" className="button" onClick={this.onAddSolution}>Add Solution</button>
+          <div className="button-list">
+            <button type="button" className="button add" onClick={this.onAddSolution}>Add Solution</button>
+          </div>
           {/* External sources */}
           <div className="button-list">
             <label htmlFor="sources">Sources</label>
