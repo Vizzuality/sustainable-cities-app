@@ -543,7 +543,7 @@ class EditBmePage extends React.Component {
             && this.state.categories.solution.map((sol, index) => (
               <SolutionSelector
                 index={index}
-                key={sol.id}
+                key={index} // eslint-disable-line react/no-array-index-key
                 solutionCategories={this.props.solutionCategories}
                 state={sol}
                 onChangeSelect={this.onChangeSolution}

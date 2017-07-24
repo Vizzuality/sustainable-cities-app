@@ -385,7 +385,9 @@ class NewBmePage extends React.Component {
               <ul>
                 {this.state.solutions.map((solution, i) => {
                   return (
-                    <li key={solution.nephew.id}>
+                    <li
+                      key={i} // eslint-disable-line react/no-array-index-key
+                    >
                       <button onClick={evt => this.onAddSolution(evt, { edit: true, index: i })}>
                         {`${solution.nephew.name} - ${solution.nephew.id}`}
                       </button>
