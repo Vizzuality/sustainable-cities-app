@@ -101,16 +101,14 @@ class SolutionForm extends React.Component {
     return (
       <div className="c-solution-form">
         <Form onSubmit={this.onSubmit}>
-          <span className="title">Solutions</span>
+          <span>Solutions</span>
           <SolutionSelector
             deletable={false}
             state={this.state.categories}
             solutionCategories={this.props.solutionCategories}
             onChangeSelect={this.onSelectSolution}
           />
-          <div className="button-list">
-            <Button className="button add">{this.props.text}</Button>
-          </div>
+          <Button className="button">{this.props.text}</Button>
         </Form>
       </div>
     );

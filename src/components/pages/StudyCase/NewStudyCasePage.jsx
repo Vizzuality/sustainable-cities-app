@@ -337,8 +337,8 @@ class NewStudyCasePage extends React.Component {
             onDelete={this.deleteProjectBme}
           />
           {/* Sources */}
-          <div className="button-list">
-            <button type="button" className="add button" onClick={this.showSourceForm}>Add Source</button>
+          <div>
+            <button type="button" className="button" onClick={this.showSourceForm}>Add Source</button>
             {this.state.external_sources_attributes.map((source, i) => {
               return (
                 <li key={source.name}>
@@ -349,8 +349,8 @@ class NewStudyCasePage extends React.Component {
             })}
           </div>
           {/* Impacts */}
-          <div className="button-list">
-            <button type="button" className="add button" onClick={this.showImpactForm}>Add Impact</button>
+          <div>
+            <button type="button" className="button" onClick={this.showImpactForm}>Add Impact</button>
             <ul>
               {this.state.impacts_attributes.map((impact, i) => {
                 return (

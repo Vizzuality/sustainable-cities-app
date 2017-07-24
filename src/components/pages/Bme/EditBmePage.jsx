@@ -550,11 +550,9 @@ class EditBmePage extends React.Component {
                 onDeleteSelect={this.onDeleteSolution}
               />
           ))}
-          <div className="button-list">
-            <button type="button" className="button add" onClick={this.onAddSolution}>Add Solution</button>
-          </div>
+          <button type="button" className="button" onClick={this.onAddSolution}>Add Solution</button>
           {/* External sources */}
-          <div className="button-list">
+          <div>
             <label htmlFor="sources">Sources</label>
             <ul>
               {this.state.external_sources_attributes.map((source, i) => {
@@ -565,12 +563,12 @@ class EditBmePage extends React.Component {
                     className={`${source._destroy ? 'hidden' : ''}`} // eslint-disable-line no-underscore-dangle
                   >
                     <button onClick={evt => this.showSourceForm(evt, { edit: true, index: i })}>{source.name}</button>
-                    <button type="button" className="delete button" onClick={() => this.deleteSource(i)}>Delete</button>
+                    <button type="button" className="button" onClick={() => this.deleteSource(i)}>Delete</button>
                   </li>
                 );
               })}
             </ul>
-            <button type="button" className="add button" onClick={evt => this.showSourceForm(evt)}>Add source</button>
+            <button type="button" className="button" onClick={evt => this.showSourceForm(evt)}>Add source</button>
           </div>
           {/* description */}
           <Textarea
