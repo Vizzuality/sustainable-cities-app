@@ -220,8 +220,9 @@ function updateEnabling({ id, data, onSuccess }) {
     dispatch(setEnablingsLoading(true));
     patch({
       url: `${config.API_URL}/enablings/${id}`,
-      body: {
-        enabling: data
+      body: { enabling: data },
+      headers: {
+        Authorization: `Bearer ${localStorage.token}`
       },
       onSuccess() {
         dispatch(setEnablingsLoading(false));

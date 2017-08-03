@@ -12,12 +12,12 @@ export default class CreatorItem extends React.Component {
 
   constructor(props) {
     super(props);
-    const { category_id, description, is_featured } = props.values || {};
+    const { bme_id, description, is_featured } = props.values || {};
 
     this.state = {
       is_featured,
       description,
-      category_id
+      bme_id
     };
   }
 
@@ -25,11 +25,11 @@ export default class CreatorItem extends React.Component {
     const { values } = nextProps;
 
     if (!isEqual(this.props.values, values)) {
-      const { category_id, is_featured, description } = values;
+      const { bme_id, is_featured, description } = values;
       this.setState({
         is_featured,
         description,
-        category_id
+        bme_id
       });
     }
   }
@@ -56,7 +56,7 @@ export default class CreatorItem extends React.Component {
       this.setState({
         is_featured: false,
         description: '',
-        category_id: null
+        bme_id: null
       });
     }
   }
@@ -67,7 +67,7 @@ export default class CreatorItem extends React.Component {
 
   render() {
     const { options, onDelete, index, deleteable, hidden } = this.props;
-    const { category_id, description, is_featured } = this.state;
+    const { bme_id, description, is_featured } = this.state;
 
     const cNames = classNames('c-creator-item', {
       hidden: !!hidden
@@ -78,10 +78,10 @@ export default class CreatorItem extends React.Component {
         <div className="row expanded">
           <div className="small-5 column">
             <Select
-              value={category_id} // eslint-disable-line camelcase
+              value={bme_id} // eslint-disable-line camelcase
               clearable={false}
               options={options}
-              onChange={evt => this.setState({ category_id: evt.value })}
+              onChange={evt => this.setState({ bme_id: evt.value })}
             />
           </div>
           <div className="small-5 column">
@@ -108,7 +108,7 @@ export default class CreatorItem extends React.Component {
             <Button
               className="button"
               type="button"
-              disabled={!this.state.category_id}
+              disabled={!this.state.bme_id}
               onClick={this.onSubmit}
             >
               Save

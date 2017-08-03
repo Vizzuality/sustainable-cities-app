@@ -28,7 +28,7 @@ export default function Creator(props) {
             values={{
               is_featured: item.is_featured,
               description: item.description,
-              category_id: item.category_id
+              bme_id: item.bme_id
             }}
             selectedField={selectedField}
           />

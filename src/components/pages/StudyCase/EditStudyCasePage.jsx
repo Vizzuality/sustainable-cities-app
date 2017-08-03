@@ -38,7 +38,8 @@ class EditStudyCasePage extends React.Component {
       project_bmes_attributes: [],
       impacts_attributes: [],
       external_sources_attributes: [],
-      photos_attributes: []
+      photos_attributes: [],
+      documents_attributes: []
     };
   }
 
@@ -62,14 +63,15 @@ class EditStudyCasePage extends React.Component {
           .filter(pBme => !!pBme.relationships.bme.data)
           .map((pBme, index) => ({
             id: pBme.id,
-            category_id: pBme.relationships.bme.data.id,
+            bme_id: pBme.relationships.bme.data.id,
             description: pBme.description,
             is_featured: pBme.is_featured,
             index
           })),
         impacts_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'impacts'),
         external_sources_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'external_sources'),
-        photos_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'photos')
+        photos_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'photos'),
+        documents_attributes: nextProps.studyCases.included.filter(sc => sc.type === 'documents')
       });
     }
 
@@ -335,7 +337,8 @@ class EditStudyCasePage extends React.Component {
       project_bmes_attributes,
       external_sources_attributes,
       operational_year,
-      photos_attributes
+      photos_attributes,
+      documents_attributes
     } = this.state;
 
     // eslint-disable-next-line camelcase
@@ -359,13 +362,14 @@ class EditStudyCasePage extends React.Component {
           .filter(pbme => !pbme.id || pbme.edited || pbme._destroy)
           .map(bme => ({
             ...bme,
-            bme_id: bme.category_id
+            bme_id: bme.bme_id
           })),
         // eslint-disable-next-line no-underscore-dangle
         external_sources_attributes,
         operational_year: new Date(this.form.operational_year
           || operational_year, 0, 2), // eslint-disable-line camelcase
-        photos_attributes
+        photos_attributes,
+        documents_attributes
       },
       onSuccess: () => {
         toastr.success('The study case has been edited');
@@ -500,27 +504,28 @@ class EditStudyCasePage extends React.Component {
           </div>
           {/* Images */}
           <div className="row">
-            <div className="column small-2">
+            <div className="column small-6">
               <DropZone
                 title="Images"
                 accept={'image/png, image/jpg, image/jpeg'}
-                files={DropZone.defaultFilesFromPhotos(this)}
-                onDrop={DropZone.defaultPhotoDropOnEdit(this)}
-                onDelete={DropZone.defaultPhotoDeleteOnEdit(this)}
+                files={DropZone.defaultFileTransform(this, 'photos_attributes')}
+                onDrop={DropZone.defaultDropOnEdit(this, 'photos_attributes')}
+                onDelete={DropZone.defaultDeleteOnEdit(this, 'photos_attributes')}
+                multiple={false}
                 withImage
                 maxSize={MAX_SIZE_IMAGE}
+              />
+            </div>
+            <div className="column small-6">
+              <DropZone
+                title="Files"
+                accept={'application/pdf, application/json, application/msword, application/excel'}
+                files={DropZone.defaultFileTransform(this, 'documents_attributes')}
+                onDrop={DropZone.defaultDropOnEdit(this, 'documents_attributes')}
+                onDelete={DropZone.defaultDeleteOnEdit(this, 'documents_attributes')}
                 multiple={false}
               />
             </div>
-            {/* <div className="column small-6">
-              <DropZone
-                title="Files"
-                files={this.state.documents_attributes}
-                accept={'application/pdf, application/json, application/msword, application/excel'}
-                onDrop={this.onFileDrop}
-                onDelete={this.onDeleteFile}
-              />
-            </div> */}
           </div>
         </Form>
       </div>

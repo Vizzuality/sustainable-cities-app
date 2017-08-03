@@ -18,7 +18,6 @@ import CitySearch from 'components/cities/CitySearch';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
 import { toggleModal } from 'modules/modal';
-import { toBase64 } from 'utils/base64';
 
 import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/study-case';
 
@@ -45,6 +44,7 @@ class NewStudyCasePage extends React.Component {
   /* Lifecycle */
   componentWillMount() {
     dispatch(getCategories({ type: 'solution' }));
+    dispatch(getCategories({ type: 'impact' }));
     dispatch(getBmes({
       pageSize: 9999,
       pageNumber: 1
@@ -84,10 +84,10 @@ class NewStudyCasePage extends React.Component {
         photos_attributes,
         documents_attributes,
         impacts_attributes,
-        project_bmes_attributes: bmes.map(bme => ({
-          bme_id: bme.category_id,
-          description: bme.description,
-          is_featured: bme.is_featured
+        project_bmes_attributes: bmes.map(pBme => ({
+          bme_id: pBme.bme_id,
+          description: pBme.description,
+          is_featured: pBme.is_featured
         })),
         external_sources_attributes,
         city_ids: [city.value],
@@ -103,40 +103,6 @@ class NewStudyCasePage extends React.Component {
   @Autobind
   onInputChange(evt) {
     this.form[evt.target.name] = evt.target.value;
-  }
-
-  @Autobind
-  onFileDrop(acceptedFiles, rejectedFiles) {
-    const parsedFiles = [];
-
-    rejectedFiles.forEach(file => toastr.error(`The file "${file.name}" has not a valid extension`));
-
-    acceptedFiles.forEach((file, i) => {
-      toBase64(file, (parsedFile) => {
-        parsedFiles.push({
-          name: file.name,
-          is_active: true,
-          attachment: parsedFile
-        });
-
-        if (i === (acceptedFiles.length - 1)) {
-          /* eslint-disable camelcase */
-          let documents_attributes = this.state.documents_attributes.slice();
-          documents_attributes = [...documents_attributes, ...parsedFiles];
-          /* eslint-enable camelcase */
-          this.setState({ documents_attributes });
-        }
-      });
-    });
-  }
-
-  @Autobind
-  onDeleteFile(index) {
-    // eslint-disable-next-line camelcase
-    const documents_attributes = this.state.documents_attributes.slice();
-    window.URL.revokeObjectURL(documents_attributes[index].attachment);
-    documents_attributes.splice(index, 1);
-    this.setState({ documents_attributes });
   }
 
   @Autobind
@@ -368,8 +334,8 @@ class NewStudyCasePage extends React.Component {
                 title="Images"
                 accept={'image/png, image/jpg, image/jpeg'}
                 files={this.state.photos_attributes}
-                onDrop={DropZone.defaultPhotoDropOnNew(this, MAX_IMAGES_ACCEPTED)}
-                onDelete={DropZone.defaultPhotoDeleteOnNew(this)}
+                onDrop={DropZone.defaultDropOnNew(this, 'photos_attributes', MAX_IMAGES_ACCEPTED)}
+                onDelete={DropZone.defaultDeleteOnNew(this, 'photos_attributes')}
                 withImage
                 multiple={false}
                 maxSize={MAX_SIZE_IMAGE}
@@ -380,8 +346,8 @@ class NewStudyCasePage extends React.Component {
                 title="Files"
                 files={this.state.documents_attributes}
                 accept={'application/pdf, application/json, application/msword, application/excel'}
-                onDrop={this.onFileDrop}
-                onDelete={this.onDeleteFile}
+                onDrop={DropZone.defaultDropOnNew(this, 'documents_attributes', MAX_IMAGES_ACCEPTED)}
+                onDelete={DropZone.defaultDeleteOnNew(this, 'documents_attributes')}
                 multiple={false}
               />
             </div>
@@ -394,9 +360,7 @@ class NewStudyCasePage extends React.Component {
 
 // Map state to props
 const mapStateToProps = ({ categories, bmes }) => ({
-  categories: {
-    solution: categories.solution
-  },
+  categories,
   bmes: bmes.list
 });
 
@@ -405,7 +369,10 @@ NewStudyCasePage.defaultProps = {
 };
 
 NewStudyCasePage.propTypes = {
-  categories: PropTypes.array,
+  categories: PropTypes.shape({
+    impact: PropTypes.array,
+    solution: PropTypes.array
+  }).isRequired,
   bmes: PropTypes.array
 };
 

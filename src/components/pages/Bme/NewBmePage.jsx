@@ -34,7 +34,8 @@ class NewBmePage extends React.Component {
       },
       solutions: [],
       external_sources_attributes: [],
-      photos_attributes: []
+      photos_attributes: [],
+      documents_attributes: []
     };
 
     this.categoryGroups = {
@@ -84,7 +85,8 @@ class NewBmePage extends React.Component {
       external_sources_attributes,
       solutions,
       timing,
-      photos_attributes
+      photos_attributes,
+      documents_attributes
     } = this.state;
 
 
@@ -97,7 +99,8 @@ class NewBmePage extends React.Component {
       ],
       enabling_ids: enablings,
       external_sources_attributes,
-      photos_attributes
+      photos_attributes,
+      documents_attributes
     };
 
     // Create Bme
@@ -385,7 +388,9 @@ class NewBmePage extends React.Component {
               <ul>
                 {this.state.solutions.map((solution, i) => {
                   return (
-                    <li key={solution.nephew.id}>
+                    <li
+                      key={i} // eslint-disable-line react/no-array-index-key
+                    >
                       <button onClick={evt => this.onAddSolution(evt, { edit: true, index: i })}>
                         {`${solution.nephew.name} - ${solution.nephew.id}`}
                       </button>
@@ -428,17 +433,26 @@ class NewBmePage extends React.Component {
             value=""
             label="Description"
           />
-          {/* Images */}
-          <div className="row">
-            <div className="column small-2">
+          <div className="row expanded">
+            <div className="column small-6">
               <DropZone
                 title="Images"
                 accept={'image/png, image/jpg, image/jpeg'}
-                files={DropZone.defaultFilesFromPhotos(this)}
-                onDrop={DropZone.defaultPhotoDropOnNew(this, MAX_IMAGES_ACCEPTED)}
-                onDelete={DropZone.defaultPhotoDeleteOnNew(this)}
+                files={DropZone.defaultFileTransform(this, 'photos_attributes')}
+                onDrop={DropZone.defaultDropOnNew(this, 'photos_attributes', MAX_IMAGES_ACCEPTED)}
+                onDelete={DropZone.defaultDeleteOnNew(this, 'photos_attributes')}
+                multiple={false}
                 withImage
                 maxSize={MAX_SIZE_IMAGE}
+              />
+            </div>
+            <div className="column small-6">
+              <DropZone
+                title="Files"
+                accept={'application/pdf, application/json, application/msword, application/excel'}
+                files={DropZone.defaultFileTransform(this, 'documents_attributes')}
+                onDrop={DropZone.defaultDropOnNew(this, 'documents_attributes', MAX_IMAGES_ACCEPTED)}
+                onDelete={DropZone.defaultDeleteOnNew(this, 'documents_attributes')}
                 multiple={false}
               />
             </div>
