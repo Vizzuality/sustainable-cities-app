@@ -84,13 +84,13 @@ class EditBmePage extends React.Component {
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
+
     // Update Enabling
     dispatch(updateEnabling({
       id: this.props.enablingDetail.id,
       data: {
         ...this.form,
-        ...this.state.bme_ids,
-        ...this.state.category_id
+        ...this.state
       },
       onSuccess() {
         toastr.success('Enabling condition edited!');
