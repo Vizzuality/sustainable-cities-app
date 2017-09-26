@@ -23,6 +23,7 @@ export default class SolutionSelector extends React.Component {
 
   onCategoryChange(level, initialVal) {
     let val = initialVal;
+    const { allLevelsMandatory } = this.props;
     if (val) {
       val = Array.isArray(val) ?
         val.map(i => i.value) : val.value;
@@ -35,7 +36,7 @@ export default class SolutionSelector extends React.Component {
 
     if (level === 'parent') {
       let options = {};
-      if (val) {
+      if (val && allLevelsMandatory) {
         options = this.getFirstSelectOption(val, 'parent');
       }
       categories.children = val ? options.children : {};
@@ -44,7 +45,7 @@ export default class SolutionSelector extends React.Component {
 
     if (level === 'children') {
       let options = {};
-      if (val) {
+      if (val && allLevelsMandatory) {
         options = this.getFirstSelectOption(val, 'children');
       }
       categories.nephew = val ? options.nephew : {};
@@ -104,7 +105,6 @@ export default class SolutionSelector extends React.Component {
     };
     const { parent, children } = this.state.categories || {};
 
-
     if (parent) {
       const parentCategory = this.props.solutionCategories.find(cat => cat.id === parent);
       options.children = (parentCategory.children || []).map(cat => ({ value: cat.id, label: cat.name }));
@@ -121,6 +121,7 @@ export default class SolutionSelector extends React.Component {
   render() {
     const selectOptions = this.loadMultiSelectOptions();
     const { parent, children, nephew } = this.state.categories || {};
+    const { allLevelsMandatory } = this.props;
 
     return (
       <div className="c-solution-selector">
@@ -137,7 +138,7 @@ export default class SolutionSelector extends React.Component {
           </div>
           <div className="small-4 columns">
             <Select
-              required
+              required={allLevelsMandatory}
               name="categories"
               value={children}
               onChange={val => this.onCategoryChange('children', val)}
@@ -147,7 +148,7 @@ export default class SolutionSelector extends React.Component {
           </div>
           <div className="small-4 columns">
             <Select
-              required
+              required={allLevelsMandatory}
               name="categories"
               value={nephew && nephew.id ? nephew.id : nephew}
               onChange={val => this.onCategoryChange('nephew', val)}
@@ -170,9 +171,11 @@ SolutionSelector.propTypes = {
   solutionCategories: PropTypes.array,
   state: PropTypes.object,
   onChangeSelect: PropTypes.func,
-  onDeleteSelect: PropTypes.func
+  onDeleteSelect: PropTypes.func,
+  allLevelsMandatory: PropTypes.bool
 };
 
 SolutionSelector.defaultProps = {
-  deletable: true
+  deletable: true,
+  allLevelsMandatory: true
 };

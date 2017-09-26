@@ -18,6 +18,7 @@ import CitySearch from 'components/cities/CitySearch';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
 import { toggleModal } from 'modules/modal';
+import SolutionSelector from 'components/solution/SolutionSelector';
 
 import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/study-case';
 
@@ -43,7 +44,7 @@ class NewStudyCasePage extends React.Component {
 
   /* Lifecycle */
   componentWillMount() {
-    dispatch(getCategories({ type: 'solution' }));
+    dispatch(getCategories({ type: 'Solution', tree: true }));
     dispatch(getCategories({ type: 'impact' }));
     dispatch(getBmes({
       pageSize: 9999,
@@ -60,15 +61,19 @@ class NewStudyCasePage extends React.Component {
       city,
       photos_attributes,
       documents_attributes,
-      category_id,
+      solution,
       impacts_attributes,
       external_sources_attributes
     } = this.state;
+
+    const { parent, children, nephew } = solution || {};
+    const categoryId = nephew || children || parent;
 
     const { operational_year } = this.form;
     delete this.form.operational_year;
     const operationalDate = new Date();
     operationalDate.setYear(operational_year);
+
 
     // removes unnecessary params
     // eslint-disable-next-line camelcase
@@ -80,7 +85,7 @@ class NewStudyCasePage extends React.Component {
     dispatch(createStudyCase({
       data: {
         ...this.form,
-        category_id,
+        category_id: categoryId,
         photos_attributes,
         documents_attributes,
         impacts_attributes,
@@ -260,14 +265,15 @@ class NewStudyCasePage extends React.Component {
             label="Tagline"
             validations={[]}
           />
-          <Select
-            name="category_id"
-            required
-            clearable={false}
-            label="Category"
-            value={this.state.category_id}
-            onChange={item => this.setState({ category_id: item.value })}
-            options={this.props.categories.solution.map(cat => ({ value: cat.id, label: cat.name }))}
+
+          {/* Solution category */}
+          <SolutionSelector
+            index={0}
+            state={this.state.solution}
+            solutionCategories={this.props.categories.solution}
+            onChangeSelect={solution => this.setState({ solution })}
+            allLevelsMandatory={false}
+            deletable={false}
           />
           <div className="row expanded">
             <div className="column small-6">

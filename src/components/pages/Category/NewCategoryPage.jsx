@@ -97,6 +97,7 @@ class NewCategoryPage extends React.Component {
           solutionCategories={this.props.categories.solution}
           onChangeSelect={this.onChangeSolution}
           onDeleteSelect={this.onDeleteSolution}
+          deletable={false}
         />
       );
     }
