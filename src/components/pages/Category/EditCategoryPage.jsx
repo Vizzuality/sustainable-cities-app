@@ -109,7 +109,7 @@ class EditCategoryPage extends React.Component {
       }
 
       if (parent && !children) {
-        parentId = parent === 'all' ? {} : parent;
+        parentId = parent === 'all' ? null : parent;
       }
     } else {
       parentId = parent_id;
