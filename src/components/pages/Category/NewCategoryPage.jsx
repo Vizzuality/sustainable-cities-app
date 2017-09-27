@@ -58,10 +58,27 @@ class NewCategoryPage extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
 
+    const { solution, category_type, parent_id } = this.state;
+    const isSolution = category_type === 'solution';
+    const { parent, children } = solution || {};
+    let parentId = null;
+
+    if (isSolution) {
+      if (children) {
+        parentId = children === 'all' ? parent : children;
+      }
+
+      if (parent && !children) {
+        parentId = parent === 'all' ? {} : parent;
+      }
+    } else {
+      parentId = parent_id;
+    }
+
     const data = {
       ...this.form,
       category_type: CATEGORY_TYPE_CONVERSOR.find(cat => cat.key === this.state.category_type).value,
-      parent_id: this.state.parent_id
+      parent_id: parentId
     };
 
     // Create category
@@ -87,7 +104,7 @@ class NewCategoryPage extends React.Component {
   renderForm() {
     const { category_type } = this.state;
 
-    if (!category_type) return;
+    if (!category_type) return null;
 
     if (category_type === 'solution') {
       return (
@@ -96,7 +113,7 @@ class NewCategoryPage extends React.Component {
           state={this.state.solution}
           solutionCategories={this.props.categories.solution}
           onChangeSelect={this.onChangeSolution}
-          onDeleteSelect={this.onDeleteSolution}
+          hideSubCategory
           deletable={false}
         />
       );

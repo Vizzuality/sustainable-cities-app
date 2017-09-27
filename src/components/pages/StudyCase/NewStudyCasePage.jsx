@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { validation } from 'utils/validation'; // eslint-disable-line no-unused-vars
-import { Select, Input, Form, Button, Textarea } from 'components/form/Form';
+import { Input, Form, Button, Textarea } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import { Link } from 'react-router';
 import { Autobind } from 'es-decorators';
@@ -67,7 +67,7 @@ class NewStudyCasePage extends React.Component {
     } = this.state;
 
     const { parent, children, nephew } = solution || {};
-    const categoryId = nephew || children || parent;
+    const categoryId = (nephew === 'all' ? null : nephew) || children || parent;
 
     const { operational_year } = this.form;
     delete this.form.operational_year;
@@ -272,7 +272,7 @@ class NewStudyCasePage extends React.Component {
             state={this.state.solution}
             solutionCategories={this.props.categories.solution}
             onChangeSelect={solution => this.setState({ solution })}
-            allLevelsMandatory={false}
+            mandatoryLevels={[1, 2]}
             deletable={false}
           />
           <div className="row expanded">

@@ -10,7 +10,7 @@ export default class SolutionSelector extends React.Component {
     super(props);
 
     this.state = {
-      categories: {}
+      categories: props.state
     };
   }
 
@@ -23,7 +23,7 @@ export default class SolutionSelector extends React.Component {
 
   onCategoryChange(level, initialVal) {
     let val = initialVal;
-    const { allLevelsMandatory } = this.props;
+    const { mandatoryLevels } = this.props;
     if (val) {
       val = Array.isArray(val) ?
         val.map(i => i.value) : val.value;
@@ -36,19 +36,20 @@ export default class SolutionSelector extends React.Component {
 
     if (level === 'parent') {
       let options = {};
-      if (val && allLevelsMandatory) {
+      if (val && mandatoryLevels.includes(2)) {
         options = this.getFirstSelectOption(val, 'parent');
       }
+
       categories.children = val ? options.children : {};
-      categories.nephew = val ? options.nephew : {};
+      categories.nephew = val ? options.nephew : 'all';
     }
 
     if (level === 'children') {
       let options = {};
-      if (val && allLevelsMandatory) {
+      if (val && mandatoryLevels.includes(3)) {
         options = this.getFirstSelectOption(val, 'children');
       }
-      categories.nephew = val ? options.nephew : {};
+      categories.nephew = val ? options.nephew : 'all';
     }
 
     this.setState({ categories }, () => {
@@ -66,26 +67,32 @@ export default class SolutionSelector extends React.Component {
   }
 
   getFirstSelectOption(value, source) {
+    const { mandatoryLevels } = this.props;
     const options = {
       children: {},
       nephew: {}
     };
+    const { hideSubCategory } = this.props;
 
     if (source === 'parent') {
       // populates children selector based on parent selection
       const parentCategory = this.props.solutionCategories.find(cat => cat.id === value);
       if (parentCategory.children && parentCategory.children.length) {
-        options.children = parentCategory.children[0].id;
+        // if (mandatoryLevels.includes(2)) {
+        //   options.children = 'all';
+        // }
+        // if (!mandatoryLevels.includes(2))
+        options.children = (parentCategory.children[0] || {}).id;
       }
 
       // populates nephew selector based on children selection
       const childrenCategory = (parentCategory.children || []).find(child => child.id === options.children);
-      if (childrenCategory && childrenCategory.children && childrenCategory.children.length) {
-        options.nephew = childrenCategory.children[0].id;
+      if (childrenCategory && childrenCategory.children && childrenCategory.children.length && mandatoryLevels.includes(2)) {
+        options.nephew = 'all';
       }
     }
 
-    if (source === 'children') {
+    if (source === 'children' && mandatoryLevels.includes(3) && !hideSubCategory) {
       // populates nephew selector based on children selection
       const parentId = this.state.categories.parent;
       const parentCategory = this.props.solutionCategories.find(cat => cat.id === parentId);
@@ -100,18 +107,28 @@ export default class SolutionSelector extends React.Component {
 
   loadMultiSelectOptions() {
     const options = {
+      parent: [],
       children: [],
       nephew: []
     };
     const { parent, children } = this.state.categories || {};
+    const { mandatoryLevels, hideSubCategory } = this.props;
 
-    if (parent) {
-      const parentCategory = this.props.solutionCategories.find(cat => cat.id === parent);
+    options.parent = this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }));
+
+    if (!mandatoryLevels.includes(1)) (options.parent || []).unshift({ value: 'all', label: 'All of the above' });
+
+    if (parent && parent !== 'all') {
+      const parentCategory = this.props.solutionCategories.find(cat => cat.id === parent) || {};
       options.children = (parentCategory.children || []).map(cat => ({ value: cat.id, label: cat.name }));
 
-      if (children) {
+      if (!mandatoryLevels.includes(2)) (options.children || []).unshift({ value: 'all', label: 'All of the above' });
+
+      if (children && !hideSubCategory) {
         const childrenCategory = (parentCategory.children || []).find(child => child.id === children);
         options.nephew = childrenCategory && childrenCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
+
+        if (!mandatoryLevels.includes(3)) (options.nephew || []).unshift({ value: 'all', label: 'All of the above' });
       }
     }
 
@@ -121,41 +138,42 @@ export default class SolutionSelector extends React.Component {
   render() {
     const selectOptions = this.loadMultiSelectOptions();
     const { parent, children, nephew } = this.state.categories || {};
-    const { allLevelsMandatory } = this.props;
+    const { mandatoryLevels, hideSubCategory } = this.props;
 
     return (
       <div className="c-solution-selector">
         <div className="row expanded">
           <div className="small-4 columns">
             <Select
-              required
+              required={mandatoryLevels.includes(1)}
               name="categories"
               value={parent}
               onChange={val => this.onCategoryChange('parent', val)}
               label="Solution group"
-              options={this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }))}
+              options={selectOptions.parent}
             />
           </div>
           <div className="small-4 columns">
             <Select
-              required={allLevelsMandatory}
+              required={mandatoryLevels.includes(2)}
               name="categories"
-              value={children}
+              value={mandatoryLevels.includes(2) && !children ? (selectOptions.children[0] || {}).value : children}
               onChange={val => this.onCategoryChange('children', val)}
               label="Solution category"
               options={selectOptions.children}
             />
           </div>
-          <div className="small-4 columns">
-            <Select
-              required={allLevelsMandatory}
-              name="categories"
-              value={nephew && nephew.id ? nephew.id : nephew}
-              onChange={val => this.onCategoryChange('nephew', val)}
-              label="Solution sub-category"
-              options={selectOptions.nephew}
-            />
-          </div>
+          {!hideSubCategory &&
+            <div className="small-4 columns">
+              <Select
+                required={mandatoryLevels.includes(3)}
+                name="categories"
+                value={nephew || (selectOptions.nephew[0] || {}).value}
+                onChange={val => this.onCategoryChange('nephew', val)}
+                label="Solution sub-category"
+                options={selectOptions.nephew}
+              />
+            </div>}
           {this.props.deletable && <div className="small-12 columns">
             <button type="button" className="button alert" onClick={this.onDeleteSelect}>Delete solution</button>
           </div>}
@@ -172,10 +190,12 @@ SolutionSelector.propTypes = {
   state: PropTypes.object,
   onChangeSelect: PropTypes.func,
   onDeleteSelect: PropTypes.func,
-  allLevelsMandatory: PropTypes.bool
+  mandatoryLevels: PropTypes.array,
+  hideSubCategory: PropTypes.bool
 };
 
 SolutionSelector.defaultProps = {
   deletable: true,
-  allLevelsMandatory: true
+  mandatoryLevels: [],
+  hideSubCategory: false
 };

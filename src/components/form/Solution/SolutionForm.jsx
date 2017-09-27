@@ -62,16 +62,16 @@ class SolutionForm extends React.Component {
     }
   }
 
-  /* this is probably a temporary patch */
   getCategoryName(categoryId) {
     const solutionSelectOptions = this.loadMultiSelectOptions(this.state.categories);
-    let categoryName;
+    const { children } = this.state;
+    let categoryName = '';
 
-    if (solutionSelectOptions.nephew) {
-      categoryName = solutionSelectOptions.nephew.filter(opt => opt.value === categoryId);
-      categoryName = categoryName ? categoryName[0].label : '-';
+    if (categoryId === 'all') {
+      categoryName = ((solutionSelectOptions.children || []).find(solutionChildren => children === solutionChildren.id) || {}).label;
+    } else {
+      categoryName = ((solutionSelectOptions.nephew || []).find(opt => opt.value === categoryId) || {}).label;
     }
-
 
     return categoryName;
   }
@@ -105,6 +105,7 @@ class SolutionForm extends React.Component {
           <SolutionSelector
             deletable={false}
             state={this.state.categories}
+            mandatoryLevels={[1, 2]}
             solutionCategories={this.props.solutionCategories}
             onChangeSelect={this.onSelectSolution}
           />
