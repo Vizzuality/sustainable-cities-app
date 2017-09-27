@@ -12,6 +12,7 @@ import { createCategory, getCategories } from 'modules/categories';
 
 import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
+import SolutionSelector from 'components/solution/SolutionSelector';
 
 import { CATEGORY_TYPE_CONVERSOR, CATEGORY_TYPE_SELECT } from 'constants/categories';
 
@@ -23,7 +24,8 @@ class NewCategoryPage extends React.Component {
     this.form = {};
     this.state = {
       category_type: null,
-      parent_id: null
+      parent_id: null,
+      solution: {}
     };
   }
 
@@ -41,11 +43,14 @@ class NewCategoryPage extends React.Component {
 
   onSelectCategoryType(field, val) {
     this.onSelectChange(field, val);
+    const categoryType = val.value;
+    const isSolution = categoryType === 'solution';
 
     dispatch(getCategories({
-      type: val.value,
+      type: isSolution ? 'Solution' : categoryType,
       pageSize: 9999,
-      sort: 'name'
+      sort: 'name',
+      ...isSolution && { tree: true }
     }));
   }
 
@@ -53,10 +58,27 @@ class NewCategoryPage extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
 
+    const { solution, category_type, parent_id } = this.state;
+    const isSolution = category_type === 'solution';
+    const { parent, children } = solution || {};
+    let parentId = null;
+
+    if (isSolution) {
+      if (children) {
+        parentId = children === 'all' ? parent : children;
+      }
+
+      if (parent && !children) {
+        parentId = parent === 'all' ? {} : parent;
+      }
+    } else {
+      parentId = parent_id;
+    }
+
     const data = {
       ...this.form,
       category_type: CATEGORY_TYPE_CONVERSOR.find(cat => cat.key === this.state.category_type).value,
-      parent_id: this.state.parent_id
+      parent_id: parentId
     };
 
     // Create category
@@ -70,7 +92,33 @@ class NewCategoryPage extends React.Component {
     }));
   }
 
+  onChangeSolution = (solution) => {
+    const { nephew } = solution || {};
+
+    this.setState({
+      parent_id: nephew,
+      solution
+    });
+  }
+
   renderForm() {
+    const { category_type } = this.state;
+
+    if (!category_type) return null;
+
+    if (category_type === 'solution') {
+      return (
+        <SolutionSelector
+          index={0}
+          state={this.state.solution}
+          solutionCategories={this.props.categories.solution}
+          onChangeSelect={this.onChangeSolution}
+          hideSubCategory
+          deletable={false}
+        />
+      );
+    }
+
     return (
       <div>
         <div className="row expanded">

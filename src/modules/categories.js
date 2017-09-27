@@ -149,7 +149,6 @@ function getCategories({ type, id, tree, pageSize, pageNumber, sort, search }) {
     search
   })}`;
 
-
   return (dispatch) => {
     dispatch(setCategoriesLoading(true));
     get({

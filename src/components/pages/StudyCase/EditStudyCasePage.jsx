@@ -6,7 +6,7 @@ import { getStudyCases, updateStudyCase, deleteStudyCase } from 'modules/study-c
 import { getCategories } from 'modules/categories';
 import { getBmes } from 'modules/bmes';
 import PropTypes from 'prop-types';
-import { Form, Select, Button, Input, Textarea } from 'components/form/Form';
+import { Form, Button, Input, Textarea } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import { Link } from 'react-router';
 import { Autobind } from 'es-decorators';
@@ -19,7 +19,13 @@ import { push } from 'react-router-redux';
 import Creator from 'components/creator/Creator';
 import ImpactForm from 'components/impacts/ImpactForm';
 import SourceForm from 'components/sources/SourceForm';
+import SolutionSelector from 'components/solution/SolutionSelector';
 
+
+// selectors
+import solutionTreeSelector from 'selectors/solutionTree-studyCase';
+
+// constants
 import { MAX_SIZE_IMAGE } from 'constants/study-case';
 
 class EditStudyCasePage extends React.Component {
@@ -33,7 +39,7 @@ class EditStudyCasePage extends React.Component {
     };
 
     this.state = {
-      category_id: null,
+      solutionTree: {},
       city: {},
       project_bmes_attributes: [],
       impacts_attributes: [],
@@ -45,12 +51,14 @@ class EditStudyCasePage extends React.Component {
 
   componentWillMount() {
     dispatch(getStudyCases({ id: this.props.studyCases.detailId }));
-    dispatch(getCategories({ type: 'solution' }));
+    dispatch(getCategories({ type: 'Solution', tree: true }));
     dispatch(getBmes({ pageSize: 9999, pageNumber: 1 }));
   }
 
   /* Component lifecycle */
   componentWillReceiveProps(nextProps) {
+    const studyCaseDetailChanged = this.props.studyCaseDetail !== nextProps.studyCaseDetail;
+    const solutionTreeChanged = this.props.solutionTree !== nextProps.solutionTree;
     // Includes arrived! So, we can populate sub-entities
     if ((!this.props.studyCases.included || !this.props.studyCases.included.length)
       && (nextProps.studyCases.included && nextProps.studyCases.included.length)) {
@@ -75,7 +83,7 @@ class EditStudyCasePage extends React.Component {
       });
     }
 
-    if (this.props.studyCaseDetail !== nextProps.studyCaseDetail) {
+    if (studyCaseDetailChanged) {
       const { name, tagline, operational_year, solution, situation } = nextProps.studyCaseDetail;
       const category_id = `${nextProps.studyCaseDetail.category_id}`; // eslint-disable-line camelcase
       this.setState({
@@ -89,6 +97,12 @@ class EditStudyCasePage extends React.Component {
           ? new Date(operational_year).getFullYear()
           : undefined
         )
+      });
+    }
+
+    if (solutionTreeChanged) {
+      this.setState({
+        solutionTree: nextProps.solutionTree
       });
     }
   }
@@ -332,7 +346,7 @@ class EditStudyCasePage extends React.Component {
 
     const {
       city,
-      category_id,
+      solutionTree,
       impacts_attributes,
       project_bmes_attributes,
       external_sources_attributes,
@@ -340,6 +354,9 @@ class EditStudyCasePage extends React.Component {
       photos_attributes,
       documents_attributes
     } = this.state;
+
+    const { parent, children, nephew } = solutionTree || {};
+    const categoryId = (nephew === 'all' ? null : nephew) || children || parent;
 
     // eslint-disable-next-line camelcase
     if (impacts_attributes) {
@@ -354,7 +371,7 @@ class EditStudyCasePage extends React.Component {
       data: {
         ...this.form,
         city_ids: city && city.value ? [city.value] : [],
-        category_id,
+        category_id: categoryId,
         // eslint-disable-next-line no-underscore-dangle
         impacts_attributes,
         // eslint-disable-next-line no-underscore-dangle
@@ -380,8 +397,7 @@ class EditStudyCasePage extends React.Component {
   }
 
   render() {
-    // Study case initial values
-    const { name, city, tagline, operational_year, solution, situation } = this.state || {};
+    const { name, city, tagline, operational_year, solution, solutionTree, situation } = this.state;
 
     return (
       <div className="c-sc-edit">
@@ -431,18 +447,18 @@ class EditStudyCasePage extends React.Component {
               />
             </div>
           </div>
-          <Select
-            name="category_id"
-            clearable={false}
-            label="Category"
-            validations={['required']}
-            value={this.state.category_id}
-            onChange={item => this.setState({ category_id: item.value })}
-            options={this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }))}
+          {/* Solution category */}
+          <SolutionSelector
+            index={0}
+            state={solutionTree}
+            solutionCategories={this.props.solutionCategories}
+            onChangeSelect={sol => this.setState({ solutionTree: sol })}
+            mandatoryLevels={[1, 2]}
+            deletable={false}
           />
           <Textarea
             name="solution"
-            value={solution !== null ? solution : ''}
+            value={solution || ''}
             label="Solution"
             validations={[]}
             onChange={this.onInputChange}
@@ -540,7 +556,8 @@ EditStudyCasePage.propTypes = {
   bmes: PropTypes.array,
   solutionCategories: PropTypes.array,
   // Reselect
-  studyCaseDetail: PropTypes.object
+  studyCaseDetail: PropTypes.object,
+  solutionTree: PropTypes.object
 };
 
 /* Map state to props */
@@ -548,6 +565,7 @@ const mapStateToProps = state => ({
   studyCases: state.studyCases,
   studyCaseDetail: getStudyCaseDetail(state),
   bmes: state.bmes.list,
+  solutionTree: solutionTreeSelector(state),
   solutionCategories: state.categories.solution
 });
 
