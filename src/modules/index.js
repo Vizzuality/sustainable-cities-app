@@ -7,6 +7,7 @@ export { categoriesReducer as categories } from './categories';
 export { modalReducer as modal } from './modal';
 export { studyCasesReducer as studyCases } from './study-cases';
 export { citiesReducer as cities } from './cities';
+export { countriesReducer as countries } from './countries';
 
 /* External reducers */
 export { reducer as toastr } from 'react-redux-toastr';

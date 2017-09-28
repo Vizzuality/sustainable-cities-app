@@ -142,7 +142,7 @@ export default class SolutionSelector extends React.Component {
 
     return (
       <div className="c-solution-selector">
-        <div className="row expanded">
+        <div className="row expanded -flex">
           <div className="small-4 columns">
             <Select
               required={mandatoryLevels.includes(1)}

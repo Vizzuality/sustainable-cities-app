@@ -1,4 +1,4 @@
-import { get, _delete } from 'utils/request';
+import { get, post, _delete } from 'utils/request';
 import { deserialize } from 'utils/json-api';
 import * as queryString from 'query-string';
 
@@ -143,6 +143,28 @@ const getCities = ({ pageNumber, pageSize, search, sort }) => (dispatch) => {
   });
 };
 
+const createCity = ({ data, onSuccess, onError }) => {
+  return (dispatch) => {
+    dispatch(setCitiesLoading(true));
+    post({
+      url: `${config.API_URL}/cities`,
+      body: { city: data },
+      headers: {
+        Authorization: `Bearer ${localStorage.token}`
+      },
+      onSuccess() {
+        dispatch(setCitiesLoading(false));
+        if (onSuccess) onSuccess();
+      },
+      onError({ errors = [] }) {
+        dispatch(setCitiesLoading(false));
+        if (onError && errors[0]) onError(errors[0]);
+      }
+    });
+  };
+};
+
+
 const deleteCity = ({ id, onSuccess }) => {
   return (dispatch) => {
     dispatch(setCitiesLoading(true));
@@ -157,4 +179,4 @@ const deleteCity = ({ id, onSuccess }) => {
 };
 
 
-export { citiesReducer, getCities, setCityDetail, deleteCity, setFilters, setCitySearch, resetCities };
+export { citiesReducer, getCities, setCityDetail, deleteCity, setFilters, setCitySearch, resetCities, createCity };

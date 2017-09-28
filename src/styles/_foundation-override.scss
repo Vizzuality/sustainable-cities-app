@@ -23,4 +23,8 @@ textarea {
 
 .row {
   margin: 0 -0.9375rem;
+
+  &.-flex {
+    display: flex;
+  }
 }
