@@ -1,4 +1,4 @@
-import { get, post, _delete } from 'utils/request';
+import { get, post, patch, _delete } from 'utils/request';
 import { deserialize } from 'utils/json-api';
 import * as queryString from 'query-string';
 
@@ -116,7 +116,7 @@ function resetCities() {
   };
 }
 
-const getCities = ({ pageNumber, pageSize, search, sort }) => (dispatch) => {
+const getCities = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => {
   const queryS = queryString.stringify({
     'page[size]': pageSize || 999999,
     'page[number]': pageNumber || 1,
@@ -124,19 +124,24 @@ const getCities = ({ pageNumber, pageSize, search, sort }) => (dispatch) => {
     search
   });
 
+  const params = id ? `/${id}` : `?${queryS}`;
+
   dispatch(setCitiesLoading(true));
   get({
-    url: `${config.API_URL}/cities?${queryS}`,
+    url: `${config.API_URL}/cities${params}`,
     onSuccess({ data, meta }) {
       dispatch(setCitiesLoading(false));
-      let parsedData = data;
 
       // Parse data to json api format
-      if (!Array.isArray(parsedData)) parsedData = [data];
-      parsedData = deserialize(data);
+      // eslint-disable-next-line no-param-reassign
+      if (!Array.isArray(data)) data = [data];
+      const parsedData = deserialize(data);
 
       dispatch(setCities({
-        list: parsedData,
+        list: parsedData.map(city => ({
+          ...city,
+          countryId: city.relationships.country.data.id
+        })),
         itemCount: meta.total_items
       }));
     }
@@ -164,6 +169,27 @@ const createCity = ({ data, onSuccess, onError }) => {
   };
 };
 
+const updateCity = ({ id, data, onSuccess, onError }) => {
+  return (dispatch) => {
+    dispatch(setCitiesLoading(true));
+    patch({
+      url: `${config.API_URL}/cities/${id}`,
+      body: { city: data },
+      headers: {
+        Authorization: `Bearer ${localStorage.token}`
+      },
+      onSuccess() {
+        dispatch(setCitiesLoading(false));
+        if (onSuccess) onSuccess(id);
+      },
+      onError({ errors = [] }) {
+        dispatch(setCitiesLoading(false));
+        if (onError && errors[0]) onError(errors[0]);
+      }
+    });
+  };
+};
+
 
 const deleteCity = ({ id, onSuccess }) => {
   return (dispatch) => {
@@ -179,4 +205,4 @@ const deleteCity = ({ id, onSuccess }) => {
 };
 
 
-export { citiesReducer, getCities, setCityDetail, deleteCity, setFilters, setCitySearch, resetCities, createCity };
+export { citiesReducer, getCities, setCityDetail, deleteCity, setFilters, setCitySearch, resetCities, createCity, updateCity };
