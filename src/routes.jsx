@@ -37,6 +37,19 @@ import EditEnablingPage from 'components/pages/Enabling/EditEnablingPage';
 import CityPage from 'components/pages/City/CityPage';
 import NewCityPage from 'components/pages/City/NewCityPage';
 import EditCityPage from 'components/pages/City/EditCityPage';
+//    - Blogs
+import BlogsPage from 'components/pages/Blogs/BlogsPage';
+import NewBlogsPage from 'components/pages/Blogs/NewBlogsPage';
+import EditBlogsPage from 'components/pages/Blogs/EditBlogsPage';
+//    - Events
+import EventsPage from 'components/pages/Events/EventsPage';
+import NewEventsPage from 'components/pages/Events/NewEventsPage';
+import EditEventsPage from 'components/pages/Events/EditEventsPage';
+//    - City Support
+import CitySupportPage from 'components/pages/CitySupport/CitySupportPage';
+import NewCitySupportPage from 'components/pages/CitySupport/NewCitySupportPage';
+import EditCitySupportPage from 'components/pages/CitySupport/EditCitySupportPage';
+
 
 // Url hooks
 import {
@@ -45,7 +58,10 @@ import {
   onEnterEditImpactPage,
   onEnterEditStudyCase,
   onEnterEditCategoryPage,
-  onEnterEditCityPage
+  onEnterEditCityPage,
+  onEnterBlogsPage,
+  onEnterEventsPage,
+  onEnterCitySupportPage
 } from 'modules/url';
 
 const Routes = ({ history }) => (
@@ -106,6 +122,33 @@ const Routes = ({ history }) => (
           path="edit/:id"
           components={{ main: EditCityPage, nav: Sidebar }}
           onEnter={onEnterEditCityPage}
+        />
+      </Route>
+      <Route path="blogs">
+        <IndexRoute components={{ main: BlogsPage, nav: Sidebar }} />
+        <Route path="new" components={{ main: NewBlogsPage, nav: Sidebar }} />
+        <Route
+          path="edit/:id"
+          components={{ main: EditBlogsPage, nav: Sidebar }}
+          onEnter={onEnterBlogsPage}
+        />
+      </Route>
+      <Route path="events">
+        <IndexRoute components={{ main: EventsPage, nav: Sidebar }} />
+        <Route path="new" components={{ main: NewEventsPage, nav: Sidebar }} />
+        <Route
+          path="edit/:id"
+          components={{ main: EditEventsPage, nav: Sidebar }}
+          onEnter={onEnterEventsPage}
+        />
+      </Route>
+      <Route path="city-supports">
+        <IndexRoute components={{ main: CitySupportPage, nav: Sidebar }} />
+        <Route path="new" components={{ main: NewCitySupportPage, nav: Sidebar }} />
+        <Route
+          path="edit/:id"
+          components={{ main: EditCitySupportPage, nav: Sidebar }}
+          onEnter={onEnterCitySupportPage}
         />
       </Route>
     </Route>

@@ -5,6 +5,9 @@ import { setEnablingDetail } from 'modules/enablings';
 import { setStudyCaseDetail } from 'modules/study-cases';
 import { setCategoryDetail } from 'modules/categories';
 import { setCityDetail } from 'modules/cities';
+import { setBlogsDetail } from 'modules/blogs';
+import { setEventsDetail } from 'modules/events';
+import { setCitySupportDetail } from 'modules/city-support';
 
 
 function onEnterEditBmePage({ params }, replaceUrl, done) {
@@ -43,11 +46,32 @@ function onEnterEditCityPage({ params }, replaceUrl, done) {
   done();
 }
 
+function onEnterEditBlogsPage({ params }, replaceUrl, done) {
+  const { id } = params;
+  dispatch(setBlogsDetail(+id));
+  done();
+}
+
+function onEnterEditEventsPage({ params }, replaceUrl, done) {
+  const { id } = params;
+  dispatch(setEventsDetail(+id));
+  done();
+}
+
+function onEnterEditCitySupportPage({ params }, replaceUrl, done) {
+  const { id } = params;
+  dispatch(setCitySupportDetail(+id));
+  done();
+}
+
 export {
   onEnterEditBmePage,
   onEnterEditEnablingPage,
   onEnterEditImpactPage,
   onEnterEditStudyCase,
   onEnterEditCategoryPage,
-  onEnterEditCityPage
+  onEnterEditCityPage,
+  onEnterEditBlogsPage,
+  onEnterEditEventsPage,
+  onEnterEditCitySupportPage
 };

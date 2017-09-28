@@ -33,6 +33,10 @@ const links = [
   {
     text: 'Cities',
     href: '/cities'
+  },
+  {
+    text: 'About',
+    href: '/about'
   }
 ];
 
