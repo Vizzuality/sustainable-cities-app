@@ -126,7 +126,7 @@ export default class SolutionSelector extends React.Component {
 
       if (children && !hideSubCategory) {
         const childrenCategory = (parentCategory.children || []).find(child => child.id === children);
-        options.nephew = childrenCategory && childrenCategory.children.map(cat => ({ value: cat.id, label: cat.name }));
+        options.nephew = childrenCategory && (childrenCategory.children || []).map(cat => ({ value: cat.id, label: cat.name }));
 
         if (!mandatoryLevels.includes(3)) (options.nephew || []).unshift({ value: 'all', label: 'All of the above' });
       }
@@ -142,7 +142,7 @@ export default class SolutionSelector extends React.Component {
 
     return (
       <div className="c-solution-selector">
-        <div className="row expanded">
+        <div className="row expanded -flex">
           <div className="small-4 columns">
             <Select
               required={mandatoryLevels.includes(1)}

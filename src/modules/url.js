@@ -4,6 +4,7 @@ import { setImpactDetail } from 'modules/impacts';
 import { setEnablingDetail } from 'modules/enablings';
 import { setStudyCaseDetail } from 'modules/study-cases';
 import { setCategoryDetail } from 'modules/categories';
+import { setCityDetail } from 'modules/cities';
 
 
 function onEnterEditBmePage({ params }, replaceUrl, done) {
@@ -36,10 +37,17 @@ function onEnterEditStudyCase({ params }, replaceUrl, done) {
   done();
 }
 
+function onEnterEditCityPage({ params }, replaceUrl, done) {
+  const { id } = params;
+  dispatch(setCityDetail(+id));
+  done();
+}
+
 export {
   onEnterEditBmePage,
   onEnterEditEnablingPage,
   onEnterEditImpactPage,
   onEnterEditStudyCase,
-  onEnterEditCategoryPage
+  onEnterEditCategoryPage,
+  onEnterEditCityPage
 };
