@@ -45,7 +45,7 @@ DropZone.defaultProps = {
 
 DropZone.defaultFileTransform = (self, field) =>
   self.state[field]
-    .filter(f => !f._destroy) // eslint-disable-line no-underscore-dangle
+    .filter(f => !f._destroy && f.attachment) // eslint-disable-line no-underscore-dangle
     .map(f => ({
       id: f.id,
       name: f.name,

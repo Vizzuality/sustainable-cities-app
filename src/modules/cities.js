@@ -13,6 +13,13 @@ const SET_CITY_FILTERS = 'SET_CITY_FILTERS';
 const SET_CITY_SEARCH = 'SET_CITY_SEARCH';
 const RESET_CITIES = 'RESET_CITIES';
 
+// helper
+const getCityPhoto = (city, include = []) => {
+  const photos = include.filter(inc => inc.type === 'photos') || [];
+  const photoAttributes = deserialize(photos)[0] || {};
+  return { photos_attributes: [photoAttributes] };
+};
+
 
 /* Initial state */
 const initialState = {
@@ -130,7 +137,7 @@ const getCities = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => 
   dispatch(setCitiesLoading(true));
   get({
     url: `${config.API_URL}/cities${params}`,
-    onSuccess({ data, meta }) {
+    onSuccess({ data, meta, included }) {
       dispatch(setCitiesLoading(false));
 
       // Parse data to json api format
@@ -141,7 +148,8 @@ const getCities = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => 
       dispatch(setCities({
         list: parsedData.map(city => ({
           ...city,
-          countryId: city.relationships.country.data.id
+          countryId: city.relationships.country.data.id,
+          ...city.relationships.photos.data.length && getCityPhoto(city, included)
         })),
         itemCount: meta.total_items
       }));

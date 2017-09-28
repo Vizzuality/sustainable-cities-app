@@ -6,4 +6,9 @@ const CITY_TABLE_FIELDS = [
   { label: 'Country', value: 'country_name', sortable: true, sort: 'countries.name' }
 ];
 
-export { DEFAULT_SORT_FIELD, CITY_TABLE_FIELDS };
+// file management
+const MAX_IMAGES_ACCEPTED = 1;
+const MAX_SIZE_IMAGE = 1048576; // 1MB
+
+export { DEFAULT_SORT_FIELD, CITY_TABLE_FIELDS, MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE };
+

@@ -10,9 +10,15 @@ import { toastr } from 'react-redux-toastr';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 
+// components
+import DropZone from 'components/dropzone/DropZone';
+
 // modules
 import { getCountries } from 'modules/countries';
 import { createCity } from 'modules/cities';
+
+// constants
+import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/cities';
 
 class NewCityPage extends React.Component {
 
@@ -24,7 +30,8 @@ class NewCityPage extends React.Component {
       country_id: null,
       province: null,
       lat: null,
-      lng: null
+      lng: null,
+      photos_attributes: []
     };
   }
 
@@ -63,7 +70,7 @@ class NewCityPage extends React.Component {
 
   render() {
     const { countries } = this.props;
-    const { name, province, lat, lng, country_id: countryId } = this.state;
+    const { name, province, lat, lng, country_id: countryId, photos_attributes: photosAttributes} = this.state;
     return (
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
@@ -136,6 +143,21 @@ class NewCityPage extends React.Component {
                 value={lng || ''}
                 label="Longitude"
                 validations={['required']}
+              />
+            </div>
+          </div>
+          <div className="row expanded">
+            <div className="column small-3">
+              {/* Image */}
+              <DropZone
+                title="City image"
+                accept={'image/png, image/jpg, image/jpeg'}
+                files={photosAttributes}
+                onDrop={DropZone.defaultDropOnNew(this, 'photos_attributes', MAX_IMAGES_ACCEPTED)}
+                onDelete={DropZone.defaultDeleteOnNew(this, 'photos_attributes')}
+                withImage
+                multiple={false}
+                maxSize={MAX_SIZE_IMAGE}
               />
             </div>
           </div>

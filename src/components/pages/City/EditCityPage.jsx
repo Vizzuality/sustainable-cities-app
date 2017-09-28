@@ -14,18 +14,28 @@ import isEqual from 'lodash/isEqual';
 import { getCountries } from 'modules/countries';
 import { getCities, updateCity, resetCities } from 'modules/cities';
 
+// components
+import DropZone from 'components/dropzone/DropZone';
+
+// constants
+import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/cities';
+
 class EditCityPage extends React.Component {
   constructor(props) {
     super(props);
 
-    const { name, countryId, province, lat, lng } = props.city;
+    const {
+      name, countryId, photos_attributes: photosAttributes,
+      province, lat, lng
+    } = props.city;
 
     this.state = {
       name,
       country_id: countryId,
       province,
       lat,
-      lng
+      lng,
+      photos_attributes: photosAttributes || []
     };
   }
 
@@ -38,14 +48,18 @@ class EditCityPage extends React.Component {
   componentWillReceiveProps(nextProps) {
     const cityChanged = !isEqual(this.props.city, nextProps.city);
     if (cityChanged) {
-      const { name, countryId, province, lat, lng } = nextProps.city;
+      const {
+        name, countryId, photos_attributes: photosAttributes,
+        province, lat, lng
+      } = nextProps.city;
 
       this.setState({
         name,
         country_id: countryId,
         province,
         lat,
-        lng
+        lng,
+        photos_attributes: photosAttributes
       });
     }
   }
@@ -159,6 +173,20 @@ class EditCityPage extends React.Component {
                 value={lng || ''}
                 label="Longitude"
                 validations={['required']}
+              />
+            </div>
+          </div>
+          <div className="row expanded">
+            <div className="column small-6">
+              <DropZone
+                title="Images"
+                accept={'image/png, image/jpg, image/jpeg'}
+                files={DropZone.defaultFileTransform(this, 'photos_attributes')}
+                onDrop={DropZone.defaultDropOnEdit(this, 'photos_attributes', MAX_IMAGES_ACCEPTED)}
+                onDelete={DropZone.defaultDeleteOnEdit(this, 'photos_attributes')}
+                multiple={false}
+                withImage
+                maxSize={MAX_SIZE_IMAGE}
               />
             </div>
           </div>
