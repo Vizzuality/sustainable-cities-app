@@ -29,6 +29,10 @@ const links = [
   {
     text: 'Enabling condition',
     href: '/enabling-condition'
+  },
+  {
+    text: 'Cities',
+    href: '/cities'
   }
 ];
 

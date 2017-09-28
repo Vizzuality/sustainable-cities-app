@@ -33,6 +33,10 @@ import EditImpactPage from 'components/pages/Impact/EditImpactPage';
 import EnablingPage from 'components/pages/Enabling/EnablingPage';
 import NewEnablingPage from 'components/pages/Enabling/NewEnablingPage';
 import EditEnablingPage from 'components/pages/Enabling/EditEnablingPage';
+//    - City
+import CityPage from 'components/pages/City/CityPage';
+import NewCityPage from 'components/pages/City/NewCityPage';
+import EditCityPage from 'components/pages/City/EditCityPage';
 
 // Url hooks
 import {
@@ -40,7 +44,8 @@ import {
   onEnterEditEnablingPage,
   onEnterEditImpactPage,
   onEnterEditStudyCase,
-  onEnterEditCategoryPage
+  onEnterEditCategoryPage,
+  onEnterEditCityPage
 } from 'modules/url';
 
 const Routes = ({ history }) => (
@@ -92,6 +97,15 @@ const Routes = ({ history }) => (
           path="edit/:id"
           components={{ main: EditEnablingPage, nav: Sidebar }}
           onEnter={onEnterEditEnablingPage}
+        />
+      </Route>
+      <Route path="cities">
+        <IndexRoute components={{ main: CityPage, nav: Sidebar }} />
+        <Route path="new" components={{ main: NewCityPage, nav: Sidebar }} />
+        <Route
+          path="edit/:id"
+          components={{ main: EditCityPage, nav: Sidebar }}
+          onEnter={onEnterEditCityPage}
         />
       </Route>
     </Route>

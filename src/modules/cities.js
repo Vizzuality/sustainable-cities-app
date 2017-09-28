@@ -1,29 +1,69 @@
-import { get } from 'utils/request';
+import { get, _delete } from 'utils/request';
 import { deserialize } from 'utils/json-api';
 import * as queryString from 'query-string';
+
+// constants
+import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
 
 /* Action types */
 const SET_CITIES = 'SET_CITIES';
 const SET_CITIES_LOADING = 'SET_CITIES_LOADING';
+const SET_CITY_DETAIL = 'SET_CITY_DETAIL';
+const SET_CITY_FILTERS = 'SET_CITY_FILTERS';
+const SET_CITY_SEARCH = 'SET_CITY_SEARCH';
+const RESET_CITIES = 'RESET_CITIES';
+
 
 /* Initial state */
 const initialState = {
   list: [],
-  loading: false
+  loading: false,
+  detailId: null,
+  filters: {},
+  itemCount: null,
+  pagination: {
+    pageSize: DEFAULT_PAGINATION_SIZE,
+    pageNumber: DEFAULT_PAGINATION_NUMBER
+  },
+  search: null
 };
 
 /* Reducer */
 function citiesReducer(state = initialState, action) {
   switch (action.type) {
-    case SET_CITIES:
+    case SET_CITIES: {
+      const { list, itemCount } = action.payload;
       return {
         ...state,
-        list: action.payload
+        list,
+        itemCount
       };
+    }
     case SET_CITIES_LOADING:
       return {
         ...state,
         loading: action.payload
+      };
+    case SET_CITY_DETAIL:
+      return {
+        ...state,
+        detailId: action.payload
+      };
+    case SET_CITY_FILTERS:
+      return {
+        ...state,
+        ...action.payload
+      };
+    case SET_CITY_SEARCH:
+      return {
+        ...state,
+        search: action.payload
+      };
+    case RESET_CITIES:
+      return {
+        ...state,
+        pagination: initialState.pagination,
+        search: initialState.search
       };
     default:
       return state;
@@ -38,14 +78,44 @@ function setCitiesLoading(loading) {
   };
 }
 
-function setCities(cities) {
+function setCities({ list, itemCount }) {
   return {
     type: SET_CITIES,
-    payload: cities
+    payload: { list, itemCount }
+  };
+}
+
+function setCityDetail(id) {
+  return {
+    type: SET_CITY_DETAIL,
+    payload: id
   };
 }
 
 /* Thunk actions */
+const setFilters = (field, value) => {
+  const filter = {};
+  filter[field] = value;
+
+  return {
+    type: SET_CITY_FILTERS,
+    payload: filter
+  };
+};
+
+const setCitySearch = (term) => {
+  return {
+    type: SET_CITY_SEARCH,
+    payload: term
+  };
+};
+
+function resetCities() {
+  return {
+    type: RESET_CITIES
+  };
+}
+
 const getCities = ({ pageNumber, pageSize, search, sort }) => (dispatch) => {
   const queryS = queryString.stringify({
     'page[size]': pageSize || 999999,
@@ -57,12 +127,34 @@ const getCities = ({ pageNumber, pageSize, search, sort }) => (dispatch) => {
   dispatch(setCitiesLoading(true));
   get({
     url: `${config.API_URL}/cities?${queryS}`,
-    onSuccess({ data }) {
+    onSuccess({ data, meta }) {
       dispatch(setCitiesLoading(false));
-      dispatch(setCities(deserialize(data)));
+      let parsedData = data;
+
+      // Parse data to json api format
+      if (!Array.isArray(parsedData)) parsedData = [data];
+      parsedData = deserialize(data);
+
+      dispatch(setCities({
+        list: parsedData,
+        itemCount: meta.total_items
+      }));
     }
   });
 };
 
+const deleteCity = ({ id, onSuccess }) => {
+  return (dispatch) => {
+    dispatch(setCitiesLoading(true));
+    _delete({
+      url: `${config.API_URL}/cities/${id}`,
+      onSuccess() {
+        dispatch(setCitiesLoading(false));
+        if (onSuccess) onSuccess(id);
+      }
+    });
+  };
+};
 
-export { citiesReducer, getCities };
+
+export { citiesReducer, getCities, setCityDetail, deleteCity, setFilters, setCitySearch, resetCities };
