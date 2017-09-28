@@ -12,17 +12,16 @@ import isEqual from 'lodash/isEqual';
 
 // modules
 import { getCountries } from 'modules/countries';
-import { getCities, updateCity } from 'modules/cities';
+import { getCities, updateCity, resetCities } from 'modules/cities';
 
 class EditCityPage extends React.Component {
   constructor(props) {
     super(props);
 
-    const { name, iso, countryId, province, lat, lng } = props.city;
+    const { name, countryId, province, lat, lng } = props.city;
 
     this.state = {
       name,
-      iso,
       country_id: countryId,
       province,
       lat,
@@ -39,17 +38,20 @@ class EditCityPage extends React.Component {
   componentWillReceiveProps(nextProps) {
     const cityChanged = !isEqual(this.props.city, nextProps.city);
     if (cityChanged) {
-      const { name, iso, countryId, province, lat, lng } = nextProps.city;
+      const { name, countryId, province, lat, lng } = nextProps.city;
 
       this.setState({
         name,
-        iso,
         country_id: countryId,
         province,
         lat,
         lng
       });
     }
+  }
+
+  componentWillUnmount() {
+    dispatch(resetCities());
   }
 
   /* Methods */
@@ -83,17 +85,17 @@ class EditCityPage extends React.Component {
 
   render() {
     const { countries } = this.props;
-    const { name, province, iso, lat, lng, country_id: countryId } = this.state;
+    const { name, province, lat, lng, country_id: countryId } = this.state;
 
     return (
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
           <BtnGroup>
-            <Link to="/enabling-condition" className="button alert">Cancel</Link>
+            <Link to="/cities" className="button alert">Cancel</Link>
             <Button type="submit" className="button success">Edit</Button>
           </BtnGroup>
           <div className="row expanded">
-            <div className="column small-5">
+            <div className="column small-6">
               {/* Name */}
               <Input
                 type="text"
@@ -104,7 +106,7 @@ class EditCityPage extends React.Component {
                 validations={['required']}
               />
             </div>
-            <div className="column small-5">
+            <div className="column small-6">
               {/* Province */}
               <Input
                 type="text"
@@ -115,17 +117,6 @@ class EditCityPage extends React.Component {
                 validations={['required']}
               />
             </div>
-            <div className="column small-2">
-              {/* ISO */}
-              <Input
-                type="text"
-                onChange={this.onInputChange}
-                name="iso"
-                value={iso || ''}
-                label="City code (ISO)"
-                validations={[]}
-              />
-            </div>
           </div>
           <div className="row expanded">
             <div className="column small-12">
@@ -133,6 +124,7 @@ class EditCityPage extends React.Component {
               <Select
                 name="country_id"
                 label="Country"
+                required
                 validations={['required']}
                 value={countryId}
                 onChange={val => this.onSelectChange('country_id', val)}
@@ -147,7 +139,7 @@ class EditCityPage extends React.Component {
                 type="number"
                 min="-90"
                 max="90"
-                step="0.01"
+                step="0.00000001"
                 onChange={this.onInputChange}
                 name="lat"
                 value={lat || ''}
@@ -161,7 +153,7 @@ class EditCityPage extends React.Component {
                 type="number"
                 min="-180"
                 max="180"
-                step="0.01"
+                step="0.00000001"
                 onChange={this.onInputChange}
                 name="lng"
                 value={lng || ''}

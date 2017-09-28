@@ -63,7 +63,7 @@ class NewCityPage extends React.Component {
 
   render() {
     const { countries } = this.props;
-    const { name, province, iso, lat, lng, country_id: countryId } = this.state;
+    const { name, province, lat, lng, country_id: countryId } = this.state;
     return (
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
@@ -72,7 +72,7 @@ class NewCityPage extends React.Component {
             <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
           <div className="row expanded">
-            <div className="column small-5">
+            <div className="column small-6">
               {/* Name */}
               <Input
                 type="text"
@@ -83,7 +83,7 @@ class NewCityPage extends React.Component {
                 validations={['required']}
               />
             </div>
-            <div className="column small-5">
+            <div className="column small-6">
               {/* Province */}
               <Input
                 type="text"
@@ -94,17 +94,6 @@ class NewCityPage extends React.Component {
                 validations={['required']}
               />
             </div>
-            <div className="column small-2">
-              {/* ISO */}
-              <Input
-                type="text"
-                onChange={this.onInputChange}
-                name="iso"
-                value={iso || ''}
-                label="City code (ISO)"
-                validations={[]}
-              />
-            </div>
           </div>
           <div className="row expanded">
             <div className="column small-12">
@@ -112,6 +101,7 @@ class NewCityPage extends React.Component {
               <Select
                 name="country_id"
                 label="Country"
+                required
                 validations={['required']}
                 value={countryId}
                 onChange={val => this.onSelectChange('country_id', val)}
@@ -126,7 +116,7 @@ class NewCityPage extends React.Component {
                 type="number"
                 min="-90"
                 max="90"
-                step="0.01"
+                step="0.00000001"
                 onChange={this.onInputChange}
                 name="lat"
                 value={lat || ''}
@@ -140,7 +130,7 @@ class NewCityPage extends React.Component {
                 type="number"
                 min="-180"
                 max="180"
-                step="0.01"
+                step="0.00000001"
                 onChange={this.onInputChange}
                 name="lng"
                 value={lng || ''}

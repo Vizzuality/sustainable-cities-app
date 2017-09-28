@@ -62,6 +62,7 @@ function citiesReducer(state = initialState, action) {
     case RESET_CITIES:
       return {
         ...state,
+        list: initialState.list,
         pagination: initialState.pagination,
         search: initialState.search
       };
