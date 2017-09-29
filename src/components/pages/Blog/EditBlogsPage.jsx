@@ -19,7 +19,7 @@ import DropZone from 'components/dropzone/DropZone';
 import DatePicker from 'react-datepicker';
 
 // constants
-import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/cities';
+import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/blog';
 
 class EditBlogsPage extends React.Component {
   constructor(props) {

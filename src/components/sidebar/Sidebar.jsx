@@ -37,6 +37,10 @@ const links = [
   {
     text: 'Blogs',
     href: '/blogs'
+  },
+  {
+    text: 'Events',
+    href: '/events'
   }
 ];
 

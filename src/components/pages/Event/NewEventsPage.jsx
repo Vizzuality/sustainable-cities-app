@@ -15,12 +15,12 @@ import DropZone from 'components/dropzone/DropZone';
 import DatePicker from 'react-datepicker';
 
 // modules
-import { createBlogs } from 'modules/blogs';
+import { createEvents } from 'modules/events';
 
 // constants
-import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/blog';
+import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/event';
 
-class NewBlogsPage extends React.Component {
+class NewEventsPage extends React.Component {
 
   constructor(props) {
     super(props);
@@ -47,11 +47,11 @@ class NewBlogsPage extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
 
-    dispatch(createBlogs({
+    dispatch(createEvents({
       data: this.state,
       onSuccess: () => {
-        dispatch(push('/blogs'));
-        toastr.success('Blog created successfully');
+        dispatch(push('/events'));
+        toastr.success('Event created successfully');
       },
       onError: ({ title }) => {
         toastr.error(title);
@@ -66,7 +66,7 @@ class NewBlogsPage extends React.Component {
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
           <BtnGroup>
-            <Link to="/blogs" className="button alert">Cancel</Link>
+            <Link to="/events" className="button alert">Cancel</Link>
             <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
           <div className="row expanded">
@@ -112,7 +112,7 @@ class NewBlogsPage extends React.Component {
             <div className="column small-6">
               {/* Image */}
               <DropZone
-                title="Blog image"
+                title="Event image"
                 accept={'image/png, image/jpg, image/jpeg'}
                 files={photosAttributes}
                 onDrop={DropZone.defaultDropOnNew(this, 'photos_attributes', MAX_IMAGES_ACCEPTED)}
@@ -132,4 +132,4 @@ class NewBlogsPage extends React.Component {
 // Map state to props
 const mapStateToProps = () => ({});
 
-export default connect(mapStateToProps, null)(NewBlogsPage);
+export default connect(mapStateToProps, null)(NewEventsPage);

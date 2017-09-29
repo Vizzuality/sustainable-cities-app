@@ -1,12 +1,16 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { validation } from 'utils/validation'; // eslint-disable-line no-unused-vars
 import { dispatch } from 'main';
 import { Autobind } from 'es-decorators';
 import { Link } from 'react-router';
 import { toastr } from 'react-redux-toastr';
 import { connect } from 'react-redux';
-import { push } from 'react-router-redux';
+import isEqual from 'lodash/isEqual';
 import moment from 'moment';
+
+// modules
+import { getEvents, updateEvents, resetEvents } from 'modules/events';
 
 // components
 import { Input, Button, Form } from 'components/form/Form';
@@ -14,23 +18,53 @@ import BtnGroup from 'components/ui/BtnGroup';
 import DropZone from 'components/dropzone/DropZone';
 import DatePicker from 'react-datepicker';
 
-// modules
-import { createBlogs } from 'modules/blogs';
-
 // constants
-import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/blog';
+import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/event';
 
-class NewBlogsPage extends React.Component {
-
+class EditEventsPage extends React.Component {
   constructor(props) {
     super(props);
 
+    const {
+      title,
+      link,
+      date,
+      photos_attributes: photosAttributes
+    } = props.event;
+
     this.state = {
-      title: null,
-      date: moment(),
-      link: null,
-      photos_attributes: []
+      title: title || null,
+      date: date || moment(),
+      link: link || null,
+      photos_attributes: photosAttributes || []
     };
+  }
+
+  componentWillMount() {
+    if (this.props.detailId) dispatch(getEvents({ id: this.props.detailId }));
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const eventChanged = !isEqual(this.props.event, nextProps.event);
+    if (eventChanged) {
+      const {
+        title,
+        link,
+        date,
+        photos_attributes: photosAttributes
+      } = nextProps.event;
+
+      this.setState({
+        title,
+        link,
+        date: moment(date),
+        photos_attributes: photosAttributes
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    dispatch(resetEvents());
   }
 
   /* Methods */
@@ -47,11 +81,11 @@ class NewBlogsPage extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
 
-    dispatch(createBlogs({
+    dispatch(updateEvents({
+      id: this.props.detailId,
       data: this.state,
-      onSuccess: () => {
-        dispatch(push('/blogs'));
-        toastr.success('Blog created successfully');
+      onSuccess() {
+        toastr.success('Event edited succesfully');
       },
       onError: ({ title }) => {
         toastr.error(title);
@@ -60,14 +94,14 @@ class NewBlogsPage extends React.Component {
   }
 
   render() {
-    const { title, link, date, photos_attributes: photosAttributes } = this.state;
+    const { title, link, date } = this.state;
 
     return (
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
           <BtnGroup>
-            <Link to="/blogs" className="button alert">Cancel</Link>
-            <Button type="submit" className="button success">Save</Button>
+            <Link to="/events" className="button alert">Cancel</Link>
+            <Button type="submit" className="button success">Edit</Button>
           </BtnGroup>
           <div className="row expanded">
             <div className="column small-12">
@@ -112,9 +146,9 @@ class NewBlogsPage extends React.Component {
             <div className="column small-6">
               {/* Image */}
               <DropZone
-                title="Blog image"
+                title="Event image"
                 accept={'image/png, image/jpg, image/jpeg'}
-                files={photosAttributes}
+                files={DropZone.defaultFileTransform(this, 'photos_attributes')}
                 onDrop={DropZone.defaultDropOnNew(this, 'photos_attributes', MAX_IMAGES_ACCEPTED)}
                 onDelete={DropZone.defaultDeleteOnNew(this, 'photos_attributes')}
                 withImage
@@ -129,7 +163,19 @@ class NewBlogsPage extends React.Component {
   }
 }
 
-// Map state to props
-const mapStateToProps = () => ({});
+EditEventsPage.propTypes = {
+  event: PropTypes.object,
+  detailId: PropTypes.number
+};
 
-export default connect(mapStateToProps, null)(NewBlogsPage);
+EditEventsPage.defaultProps = {
+  event: {}
+};
+
+// Map state to props
+const mapStateToProps = ({ events }) => ({
+  event: events.list[0],
+  detailId: events.detailId
+});
+
+export default connect(mapStateToProps, null)(EditEventsPage);

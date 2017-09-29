@@ -2,6 +2,10 @@ import { get, post, patch, _delete } from 'utils/request';
 import { deserialize } from 'utils/json-api';
 import * as queryString from 'query-string';
 
+// utils
+import getPhoto from 'utils/photo';
+
+
 // constants
 import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
 
@@ -130,7 +134,7 @@ const getCitySupport = ({ pageNumber, pageSize, search, sort, id }) => (dispatch
   dispatch(setCitySupportLoading(true));
   get({
     url: `${config.API_URL}/city_supports/${params}`,
-    onSuccess({ data, meta }) {
+    onSuccess({ data, meta, included }) {
       dispatch(setCitySupportLoading(false));
 
       // Parse data to json api format
@@ -139,7 +143,10 @@ const getCitySupport = ({ pageNumber, pageSize, search, sort, id }) => (dispatch
       const parsedData = deserialize(data);
 
       dispatch(setCitySupport({
-        list: parsedData,
+        list: parsedData.map(citySupport => ({
+          ...citySupport,
+          ...citySupport.relationships.photos.data.length && getPhoto(included)
+        })),
         itemCount: meta.total_items
       }));
     }

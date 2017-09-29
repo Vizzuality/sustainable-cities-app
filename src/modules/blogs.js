@@ -2,6 +2,9 @@ import { get, post, patch, _delete } from 'utils/request';
 import { deserialize } from 'utils/json-api';
 import * as queryString from 'query-string';
 
+// utils
+import getPhoto from 'utils/photo';
+
 // constants
 import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
 
@@ -148,7 +151,7 @@ const getBlogs = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => {
       dispatch(setBlogs({
         list: parsedData.map(blog => ({
           ...blog,
-          ...blog.relationships.photos.data.length && getBlogPhoto(included)
+          ...blog.relationships.photos.data.length && getPhoto(included)
         })),
         itemCount: meta.total_items
       }));

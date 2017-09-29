@@ -42,9 +42,9 @@ import BlogsPage from 'components/pages/Blog/BlogsPage';
 import NewBlogsPage from 'components/pages/Blog/NewBlogsPage';
 import EditBlogsPage from 'components/pages/Blog/EditBlogsPage';
 //    - Events
-// import EventsPage from 'components/pages/Events/EventsPage';
-// import NewEventsPage from 'components/pages/Events/NewEventsPage';
-// import EditEventsPage from 'components/pages/Events/EditEventsPage';
+import EventsPage from 'components/pages/Event/EventsPage';
+import NewEventsPage from 'components/pages/Event/NewEventsPage';
+import EditEventsPage from 'components/pages/Event/EditEventsPage';
 // //    - City Support
 // import CitySupportPage from 'components/pages/CitySupport/CitySupportPage';
 // import NewCitySupportPage from 'components/pages/CitySupport/NewCitySupportPage';
@@ -133,16 +133,16 @@ const Routes = ({ history }) => (
           onEnter={onEnterEditBlogsPage}
         />
       </Route>
-      {/* <Route path="events">
+      <Route path="events">
         <IndexRoute components={{ main: EventsPage, nav: Sidebar }} />
         <Route path="new" components={{ main: NewEventsPage, nav: Sidebar }} />
         <Route
           path="edit/:id"
           components={{ main: EditEventsPage, nav: Sidebar }}
-          onEnter={onEnterEventsPage}
+          onEnter={onEnterEditEventsPage}
         />
       </Route>
-      <Route path="city-supports">
+      {/* <Route path="city-supports">
         <IndexRoute components={{ main: CitySupportPage, nav: Sidebar }} />
         <Route path="new" components={{ main: NewCitySupportPage, nav: Sidebar }} />
         <Route
