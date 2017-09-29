@@ -8,6 +8,9 @@ export { modalReducer as modal } from './modal';
 export { studyCasesReducer as studyCases } from './study-cases';
 export { citiesReducer as cities } from './cities';
 export { countriesReducer as countries } from './countries';
+export { blogReducer as blogs } from './blogs';
+export { eventsReducer as events } from './events';
+export { citySupportReducer as citySupport } from './city-support';
 
 /* External reducers */
 export { reducer as toastr } from 'react-redux-toastr';

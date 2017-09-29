@@ -2,19 +2,19 @@ import { get, post, patch, _delete } from 'utils/request';
 import { deserialize } from 'utils/json-api';
 import * as queryString from 'query-string';
 
-// constants
-import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
-
 // utils
 import getPhoto from 'utils/photo';
 
+// constants
+import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
+
 /* Action types */
-const SET_CITIES = 'SET_CITIES';
-const SET_CITIES_LOADING = 'SET_CITIES_LOADING';
-const SET_CITY_DETAIL = 'SET_CITY_DETAIL';
-const SET_CITY_FILTERS = 'SET_CITY_FILTERS';
-const SET_CITY_SEARCH = 'SET_CITY_SEARCH';
-const RESET_CITIES = 'RESET_CITIES';
+const SET_BLOGS = 'SET_BLOGS';
+const SET_BLOGS_LOADING = 'SET_BLOGS_LOADING';
+const SET_BLOGS_DETAIL = 'SET_BLOGS_DETAIL';
+const SET_BLOGS_FILTERS = 'SET_BLOGS_FILTERS';
+const SET_BLOGS_SEARCH = 'SET_BLOGS_SEARCH';
+const RESET_BLOGS = 'RESET_BLOGS';
 
 
 /* Initial state */
@@ -31,10 +31,17 @@ const initialState = {
   search: null
 };
 
+// helper
+const getBlogPhoto = (include = []) => {
+  const photos = include.filter(inc => inc.type === 'photos') || [];
+  const photoAttributes = deserialize(photos)[0] || {};
+  return { photos_attributes: [photoAttributes] };
+};
+
 /* Reducer */
-function citiesReducer(state = initialState, action) {
+function blogReducer(state = initialState, action) {
   switch (action.type) {
-    case SET_CITIES: {
+    case SET_BLOGS: {
       const { list, itemCount } = action.payload;
       return {
         ...state,
@@ -42,30 +49,30 @@ function citiesReducer(state = initialState, action) {
         itemCount
       };
     }
-    case SET_CITIES_LOADING:
+    case SET_BLOGS_LOADING:
       return {
         ...state,
         loading: action.payload
       };
-    case SET_CITY_DETAIL:
+    case SET_BLOGS_DETAIL:
       return {
         ...state,
         detailId: action.payload
       };
-    case SET_CITY_FILTERS:
+    case SET_BLOGS_FILTERS:
       return {
         ...state,
         ...action.payload
       };
-    case SET_CITY_SEARCH:
+    case SET_BLOGS_SEARCH:
       return {
         ...state,
         search: action.payload
       };
-    case RESET_CITIES:
+    case RESET_BLOGS:
       return {
         ...state,
-        list: initialState.list,
+        list: [],
         pagination: initialState.pagination,
         search: initialState.search
       };
@@ -75,23 +82,23 @@ function citiesReducer(state = initialState, action) {
 }
 
 /* Action creators */
-function setCitiesLoading(loading) {
+function setBlogsLoading(loading) {
   return {
-    type: SET_CITIES_LOADING,
+    type: SET_BLOGS_LOADING,
     payload: loading
   };
 }
 
-function setCities({ list, itemCount }) {
+function setBlogs({ list, itemCount }) {
   return {
-    type: SET_CITIES,
+    type: SET_BLOGS,
     payload: { list, itemCount }
   };
 }
 
-function setCityDetail(id) {
+function setBlogsDetail(id) {
   return {
-    type: SET_CITY_DETAIL,
+    type: SET_BLOGS_DETAIL,
     payload: id
   };
 }
@@ -102,25 +109,25 @@ const setFilters = (field, value) => {
   filter[field] = value;
 
   return {
-    type: SET_CITY_FILTERS,
+    type: SET_BLOGS_FILTERS,
     payload: filter
   };
 };
 
-const setCitySearch = (term) => {
+const setBlogsSearch = (term) => {
   return {
-    type: SET_CITY_SEARCH,
+    type: SET_BLOGS_SEARCH,
     payload: term
   };
 };
 
-function resetCities() {
+function resetBlogs() {
   return {
-    type: RESET_CITIES
+    type: RESET_BLOGS
   };
 }
 
-const getCities = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => {
+const getBlogs = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => {
   const queryS = queryString.stringify({
     'page[size]': pageSize || 999999,
     'page[number]': pageNumber || 1,
@@ -130,22 +137,21 @@ const getCities = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => 
 
   const params = id ? `/${id}` : `?${queryS}`;
 
-  dispatch(setCitiesLoading(true));
+  dispatch(setBlogsLoading(true));
   get({
-    url: `${config.API_URL}/cities${params}`,
+    url: `${config.API_URL}/blogs/${params}`,
     onSuccess({ data, meta, included }) {
-      dispatch(setCitiesLoading(false));
+      dispatch(setBlogsLoading(false));
 
       // Parse data to json api format
       // eslint-disable-next-line no-param-reassign
       if (!Array.isArray(data)) data = [data];
       const parsedData = deserialize(data);
 
-      dispatch(setCities({
-        list: parsedData.map(city => ({
-          ...city,
-          countryId: city.relationships.country.data.id,
-          ...city.relationships.photos.data.length && getPhoto(included)
+      dispatch(setBlogs({
+        list: parsedData.map(blog => ({
+          ...blog,
+          ...blog.relationships.photos.data.length && getPhoto(included)
         })),
         itemCount: meta.total_items
       }));
@@ -153,42 +159,42 @@ const getCities = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => 
   });
 };
 
-const createCity = ({ data, onSuccess, onError }) => {
+const createBlogs = ({ data, onSuccess, onError }) => {
   return (dispatch) => {
-    dispatch(setCitiesLoading(true));
+    dispatch(setBlogsLoading(true));
     post({
-      url: `${config.API_URL}/cities`,
-      body: { city: data },
+      url: `${config.API_URL}/blogs`,
+      body: { blog: data },
       headers: {
         Authorization: `Bearer ${localStorage.token}`
       },
       onSuccess() {
-        dispatch(setCitiesLoading(false));
+        dispatch(setBlogsLoading(false));
         if (onSuccess) onSuccess();
       },
       onError({ errors = [] }) {
-        dispatch(setCitiesLoading(false));
+        dispatch(setBlogsLoading(false));
         if (onError && errors[0]) onError(errors[0]);
       }
     });
   };
 };
 
-const updateCity = ({ id, data, onSuccess, onError }) => {
+const updateBlogs = ({ id, data, onSuccess, onError }) => {
   return (dispatch) => {
-    dispatch(setCitiesLoading(true));
+    dispatch(setBlogsLoading(true));
     patch({
-      url: `${config.API_URL}/cities/${id}`,
-      body: { city: data },
+      url: `${config.API_URL}/blogs/${id}`,
+      body: { blog: data },
       headers: {
         Authorization: `Bearer ${localStorage.token}`
       },
       onSuccess() {
-        dispatch(setCitiesLoading(false));
+        dispatch(setBlogsLoading(false));
         if (onSuccess) onSuccess(id);
       },
       onError({ errors = [] }) {
-        dispatch(setCitiesLoading(false));
+        dispatch(setBlogsLoading(false));
         if (onError && errors[0]) onError(errors[0]);
       }
     });
@@ -196,13 +202,13 @@ const updateCity = ({ id, data, onSuccess, onError }) => {
 };
 
 
-const deleteCity = ({ id, onSuccess }) => {
+const deleteBlogs = ({ id, onSuccess }) => {
   return (dispatch) => {
-    dispatch(setCitiesLoading(true));
+    dispatch(setBlogsLoading(true));
     _delete({
-      url: `${config.API_URL}/cities/${id}`,
+      url: `${config.API_URL}/blogs/${id}`,
       onSuccess() {
-        dispatch(setCitiesLoading(false));
+        dispatch(setBlogsLoading(false));
         if (onSuccess) onSuccess(id);
       }
     });
@@ -210,4 +216,14 @@ const deleteCity = ({ id, onSuccess }) => {
 };
 
 
-export { citiesReducer, getCities, setCityDetail, deleteCity, setFilters, setCitySearch, resetCities, createCity, updateCity };
+export {
+  blogReducer,
+  getBlogs,
+  setBlogsDetail,
+  deleteBlogs,
+  setFilters,
+  setBlogsSearch,
+  resetBlogs,
+  createBlogs,
+  updateBlogs
+};

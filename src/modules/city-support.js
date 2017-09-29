@@ -2,19 +2,19 @@ import { get, post, patch, _delete } from 'utils/request';
 import { deserialize } from 'utils/json-api';
 import * as queryString from 'query-string';
 
-// constants
-import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
-
 // utils
 import getPhoto from 'utils/photo';
 
+// constants
+import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
+
 /* Action types */
-const SET_CITIES = 'SET_CITIES';
-const SET_CITIES_LOADING = 'SET_CITIES_LOADING';
-const SET_CITY_DETAIL = 'SET_CITY_DETAIL';
-const SET_CITY_FILTERS = 'SET_CITY_FILTERS';
-const SET_CITY_SEARCH = 'SET_CITY_SEARCH';
-const RESET_CITIES = 'RESET_CITIES';
+const SET_CITY_SUPPORTS = 'SET_CITY_SUPPORTS';
+const SET_CITY_SUPPORTS_LOADING = 'SET_CITY_SUPPORTS_LOADING';
+const SET_CITY_SUPPORTS_DETAIL = 'SET_CITY_SUPPORTS_DETAIL';
+const SET_CITY_SUPPORTS_FILTERS = 'SET_CITY_SUPPORTS_FILTERS';
+const SET_CITY_SUPPORTS_SEARCH = 'SET_CITY_SUPPORTS_SEARCH';
+const RESET_CITY_SUPPORTS = 'RESET_CITY_SUPPORTS';
 
 
 /* Initial state */
@@ -32,9 +32,9 @@ const initialState = {
 };
 
 /* Reducer */
-function citiesReducer(state = initialState, action) {
+function citySupportReducer(state = initialState, action) {
   switch (action.type) {
-    case SET_CITIES: {
+    case SET_CITY_SUPPORTS: {
       const { list, itemCount } = action.payload;
       return {
         ...state,
@@ -42,30 +42,30 @@ function citiesReducer(state = initialState, action) {
         itemCount
       };
     }
-    case SET_CITIES_LOADING:
+    case SET_CITY_SUPPORTS_LOADING:
       return {
         ...state,
         loading: action.payload
       };
-    case SET_CITY_DETAIL:
+    case SET_CITY_SUPPORTS_DETAIL:
       return {
         ...state,
         detailId: action.payload
       };
-    case SET_CITY_FILTERS:
+    case SET_CITY_SUPPORTS_FILTERS:
       return {
         ...state,
         ...action.payload
       };
-    case SET_CITY_SEARCH:
+    case SET_CITY_SUPPORTS_SEARCH:
       return {
         ...state,
         search: action.payload
       };
-    case RESET_CITIES:
+    case RESET_CITY_SUPPORTS:
       return {
         ...state,
-        list: initialState.list,
+        list: [],
         pagination: initialState.pagination,
         search: initialState.search
       };
@@ -75,23 +75,23 @@ function citiesReducer(state = initialState, action) {
 }
 
 /* Action creators */
-function setCitiesLoading(loading) {
+function setCitySupportLoading(loading) {
   return {
-    type: SET_CITIES_LOADING,
+    type: SET_CITY_SUPPORTS_LOADING,
     payload: loading
   };
 }
 
-function setCities({ list, itemCount }) {
+function setCitySupport({ list, itemCount }) {
   return {
-    type: SET_CITIES,
+    type: SET_CITY_SUPPORTS,
     payload: { list, itemCount }
   };
 }
 
-function setCityDetail(id) {
+function setCitySupportDetail(id) {
   return {
-    type: SET_CITY_DETAIL,
+    type: SET_CITY_SUPPORTS_DETAIL,
     payload: id
   };
 }
@@ -102,25 +102,25 @@ const setFilters = (field, value) => {
   filter[field] = value;
 
   return {
-    type: SET_CITY_FILTERS,
+    type: SET_CITY_SUPPORTS_FILTERS,
     payload: filter
   };
 };
 
-const setCitySearch = (term) => {
+const setCitySupportSearch = (term) => {
   return {
-    type: SET_CITY_SEARCH,
+    type: SET_CITY_SUPPORTS_SEARCH,
     payload: term
   };
 };
 
-function resetCities() {
+function resetCitySupport() {
   return {
-    type: RESET_CITIES
+    type: RESET_CITY_SUPPORTS
   };
 }
 
-const getCities = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => {
+const getCitySupport = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => {
   const queryS = queryString.stringify({
     'page[size]': pageSize || 999999,
     'page[number]': pageNumber || 1,
@@ -130,22 +130,21 @@ const getCities = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => 
 
   const params = id ? `/${id}` : `?${queryS}`;
 
-  dispatch(setCitiesLoading(true));
+  dispatch(setCitySupportLoading(true));
   get({
-    url: `${config.API_URL}/cities${params}`,
+    url: `${config.API_URL}/city_supports/${params}`,
     onSuccess({ data, meta, included }) {
-      dispatch(setCitiesLoading(false));
+      dispatch(setCitySupportLoading(false));
 
       // Parse data to json api format
       // eslint-disable-next-line no-param-reassign
       if (!Array.isArray(data)) data = [data];
       const parsedData = deserialize(data);
 
-      dispatch(setCities({
-        list: parsedData.map(city => ({
-          ...city,
-          countryId: city.relationships.country.data.id,
-          ...city.relationships.photos.data.length && getPhoto(included)
+      dispatch(setCitySupport({
+        list: parsedData.map(citySupport => ({
+          ...citySupport,
+          ...citySupport.relationships.photos.data.length && getPhoto(included)
         })),
         itemCount: meta.total_items
       }));
@@ -153,42 +152,42 @@ const getCities = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => 
   });
 };
 
-const createCity = ({ data, onSuccess, onError }) => {
+const createCitySupport = ({ data, onSuccess, onError }) => {
   return (dispatch) => {
-    dispatch(setCitiesLoading(true));
+    dispatch(setCitySupportLoading(true));
     post({
-      url: `${config.API_URL}/cities`,
-      body: { city: data },
+      url: `${config.API_URL}/city_supports`,
+      body: { city_support: data },
       headers: {
         Authorization: `Bearer ${localStorage.token}`
       },
       onSuccess() {
-        dispatch(setCitiesLoading(false));
+        dispatch(setCitySupportLoading(false));
         if (onSuccess) onSuccess();
       },
       onError({ errors = [] }) {
-        dispatch(setCitiesLoading(false));
+        dispatch(setCitySupportLoading(false));
         if (onError && errors[0]) onError(errors[0]);
       }
     });
   };
 };
 
-const updateCity = ({ id, data, onSuccess, onError }) => {
+const updateCitySupport = ({ id, data, onSuccess, onError }) => {
   return (dispatch) => {
-    dispatch(setCitiesLoading(true));
+    dispatch(setCitySupportLoading(true));
     patch({
-      url: `${config.API_URL}/cities/${id}`,
-      body: { city: data },
+      url: `${config.API_URL}/city_supports/${id}`,
+      body: { city_support: data },
       headers: {
         Authorization: `Bearer ${localStorage.token}`
       },
       onSuccess() {
-        dispatch(setCitiesLoading(false));
+        dispatch(setCitySupportLoading(false));
         if (onSuccess) onSuccess(id);
       },
       onError({ errors = [] }) {
-        dispatch(setCitiesLoading(false));
+        dispatch(setCitySupportLoading(false));
         if (onError && errors[0]) onError(errors[0]);
       }
     });
@@ -196,13 +195,13 @@ const updateCity = ({ id, data, onSuccess, onError }) => {
 };
 
 
-const deleteCity = ({ id, onSuccess }) => {
+const deleteCitySupport = ({ id, onSuccess }) => {
   return (dispatch) => {
-    dispatch(setCitiesLoading(true));
+    dispatch(setCitySupportLoading(true));
     _delete({
-      url: `${config.API_URL}/cities/${id}`,
+      url: `${config.API_URL}/city_supports/${id}`,
       onSuccess() {
-        dispatch(setCitiesLoading(false));
+        dispatch(setCitySupportLoading(false));
         if (onSuccess) onSuccess(id);
       }
     });
@@ -210,4 +209,14 @@ const deleteCity = ({ id, onSuccess }) => {
 };
 
 
-export { citiesReducer, getCities, setCityDetail, deleteCity, setFilters, setCitySearch, resetCities, createCity, updateCity };
+export {
+  citySupportReducer,
+  getCitySupport,
+  setCitySupportDetail,
+  deleteCitySupport,
+  setFilters,
+  setCitySupportSearch,
+  resetCitySupport,
+  createCitySupport,
+  updateCitySupport
+};

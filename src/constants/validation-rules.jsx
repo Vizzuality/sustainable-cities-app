@@ -16,4 +16,14 @@ const passwordConfirmation = {
   hint: () => <span className="form-error -password-confirmation">{'Passwords don\'t match'}</span>
 };
 
-export { required, email, passwordConfirmation };
+const url = {
+  rule: (value) => {
+    const regex = /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
+    return regex.test(value || '');
+  },
+  hint: () => {
+    return 'The field should be an url: http://example.com';
+  }
+};
+
+export { required, email, passwordConfirmation, url };
