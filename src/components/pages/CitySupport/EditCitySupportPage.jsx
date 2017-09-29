@@ -10,10 +10,10 @@ import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 
 // modules
-import { getCitySupport, updateCitySupport, resetCitySupport } from 'modules/city-support';
+import { getCitySupport, getCategories, updateCitySupport, resetCitySupport } from 'modules/city-support';
 
 // components
-import { Input, Button, Form, Textarea } from 'components/form/Form';
+import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import DropZone from 'components/dropzone/DropZone';
 import DatePicker from 'react-datepicker';
@@ -43,6 +43,7 @@ class EditCitySupportPage extends React.Component {
   }
 
   componentWillMount() {
+    dispatch(getCategories());
     if (this.props.detailId) dispatch(getCitySupport({ id: this.props.detailId }));
   }
 
@@ -54,6 +55,7 @@ class EditCitySupportPage extends React.Component {
         description,
         date,
         photos_attributes: photosAttributes,
+        city_support_category_id: category,
         image_source: imageSource
       } = nextProps.city;
 
@@ -61,7 +63,8 @@ class EditCitySupportPage extends React.Component {
         title,
         description,
         date: moment(date),
-        photos_attributes: photosAttributes,
+        city_support_category_id: category,
+        photos_attributes: photosAttributes || [],
         image_source: imageSource
       });
     }
@@ -81,6 +84,12 @@ class EditCitySupportPage extends React.Component {
     this.setState({ date });
   }
 
+  onSelectChange = (field, val) => {
+    this.setState({
+      [field]: val.value
+    });
+  }
+
   @Autobind
   onSubmit(evt) {
     evt.preventDefault();
@@ -98,7 +107,14 @@ class EditCitySupportPage extends React.Component {
   }
 
   render() {
-    const { title, description, date, image_source: imageSource } = this.state;
+    const { categories } = this.props;
+    const {
+      title,
+      description,
+      city_support_category_id: category,
+      date,
+      image_source: imageSource
+    } = this.state;
 
     return (
       <section className="c-form">
@@ -108,7 +124,7 @@ class EditCitySupportPage extends React.Component {
             <Button type="submit" className="button success">Edit</Button>
           </BtnGroup>
           <div className="row expanded">
-            <div className="column small-12">
+            <div className="column small-8">
               {/* Title */}
               <Input
                 type="text"
@@ -117,6 +133,16 @@ class EditCitySupportPage extends React.Component {
                 value={title || ''}
                 label="Title"
                 validations={['required']}
+              />
+            </div>
+            <div className="column small-4">
+              <Select
+                required
+                name="city_support_category_id"
+                value={category}
+                onChange={val => this.onSelectChange('city_support_category_id', val)}
+                label="Category"
+                options={categories}
               />
             </div>
           </div>
@@ -181,17 +207,20 @@ class EditCitySupportPage extends React.Component {
 
 EditCitySupportPage.propTypes = {
   city: PropTypes.object,
+  categories: PropTypes.array,
   detailId: PropTypes.number
 };
 
 EditCitySupportPage.defaultProps = {
-  city: {}
+  city: {},
+  categories: []
 };
 
 // Map state to props
 const mapStateToProps = ({ citySupport }) => ({
   city: citySupport.list[0],
-  detailId: citySupport.detailId
+  detailId: citySupport.detailId,
+  categories: citySupport.categories.list
 });
 
 export default connect(mapStateToProps, null)(EditCitySupportPage);

@@ -58,7 +58,7 @@ class EditBlogsPage extends React.Component {
         title,
         link,
         date: moment(date),
-        photos_attributes: photosAttributes
+        photos_attributes: photosAttributes || []
       });
     }
   }
