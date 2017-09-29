@@ -5,7 +5,6 @@ import * as queryString from 'query-string';
 // utils
 import getPhoto from 'utils/photo';
 
-
 // constants
 import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
 

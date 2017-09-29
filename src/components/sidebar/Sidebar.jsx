@@ -14,14 +14,6 @@ const links = [
     text: 'Categories',
     href: '/category'
   },
-  // {
-  //   text: 'Solution',
-  //   href: '/solution'
-  // },
-  // {
-  //   text: 'Source',
-  //   href: '/source'
-  // },
   {
     text: 'Impact',
     href: '/impact'
@@ -41,6 +33,10 @@ const links = [
   {
     text: 'Events',
     href: '/events'
+  },
+  {
+    text: 'City Supports',
+    href: '/city-supports'
   }
 ];
 

@@ -5,6 +5,9 @@ import * as queryString from 'query-string';
 // constants
 import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
 
+// utils
+import getPhoto from 'utils/photo';
+
 /* Action types */
 const SET_CITIES = 'SET_CITIES';
 const SET_CITIES_LOADING = 'SET_CITIES_LOADING';
@@ -12,13 +15,6 @@ const SET_CITY_DETAIL = 'SET_CITY_DETAIL';
 const SET_CITY_FILTERS = 'SET_CITY_FILTERS';
 const SET_CITY_SEARCH = 'SET_CITY_SEARCH';
 const RESET_CITIES = 'RESET_CITIES';
-
-// helper
-const getCityPhoto = (city, include = []) => {
-  const photos = include.filter(inc => inc.type === 'photos') || [];
-  const photoAttributes = deserialize(photos)[0] || {};
-  return { photos_attributes: [photoAttributes] };
-};
 
 
 /* Initial state */
@@ -149,7 +145,7 @@ const getCities = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => 
         list: parsedData.map(city => ({
           ...city,
           countryId: city.relationships.country.data.id,
-          ...city.relationships.photos.data.length && getCityPhoto(city, included)
+          ...city.relationships.photos.data.length && getPhoto(included)
         })),
         itemCount: meta.total_items
       }));

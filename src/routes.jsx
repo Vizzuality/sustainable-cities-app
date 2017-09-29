@@ -46,9 +46,9 @@ import EventsPage from 'components/pages/Event/EventsPage';
 import NewEventsPage from 'components/pages/Event/NewEventsPage';
 import EditEventsPage from 'components/pages/Event/EditEventsPage';
 // //    - City Support
-// import CitySupportPage from 'components/pages/CitySupport/CitySupportPage';
-// import NewCitySupportPage from 'components/pages/CitySupport/NewCitySupportPage';
-// import EditCitySupportPage from 'components/pages/CitySupport/EditCitySupportPage';
+import CitySupportPage from 'components/pages/CitySupport/CitySupportPage';
+import NewCitySupportPage from 'components/pages/CitySupport/NewCitySupportPage';
+import EditCitySupportPage from 'components/pages/CitySupport/EditCitySupportPage';
 
 
 // Url hooks
@@ -142,15 +142,15 @@ const Routes = ({ history }) => (
           onEnter={onEnterEditEventsPage}
         />
       </Route>
-      {/* <Route path="city-supports">
+      <Route path="city-supports">
         <IndexRoute components={{ main: CitySupportPage, nav: Sidebar }} />
         <Route path="new" components={{ main: NewCitySupportPage, nav: Sidebar }} />
         <Route
           path="edit/:id"
           components={{ main: EditCitySupportPage, nav: Sidebar }}
-          onEnter={onEnterCitySupportPage}
+          onEnter={onEnterEditCitySupportPage}
         />
-      </Route> */}
+      </Route>
     </Route>
   </Router>
 );
