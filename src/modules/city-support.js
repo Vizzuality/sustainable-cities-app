@@ -75,7 +75,7 @@ function citySupportReducer(state = initialState, action) {
 function setCitySupportLoading(loading) {
   return {
     type: SET_CITY_SUPPORTS_LOADING,
-    payload: { loading }
+    payload: loading
   };
 }
 

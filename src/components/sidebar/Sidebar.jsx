@@ -35,8 +35,8 @@ const links = [
     href: '/cities'
   },
   {
-    text: 'About',
-    href: '/about'
+    text: 'Blogs',
+    href: '/blogs'
   }
 ];
 

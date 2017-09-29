@@ -20,6 +20,9 @@ import {
   resetBlogs
 } from 'modules/blogs';
 
+// selectors
+import getParsedBlogDate from 'selectors/blog-date';
+
 // constants
 import { DEFAULT_SORT_FIELD, BLOGS_TABLE_FIELDS } from 'constants/blog';
 import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
@@ -84,6 +87,7 @@ class BlogsPage extends React.Component {
 
   render() {
     const { blogs, loading, pagination, itemCount } = this.props;
+
     return (
       <div className="c-page">
         <Link className="button" to="/blogs/new">New Blog</Link>
@@ -99,7 +103,7 @@ class BlogsPage extends React.Component {
           onDelete={(item) => {
             const confirm = (
               <Confirm
-                text={`Blog "${item.name}" will be deleted. Are you sure?`}
+                text={`Blog "${item.title}" will be deleted. Are you sure?`}
                 onAccept={() => this.deteleBlog(item)}
               />
             );
@@ -127,14 +131,14 @@ BlogsPage.defaultProps = {
 };
 
 // Map state to props
-const mapStateToProps = ({ blogs }) => ({
-  blogs: blogs.list,
-  filters: blogs.filters,
-  loading: blogs.loading,
-  pagination: blogs.pagination,
-  itemCount: blogs.itemCount,
-  search: blogs.search,
-  sort: blogs.sort
+const mapStateToProps = state => ({
+  blogs: getParsedBlogDate(state),
+  filters: state.blogs.filters,
+  loading: state.blogs.loading,
+  pagination: state.blogs.pagination,
+  itemCount: state.blogs.itemCount,
+  search: state.blogs.search,
+  sort: state.blogs.sort
 });
 
 export default connect(mapStateToProps, null)(BlogsPage);

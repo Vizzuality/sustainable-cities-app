@@ -28,6 +28,13 @@ const initialState = {
   search: null
 };
 
+// helper
+const getBlogPhoto = (include = []) => {
+  const photos = include.filter(inc => inc.type === 'photos') || [];
+  const photoAttributes = deserialize(photos)[0] || {};
+  return { photos_attributes: [photoAttributes] };
+};
+
 /* Reducer */
 function blogReducer(state = initialState, action) {
   switch (action.type) {
@@ -75,7 +82,7 @@ function blogReducer(state = initialState, action) {
 function setBlogsLoading(loading) {
   return {
     type: SET_BLOGS_LOADING,
-    payload: { loading }
+    payload: loading
   };
 }
 
@@ -130,7 +137,7 @@ const getBlogs = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => {
   dispatch(setBlogsLoading(true));
   get({
     url: `${config.API_URL}/blogs/${params}`,
-    onSuccess({ data, meta }) {
+    onSuccess({ data, meta, included }) {
       dispatch(setBlogsLoading(false));
 
       // Parse data to json api format
@@ -139,7 +146,10 @@ const getBlogs = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => {
       const parsedData = deserialize(data);
 
       dispatch(setBlogs({
-        list: parsedData,
+        list: parsedData.map(blog => ({
+          ...blog,
+          ...blog.relationships.photos.data.length && getBlogPhoto(included)
+        })),
         itemCount: meta.total_items
       }));
     }

@@ -75,7 +75,7 @@ function eventsReducer(state = initialState, action) {
 function setEventsLoading(loading) {
   return {
     type: SET_EVENTS_LOADING,
-    payload: { loading }
+    payload: loading
   };
 }
 
