@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { validation } from 'utils/validation'; // eslint-disable-line no-unused-vars
 import { dispatch } from 'main';
 import { Autobind } from 'es-decorators';
@@ -9,13 +10,13 @@ import { push } from 'react-router-redux';
 import moment from 'moment';
 
 // components
-import { Input, Button, Form, Textarea } from 'components/form/Form';
+import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
 import DropZone from 'components/dropzone/DropZone';
 import DatePicker from 'react-datepicker';
 
 // modules
-import { createCitySupport } from 'modules/city-support';
+import { createCitySupport, getCategories } from 'modules/city-support';
 
 // constants
 import { MAX_IMAGES_ACCEPTED, MAX_SIZE_IMAGE } from 'constants/city-support';
@@ -29,8 +30,14 @@ class NewCitySupportPage extends React.Component {
       title: null,
       date: moment(),
       description: null,
+      image_source: null,
+      city_support_category_id: null,
       photos_attributes: []
     };
+  }
+
+  componentWillMount() {
+    dispatch(getCategories());
   }
 
   /* Methods */
@@ -41,6 +48,12 @@ class NewCitySupportPage extends React.Component {
 
   onChangeDate = (date) => {
     this.setState({ date });
+  }
+
+  onSelectChange = (field, val) => {
+    this.setState({
+      [field]: val.value
+    });
   }
 
   @Autobind
@@ -60,7 +73,15 @@ class NewCitySupportPage extends React.Component {
   }
 
   render() {
-    const { title, description, date, photos_attributes: photosAttributes } = this.state;
+    const { categories } = this.props;
+    const {
+      title,
+      description,
+      city_support_category_id: category,
+      date,
+      photos_attributes: photosAttributes,
+      image_source: imageSource
+     } = this.state;
 
     return (
       <section className="c-form">
@@ -70,7 +91,7 @@ class NewCitySupportPage extends React.Component {
             <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
           <div className="row expanded">
-            <div className="column small-12">
+            <div className="column small-8">
               {/* Title */}
               <Input
                 type="text"
@@ -79,6 +100,16 @@ class NewCitySupportPage extends React.Component {
                 value={title || ''}
                 label="Title"
                 validations={['required']}
+              />
+            </div>
+            <div className="column small-4">
+              <Select
+                required
+                name="city_support_category_id"
+                value={category}
+                onChange={val => this.onSelectChange('city_support_category_id', val)}
+                label="Category"
+                options={categories}
               />
             </div>
           </div>
@@ -108,6 +139,19 @@ class NewCitySupportPage extends React.Component {
             </div>
           </div>
           <div className="row expanded">
+            <div className="column small-12">
+              {/* Image source */}
+              <Input
+                type="text"
+                onChange={this.onInputChange}
+                name="image_source"
+                value={imageSource || ''}
+                label="Image source"
+                validations={[]}
+              />
+            </div>
+          </div>
+          <div className="row expanded">
             <div className="column small-6">
               {/* Image */}
               <DropZone
@@ -128,7 +172,17 @@ class NewCitySupportPage extends React.Component {
   }
 }
 
+NewCitySupportPage.propTypes = {
+  categories: PropTypes.array
+};
+
+NewCitySupportPage.defaultProps = {
+  categories: []
+};
+
 // Map state to props
-const mapStateToProps = () => ({});
+const mapStateToProps = ({ citySupport }) => ({
+  categories: citySupport.categories.list
+});
 
 export default connect(mapStateToProps, null)(NewCitySupportPage);

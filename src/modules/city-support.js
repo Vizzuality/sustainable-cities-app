@@ -10,6 +10,8 @@ import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/ta
 
 /* Action types */
 const SET_CITY_SUPPORTS = 'SET_CITY_SUPPORTS';
+const SET_CATEGORIES = 'SET_CATEGORIES';
+const SET_CATEGORIES_LOADING = 'SET_CATEGORIES_LOADING';
 const SET_CITY_SUPPORTS_LOADING = 'SET_CITY_SUPPORTS_LOADING';
 const SET_CITY_SUPPORTS_DETAIL = 'SET_CITY_SUPPORTS_DETAIL';
 const SET_CITY_SUPPORTS_FILTERS = 'SET_CITY_SUPPORTS_FILTERS';
@@ -28,7 +30,17 @@ const initialState = {
     pageSize: DEFAULT_PAGINATION_SIZE,
     pageNumber: DEFAULT_PAGINATION_NUMBER
   },
-  search: null
+  search: null,
+  categories: {
+    list: [],
+    loading: false
+  }
+};
+
+const getCategory = (included) => {
+  const categories = included.filter(inc => inc.type === 'city_support_categories');
+  const category = categories[0] || {};
+  return { city_support_category_id: category.id };
 };
 
 /* Reducer */
@@ -62,6 +74,22 @@ function citySupportReducer(state = initialState, action) {
         ...state,
         search: action.payload
       };
+    case SET_CATEGORIES:
+      return {
+        ...state,
+        categories: {
+          ...state.categories,
+          list: action.payload
+        }
+      };
+    case SET_CATEGORIES_LOADING:
+      return {
+        ...state,
+        categories: {
+          ...state.categories,
+          loading: action.payload
+        }
+      };
     case RESET_CITY_SUPPORTS:
       return {
         ...state,
@@ -82,10 +110,24 @@ function setCitySupportLoading(loading) {
   };
 }
 
+function setCategoriesLoading(loading) {
+  return {
+    type: SET_CATEGORIES_LOADING,
+    payload: loading
+  };
+}
+
 function setCitySupport({ list, itemCount }) {
   return {
     type: SET_CITY_SUPPORTS,
     payload: { list, itemCount }
+  };
+}
+
+function setCategories(categories) {
+  return {
+    type: SET_CATEGORIES,
+    payload: categories
   };
 }
 
@@ -144,10 +186,35 @@ const getCitySupport = ({ pageNumber, pageSize, search, sort, id }) => (dispatch
       dispatch(setCitySupport({
         list: parsedData.map(citySupport => ({
           ...citySupport,
+          ...citySupport.relationships.city_support_category.data && getCategory(included),
           ...citySupport.relationships.photos.data.length && getPhoto(included)
         })),
         itemCount: meta.total_items
       }));
+    }
+  });
+};
+
+const getCategories = () => (dispatch) => {
+  dispatch(setCategoriesLoading(true));
+  get({
+    url: `${config.API_URL}/city_support_categories`,
+    onSuccess({ data }) {
+      dispatch(setCategoriesLoading(false));
+
+      // Parse data to json api format
+      // eslint-disable-next-line no-param-reassign
+      if (!Array.isArray(data)) data = [data];
+      const parsedData = deserialize(data);
+
+
+      dispatch(setCategories(
+        parsedData.map(d => ({
+          id: d.id,
+          label: d.title,
+          value: d.id
+        }))
+      ));
     }
   });
 };
@@ -212,6 +279,7 @@ const deleteCitySupport = ({ id, onSuccess }) => {
 export {
   citySupportReducer,
   getCitySupport,
+  getCategories,
   setCitySupportDetail,
   deleteCitySupport,
   setFilters,
