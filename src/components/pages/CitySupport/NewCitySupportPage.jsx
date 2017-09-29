@@ -50,7 +50,7 @@ class NewCitySupportPage extends React.Component {
     dispatch(createCitySupport({
       data: this.state,
       onSuccess: () => {
-        dispatch(push('/city-support'));
+        dispatch(push('/city-supports'));
         toastr.success('City support created successfully');
       },
       onError: ({ title }) => {
