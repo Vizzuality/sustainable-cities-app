@@ -29,14 +29,16 @@ class EditCitySupportPage extends React.Component {
       title,
       description,
       date,
-      photos_attributes: photosAttributes
+      photos_attributes: photosAttributes,
+      image_source: imageSource
     } = props.city;
 
     this.state = {
       title: title || null,
       date: date || moment(),
       description: description || null,
-      photos_attributes: photosAttributes || []
+      photos_attributes: photosAttributes || [],
+      image_source: imageSource || null
     };
   }
 
@@ -51,14 +53,16 @@ class EditCitySupportPage extends React.Component {
         title,
         description,
         date,
-        photos_attributes: photosAttributes
+        photos_attributes: photosAttributes,
+        image_source: imageSource
       } = nextProps.city;
 
       this.setState({
         title,
         description,
         date: moment(date),
-        photos_attributes: photosAttributes
+        photos_attributes: photosAttributes,
+        image_source: imageSource
       });
     }
   }
@@ -94,7 +98,7 @@ class EditCitySupportPage extends React.Component {
   }
 
   render() {
-    const { title, description, date } = this.state;
+    const { title, description, date, image_source: imageSource } = this.state;
 
     return (
       <section className="c-form">
@@ -138,6 +142,19 @@ class EditCitySupportPage extends React.Component {
                 onChange={this.onChangeDate}
                 dateFormat="LL"
                 placeholderText="Select a date"
+              />
+            </div>
+          </div>
+          <div className="row expanded">
+            <div className="column small-12">
+              {/* Image source */}
+              <Input
+                type="text"
+                onChange={this.onInputChange}
+                name="image_source"
+                value={imageSource || ''}
+                label="Image source"
+                validations={[]}
               />
             </div>
           </div>

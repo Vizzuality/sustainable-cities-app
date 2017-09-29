@@ -29,6 +29,7 @@ class NewCitySupportPage extends React.Component {
       title: null,
       date: moment(),
       description: null,
+      image_source: null,
       photos_attributes: []
     };
   }
@@ -60,7 +61,13 @@ class NewCitySupportPage extends React.Component {
   }
 
   render() {
-    const { title, description, date, photos_attributes: photosAttributes } = this.state;
+    const {
+      title,
+      description,
+      date,
+      photos_attributes: photosAttributes,
+      image_source: imageSource
+     } = this.state;
 
     return (
       <section className="c-form">
@@ -104,6 +111,19 @@ class NewCitySupportPage extends React.Component {
                 onChange={this.onChangeDate}
                 dateFormat="LL"
                 placeholderText="Select a date"
+              />
+            </div>
+          </div>
+          <div className="row expanded">
+            <div className="column small-12">
+              {/* Image source */}
+              <Input
+                type="text"
+                onChange={this.onInputChange}
+                name="image_source"
+                value={imageSource || ''}
+                label="Image source"
+                validations={[]}
               />
             </div>
           </div>
