@@ -148,7 +148,7 @@ class EditCitySupportPage extends React.Component {
                 title="City support image"
                 accept={'image/png, image/jpg, image/jpeg'}
                 files={DropZone.defaultFileTransform(this, 'photos_attributes')}
-                onDrop={DropZone.defaultDropOnNew(this, 'photos_attributes', MAX_IMAGES_ACCEPTED)}
+                onDrop={DropZone.defaultDropOnEdit(this, 'photos_attributes', MAX_IMAGES_ACCEPTED)}
                 onDelete={DropZone.defaultDeleteOnNew(this, 'photos_attributes')}
                 withImage
                 multiple={false}
