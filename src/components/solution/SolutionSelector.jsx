@@ -116,19 +116,19 @@ export default class SolutionSelector extends React.Component {
 
     options.parent = this.props.solutionCategories.map(cat => ({ value: cat.id, label: cat.name }));
 
-    if (!mandatoryLevels.includes(1)) (options.parent || []).unshift({ value: 'all', label: 'All of the above' });
+    if (!mandatoryLevels.includes(1)) (options.parent || []).unshift({ value: 'all', label: 'All' });
 
     if (parent && parent !== 'all') {
       const parentCategory = this.props.solutionCategories.find(cat => cat.id === parent) || {};
       options.children = (parentCategory.children || []).map(cat => ({ value: cat.id, label: cat.name }));
 
-      if (!mandatoryLevels.includes(2)) (options.children || []).unshift({ value: 'all', label: 'All of the above' });
+      if (!mandatoryLevels.includes(2)) (options.children || []).unshift({ value: 'all', label: 'All' });
 
       if (children && !hideSubCategory) {
         const childrenCategory = (parentCategory.children || []).find(child => child.id === children);
         options.nephew = childrenCategory && (childrenCategory.children || []).map(cat => ({ value: cat.id, label: cat.name }));
 
-        if (!mandatoryLevels.includes(3)) (options.nephew || []).unshift({ value: 'all', label: 'All of the above' });
+        if (!mandatoryLevels.includes(3)) (options.nephew || []).unshift({ value: 'all', label: 'All' });
       }
     }
 
