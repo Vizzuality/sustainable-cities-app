@@ -59,7 +59,7 @@ class EditCityPage extends React.Component {
         province,
         lat,
         lng,
-        photos_attributes: photosAttributes
+        photos_attributes: photosAttributes || []
       });
     }
   }
