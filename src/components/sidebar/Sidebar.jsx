@@ -14,14 +14,6 @@ const links = [
     text: 'Categories',
     href: '/category'
   },
-  // {
-  //   text: 'Solution',
-  //   href: '/solution'
-  // },
-  // {
-  //   text: 'Source',
-  //   href: '/source'
-  // },
   {
     text: 'Impact',
     href: '/impact'
@@ -29,6 +21,22 @@ const links = [
   {
     text: 'Enabling condition',
     href: '/enabling-condition'
+  },
+  {
+    text: 'Cities',
+    href: '/cities'
+  },
+  {
+    text: 'Blogs',
+    href: '/blogs'
+  },
+  {
+    text: 'Events',
+    href: '/events'
+  },
+  {
+    text: 'City Supports',
+    href: '/city-supports'
   }
 ];
 

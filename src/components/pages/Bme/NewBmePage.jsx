@@ -95,7 +95,10 @@ class NewBmePage extends React.Component {
       category_ids: [
         ...timing,
         ...[categories.bme.nephew],
-        ...solutions.map(solution => solution.nephew.id)
+        ...solutions.map((solution) => {
+          if (solution.nephew.id === 'all') return solution.children;
+          return solution.nephew.id;
+        })
       ],
       enabling_ids: enablings,
       external_sources_attributes,
@@ -392,7 +395,7 @@ class NewBmePage extends React.Component {
                       key={i} // eslint-disable-line react/no-array-index-key
                     >
                       <button onClick={evt => this.onAddSolution(evt, { edit: true, index: i })}>
-                        {`${solution.nephew.name} - ${solution.nephew.id}`}
+                        {`${solution.nephew.name}`}
                       </button>
                       <button className="delete button" onClick={() => this.deleteSolution(i)}>Delete solution</button>
                     </li>

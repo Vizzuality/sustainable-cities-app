@@ -8,11 +8,14 @@ import { Autobind } from 'es-decorators';
 import { dispatch } from 'main';
 import isEqual from 'lodash/isEqual';
 
+// selectors
 import { getCategories, updateCategory } from 'modules/categories';
 import getCategoryDetail from 'selectors/categoryDetail';
+import solutionTreeSelector from 'selectors/solutionTree-category';
 
 import { Input, Button, Form, Textarea, Select } from 'components/form/Form';
 import BtnGroup from 'components/ui/BtnGroup';
+import SolutionSelector from 'components/solution/SolutionSelector';
 
 import { CATEGORY_TYPE_CONVERSOR, CATEGORY_TYPE_SELECT } from 'constants/categories';
 
@@ -23,7 +26,8 @@ class EditCategoryPage extends React.Component {
     this.form = {};
     this.state = {
       category_type: null,
-      parent_id: null
+      parent_id: null,
+      solutionTree: {}
     };
 
     // As 'categoryDetail' can be retrieved locally or asking for it,
@@ -50,11 +54,18 @@ class EditCategoryPage extends React.Component {
   componentWillReceiveProps(nextProps) {
     const currentCategoryDetails = this.props.categories.detail ? this.props.categories.detail[0] : null;
     const nextCategoryDetails = nextProps.categories.detail ? nextProps.categories.detail[0] : null;
+    const solutionTreeChanged = this.props.solutionTree !== nextProps.solutionTree;
 
     // if category details are equal, there's no need to do anything
     if (!isEqual(currentCategoryDetails, nextCategoryDetails)) {
       this.categoryDetail = nextCategoryDetails;
       this.setCategory(nextCategoryDetails);
+    }
+
+    if (solutionTreeChanged) {
+      this.setState({
+        solutionTree: nextProps.solutionTree
+      });
     }
   }
 
@@ -72,11 +83,14 @@ class EditCategoryPage extends React.Component {
 
   onSelectCategoryType(field, val) {
     this.onSelectChange(field, val);
+    const categoryType = val.value;
+    const isSolution = categoryType === 'solution';
 
     dispatch(getCategories({
-      type: val.value,
+      type: isSolution ? 'Solution' : categoryType,
       pageSize: 9999,
-      sort: 'name'
+      sort: 'name',
+      ...isSolution && { tree: true }
     }));
   }
 
@@ -84,9 +98,26 @@ class EditCategoryPage extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
 
+    const { solution, category_type, parent_id } = this.state;
+    const isSolution = category_type === 'solution';
+    const { parent, children } = solution || {};
+    let parentId = null;
+
+    if (isSolution) {
+      if (children) {
+        parentId = children === 'all' ? parent : children;
+      }
+
+      if (parent && !children) {
+        parentId = parent === 'all' ? null : parent;
+      }
+    } else {
+      parentId = parent_id;
+    }
+
     const data = {
       ...this.form,
-      parent_id: this.state.parent_id,
+      parent_id: parentId,
       category_type: CATEGORY_TYPE_CONVERSOR.find(cat => cat.key === this.state.category_type).value
     };
 
@@ -100,30 +131,72 @@ class EditCategoryPage extends React.Component {
     }));
   }
 
+  onChangeSolution = (solution) => {
+    const { nephew } = solution || {};
+
+    this.setState({
+      parent_id: nephew,
+      solution,
+      solutionTree: solution
+    });
+  }
+
   setCategory(categoryDetail) {
     // API type values are a bit different from the ones we use locally,
     // that's why it needs a conversion before doing anything
     const convertedCategoryType = CATEGORY_TYPE_CONVERSOR.find(cat => cat.value === categoryDetail.category_type).key;
+    const isSolution = convertedCategoryType === 'solution';
 
-    // gets categories by type to populate category selector
-    dispatch(getCategories({
-      type: convertedCategoryType,
-      pageSize: 9999,
-      sort: 'name'
-    }));
+
+    if (isSolution) dispatch(getCategories({ type: 'Solution', tree: true }));
+    if (!isSolution) {
+      // gets categories by type to populate category selector
+      dispatch(getCategories({
+        type: convertedCategoryType,
+        pageSize: 9999,
+        sort: 'name'
+      }));
+    }
 
     this.setState({
       category_type: convertedCategoryType,
       // asks for its parent to know if the category selector must be setted
       // with an option or not
-      parent_id: categoryDetail.relationships.parent.data ? categoryDetail.relationships.parent.data.id : null
+      parent_id: categoryDetail.relationships.parent.data ? categoryDetail.relationships.parent.data.id : null,
+      ...isSolution && { solution: { nephew: categoryDetail.id } }
     });
+  }
+
+  filterCurrentCategory(currentCategoryId) {
+    const solutions = this.props.categories.solution;
+    let filteredSolutions = [];
+
+    if (!solutions.length) return [];
+    filteredSolutions = solutions.filter(sol => +currentCategoryId !== +sol.id) || [];
+
+    if (filteredSolutions.length !== solutions.length) return filteredSolutions;
+
+    solutions.every((parentSolution, index) => {
+      const filteredChildren = (parentSolution.children || []).filter(childrenSolution => +currentCategoryId !== +childrenSolution.id);
+
+      if (filteredChildren.length) {
+        parentSolution.children = filteredChildren;
+        solutions[index] = parentSolution;
+        filteredSolutions = solutions;
+        return false;
+      }
+      return true;
+    });
+
+    return filteredSolutions;
   }
 
   render() {
     let categoryOption = null;
     let categoryOptions = [];
     const { label, description } = this.categoryDetail || {};
+    const isSolution = this.state.category_type === 'solution';
+    const { solutionTree } = this.state;
 
     if (this.state.category_type && this.props.categories[this.state.category_type].length) {
       const currentCategories = this.props.categories[this.state.category_type];
@@ -134,6 +207,8 @@ class EditCategoryPage extends React.Component {
         categoryOption = categoryOption.id;
       }
     }
+
+    const filteredSolutions = isSolution ? this.filterCurrentCategory(this.props.categories.detailId) : [];
 
     return (
       <section className="c-form">
@@ -167,7 +242,7 @@ class EditCategoryPage extends React.Component {
           />
           <div className="row expanded">
             {/* category */}
-            <div className="small-12 columns">
+            {!isSolution && <div className="small-12 columns">
               <Select
                 name="parent_id"
                 value={categoryOption}
@@ -175,7 +250,17 @@ class EditCategoryPage extends React.Component {
                 label="Parent category"
                 options={categoryOptions}
               />
-            </div>
+            </div>}
+            {isSolution &&
+              <SolutionSelector
+                index={0}
+                state={solutionTree}
+                hideSubCategory
+                solutionCategories={filteredSolutions}
+                onChangeSelect={this.onChangeSolution}
+                deletable={false}
+              />
+            }
           </div>
           {/* BME question */}
           {this.state.category_type === 'bme' &&
@@ -203,13 +288,17 @@ class EditCategoryPage extends React.Component {
 
 EditCategoryPage.propTypes = {
   categories: Proptypes.object,
-  categoryDetail: Proptypes.object
+  solutionCategories: Proptypes.array,
+  categoryDetail: Proptypes.object,
+  solutionTree: Proptypes.object
 };
 
 const mapStateToProps = state => ({
   categories: state.categories,
+  solutionCategories: state.categories.solution,
   categoryDetail: getCategoryDetail(state),
-  categoryType: state.categories.categoryType
+  categoryType: state.categories.categoryType,
+  solutionTree: solutionTreeSelector(state)
 });
 
 export default connect(mapStateToProps, null)(EditCategoryPage);

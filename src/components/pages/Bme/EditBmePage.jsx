@@ -18,6 +18,9 @@ import isEqual from 'lodash/isEqual';
 import { xhrErrorToast } from 'utils/toasts';
 import DropZone from 'components/dropzone/DropZone';
 
+// selectors
+import solutionTreeSelector from 'selectors/solutionTree-bme';
+
 import { MAX_SIZE_IMAGE } from 'constants/bmes';
 
 class EditBmePage extends React.Component {
@@ -40,8 +43,8 @@ class EditBmePage extends React.Component {
     };
 
     this.categoryGroups = {
-      bme: props.bmeCategories,
-      solution: props.solutionCategories
+      bme: props.bmeCategories
+      // solution: props.solutionCategories
     };
 
     // contains ids from selected solutions
@@ -67,7 +70,8 @@ class EditBmePage extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { bmeCategories, solutionCategories, bmesDetail, bmes } = this.props;
+    const { bmeCategories, bmesDetail, bmes } = this.props;
+    const solutionTreeChanged = this.props.solutionTree !== nextProps.solutionTree;
     if (!isEqual(bmeCategories, nextProps.bmeCategories)) {
       this.categoryGroups = {
         ...this.categoryGroups,
@@ -75,12 +79,12 @@ class EditBmePage extends React.Component {
       };
     }
 
-    if (!isEqual(solutionCategories, nextProps.solutionCategories)) {
-      this.categoryGroups = {
-        ...this.categoryGroups,
-        ...{ solution: nextProps.solutionCategories }
-      };
-    }
+    // if (!isEqual(solutionCategories, nextProps.solutionCategories)) {
+    //   this.categoryGroups = {
+    //     ...this.categoryGroups,
+    //     ...{ solution: nextProps.solutionCategories }
+    //   };
+    // }
 
     if (!isEqual(bmesDetail, nextProps.bmesDetail)) {
       this.fillFields(nextProps);
@@ -100,6 +104,15 @@ class EditBmePage extends React.Component {
     if (!isEqual(bmeCategories, nextProps.bmeCategories) &&
       this.props.bmesDetail !== undefined) {
       this.setCategories(nextProps);
+    }
+
+    if (solutionTreeChanged) {
+      this.setState({
+        categories: {
+          ...this.state.categories,
+          solution: nextProps.solutionTree
+        }
+      });
     }
   }
 
@@ -194,7 +207,11 @@ class EditBmePage extends React.Component {
   @Autobind
   onAddSolution() {
     const solutionState = this.state.categories.solution;
-    solutionState.push({});
+    solutionState.push({
+      parent: null,
+      children: null,
+      nephew: null
+    });
 
     const newState = {
       ...this.state.categories,
@@ -206,16 +223,18 @@ class EditBmePage extends React.Component {
 
   @Autobind
   onChangeSolution(values, index) {
-    this.solutionIds[index] = values.nephew;
     const solutionState = this.state.categories.solution;
     solutionState[index] = values;
 
-    const newState = {
-      ...this.state.categories,
-      ...{ solution: solutionState }
-    };
+    this.solutionIds[index] = values.nephew === 'all' ?
+      values.children : values.nephew;
 
-    this.setState({ categories: newState });
+    this.setState({
+      categories: {
+        ...this.state.categories,
+        ...{ solution: solutionState }
+      }
+    });
   }
 
   @Autobind
@@ -307,25 +326,25 @@ class EditBmePage extends React.Component {
     Object.keys(this.categoryGroups).forEach((key) => {
       let nephewCategory;
 
+
       switch (key) {
         case 'bme':
           nephewCategory = bmesDetail.categories.filter(cat => cat.category_type === 'Bme')[0];
           break;
-        case 'solution':
-          nephewCategory = bmesDetail.categories.filter(cat => cat.category_type === 'Solution');
-          break;
+        // case 'solution':
+        //   nephewCategory = bmesDetail.categories.filter(cat => cat.category_type === 'Solution');
+        //   break;
         default:
           break;
       }
 
-      if (!nephewCategory) {
-        newState = {
-          ...newState,
-          ...newState.categories,
-          ...{ [key]: {} }
-        };
-        return;
-      }
+      // if (!nephewCategory) {
+      //   newState = {
+      //     ...newState.categories,
+      //     ...{ [key]: [] }
+      //   };
+      //   return;
+      // }
 
       let parentCategory = null;
       let childrenCategoryId = null;
@@ -338,8 +357,7 @@ class EditBmePage extends React.Component {
         }) : {};
 
         newState = {
-          ...newState,
-          ...newState.categories,
+          ...this.state.categories,
           ...{ [key]: {
             parent: parentCategory ? parentCategory.id : null,
             children: childrenCategoryId,
@@ -550,6 +568,7 @@ class EditBmePage extends React.Component {
                 key={index} // eslint-disable-line react/no-array-index-key
                 solutionCategories={this.props.solutionCategories}
                 state={sol}
+                mandatoryLevels={[1, 2]}
                 onChangeSelect={this.onChangeSolution}
                 onDeleteSelect={this.onDeleteSolution}
               />
@@ -623,7 +642,12 @@ EditBmePage.propTypes = {
   solutionCategories: PropTypes.array,
   timingCategories: PropTypes.array,
   // Selector
-  bmesDetail: PropTypes.object
+  bmesDetail: PropTypes.object,
+  solutionTree: PropTypes.array
+};
+
+EditBmePage.defaultProps = {
+  solutionTree: []
 };
 
 // Map state to props
@@ -633,6 +657,7 @@ const mapStateToProps = state => ({
   solutionCategories: state.categories.solution,
   timingCategories: state.categories.timing,
   enablings: state.enablings,
+  solutionTree: solutionTreeSelector(state),
   bmesDetail: getBmeDetail(state)
 });
 

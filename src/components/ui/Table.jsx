@@ -73,7 +73,7 @@ export default class Table extends React.Component {
         {this.props.fields.map((field) => {
           return (
             <th key={field.value}>{field.sortable ?
-              <button onClick={() => this.onSort(field.value)}>
+              <button onClick={() => this.onSort(field.sort || field.value)}>
                 {this.state.sort.field === field.value && <Icon
                   className="table-btn-icon -small"
                   name={this.state.sort.direction === 1 ? 'icon-arrow-up-2' : 'icon-arrow-down-2'}

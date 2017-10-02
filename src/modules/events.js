@@ -2,19 +2,19 @@ import { get, post, patch, _delete } from 'utils/request';
 import { deserialize } from 'utils/json-api';
 import * as queryString from 'query-string';
 
-// constants
-import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
-
 // utils
 import getPhoto from 'utils/photo';
 
+// constants
+import { DEFAULT_PAGINATION_NUMBER, DEFAULT_PAGINATION_SIZE } from 'constants/table';
+
 /* Action types */
-const SET_CITIES = 'SET_CITIES';
-const SET_CITIES_LOADING = 'SET_CITIES_LOADING';
-const SET_CITY_DETAIL = 'SET_CITY_DETAIL';
-const SET_CITY_FILTERS = 'SET_CITY_FILTERS';
-const SET_CITY_SEARCH = 'SET_CITY_SEARCH';
-const RESET_CITIES = 'RESET_CITIES';
+const SET_EVENTS = 'SET_EVENTS';
+const SET_EVENTS_LOADING = 'SET_EVENTS_LOADING';
+const SET_EVENTS_DETAIL = 'SET_EVENTS_DETAIL';
+const SET_EVENTS_FILTERS = 'SET_EVENTS_FILTERS';
+const SET_EVENTS_SEARCH = 'SET_EVENTS_SEARCH';
+const RESET_EVENTS = 'RESET_EVENTS';
 
 
 /* Initial state */
@@ -32,9 +32,9 @@ const initialState = {
 };
 
 /* Reducer */
-function citiesReducer(state = initialState, action) {
+function eventsReducer(state = initialState, action) {
   switch (action.type) {
-    case SET_CITIES: {
+    case SET_EVENTS: {
       const { list, itemCount } = action.payload;
       return {
         ...state,
@@ -42,30 +42,30 @@ function citiesReducer(state = initialState, action) {
         itemCount
       };
     }
-    case SET_CITIES_LOADING:
+    case SET_EVENTS_LOADING:
       return {
         ...state,
         loading: action.payload
       };
-    case SET_CITY_DETAIL:
+    case SET_EVENTS_DETAIL:
       return {
         ...state,
         detailId: action.payload
       };
-    case SET_CITY_FILTERS:
+    case SET_EVENTS_FILTERS:
       return {
         ...state,
         ...action.payload
       };
-    case SET_CITY_SEARCH:
+    case SET_EVENTS_SEARCH:
       return {
         ...state,
         search: action.payload
       };
-    case RESET_CITIES:
+    case RESET_EVENTS:
       return {
         ...state,
-        list: initialState.list,
+        list: [],
         pagination: initialState.pagination,
         search: initialState.search
       };
@@ -75,23 +75,23 @@ function citiesReducer(state = initialState, action) {
 }
 
 /* Action creators */
-function setCitiesLoading(loading) {
+function setEventsLoading(loading) {
   return {
-    type: SET_CITIES_LOADING,
+    type: SET_EVENTS_LOADING,
     payload: loading
   };
 }
 
-function setCities({ list, itemCount }) {
+function setEvents({ list, itemCount }) {
   return {
-    type: SET_CITIES,
+    type: SET_EVENTS,
     payload: { list, itemCount }
   };
 }
 
-function setCityDetail(id) {
+function setEventsDetail(id) {
   return {
-    type: SET_CITY_DETAIL,
+    type: SET_EVENTS_DETAIL,
     payload: id
   };
 }
@@ -102,25 +102,25 @@ const setFilters = (field, value) => {
   filter[field] = value;
 
   return {
-    type: SET_CITY_FILTERS,
+    type: SET_EVENTS_FILTERS,
     payload: filter
   };
 };
 
-const setCitySearch = (term) => {
+const setEventsSearch = (term) => {
   return {
-    type: SET_CITY_SEARCH,
+    type: SET_EVENTS_SEARCH,
     payload: term
   };
 };
 
-function resetCities() {
+function resetEvents() {
   return {
-    type: RESET_CITIES
+    type: RESET_EVENTS
   };
 }
 
-const getCities = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => {
+const getEvents = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => {
   const queryS = queryString.stringify({
     'page[size]': pageSize || 999999,
     'page[number]': pageNumber || 1,
@@ -130,22 +130,21 @@ const getCities = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => 
 
   const params = id ? `/${id}` : `?${queryS}`;
 
-  dispatch(setCitiesLoading(true));
+  dispatch(setEventsLoading(true));
   get({
-    url: `${config.API_URL}/cities${params}`,
+    url: `${config.API_URL}/events/${params}`,
     onSuccess({ data, meta, included }) {
-      dispatch(setCitiesLoading(false));
+      dispatch(setEventsLoading(false));
 
       // Parse data to json api format
       // eslint-disable-next-line no-param-reassign
       if (!Array.isArray(data)) data = [data];
       const parsedData = deserialize(data);
 
-      dispatch(setCities({
-        list: parsedData.map(city => ({
-          ...city,
-          countryId: city.relationships.country.data.id,
-          ...city.relationships.photos.data.length && getPhoto(included)
+      dispatch(setEvents({
+        list: parsedData.map(event => ({
+          ...event,
+          ...event.relationships.photos.data.length && getPhoto(included)
         })),
         itemCount: meta.total_items
       }));
@@ -153,42 +152,42 @@ const getCities = ({ pageNumber, pageSize, search, sort, id }) => (dispatch) => 
   });
 };
 
-const createCity = ({ data, onSuccess, onError }) => {
+const createEvents = ({ data, onSuccess, onError }) => {
   return (dispatch) => {
-    dispatch(setCitiesLoading(true));
+    dispatch(setEventsLoading(true));
     post({
-      url: `${config.API_URL}/cities`,
-      body: { city: data },
+      url: `${config.API_URL}/events`,
+      body: { event: data },
       headers: {
         Authorization: `Bearer ${localStorage.token}`
       },
       onSuccess() {
-        dispatch(setCitiesLoading(false));
+        dispatch(setEventsLoading(false));
         if (onSuccess) onSuccess();
       },
       onError({ errors = [] }) {
-        dispatch(setCitiesLoading(false));
+        dispatch(setEventsLoading(false));
         if (onError && errors[0]) onError(errors[0]);
       }
     });
   };
 };
 
-const updateCity = ({ id, data, onSuccess, onError }) => {
+const updateEvents = ({ id, data, onSuccess, onError }) => {
   return (dispatch) => {
-    dispatch(setCitiesLoading(true));
+    dispatch(setEventsLoading(true));
     patch({
-      url: `${config.API_URL}/cities/${id}`,
-      body: { city: data },
+      url: `${config.API_URL}/events/${id}`,
+      body: { event: data },
       headers: {
         Authorization: `Bearer ${localStorage.token}`
       },
       onSuccess() {
-        dispatch(setCitiesLoading(false));
+        dispatch(setEventsLoading(false));
         if (onSuccess) onSuccess(id);
       },
       onError({ errors = [] }) {
-        dispatch(setCitiesLoading(false));
+        dispatch(setEventsLoading(false));
         if (onError && errors[0]) onError(errors[0]);
       }
     });
@@ -196,13 +195,13 @@ const updateCity = ({ id, data, onSuccess, onError }) => {
 };
 
 
-const deleteCity = ({ id, onSuccess }) => {
+const deleteEvents = ({ id, onSuccess }) => {
   return (dispatch) => {
-    dispatch(setCitiesLoading(true));
+    dispatch(setEventsLoading(true));
     _delete({
-      url: `${config.API_URL}/cities/${id}`,
+      url: `${config.API_URL}/events/${id}`,
       onSuccess() {
-        dispatch(setCitiesLoading(false));
+        dispatch(setEventsLoading(false));
         if (onSuccess) onSuccess(id);
       }
     });
@@ -210,4 +209,14 @@ const deleteCity = ({ id, onSuccess }) => {
 };
 
 
-export { citiesReducer, getCities, setCityDetail, deleteCity, setFilters, setCitySearch, resetCities, createCity, updateCity };
+export {
+  eventsReducer,
+  getEvents,
+  setEventsDetail,
+  deleteEvents,
+  setFilters,
+  setEventsSearch,
+  resetEvents,
+  createEvents,
+  updateEvents
+};

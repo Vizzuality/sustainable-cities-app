@@ -12,7 +12,10 @@ function getCities(input, cb) {
   get({
     url: `${config.API_URL}/cities?page[number]=1&&page[size]=50sort=name&search=${input.toLowerCase()}`,
     onSuccess({ data }) {
-      const options = data.map(c => ({ value: c.id, label: `${c.attributes.name} (${c.attributes.iso})` }));
+      const options = data.map(c => ({
+        value: c.id,
+        label: `${c.attributes.name} ${c.attributes.iso ? `(${c.attributes.iso})` : ''}`
+      }));
       cb(null, { options });
     }
   });
