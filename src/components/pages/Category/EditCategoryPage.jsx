@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import Proptypes from 'prop-types';
 import { validation } from 'utils/validation'; // eslint-disable-line no-unused-vars
 import { connect } from 'react-redux';
@@ -7,6 +7,7 @@ import { toastr } from 'react-redux-toastr';
 import { Autobind } from 'es-decorators';
 import { dispatch } from 'main';
 import isEqual from 'lodash/isEqual';
+import DropZone from 'components/dropzone/DropZone';
 
 // selectors
 import { getCategories, updateCategory } from 'modules/categories';
@@ -19,7 +20,13 @@ import SolutionSelector from 'components/solution/SolutionSelector';
 
 import { CATEGORY_TYPE_CONVERSOR, CATEGORY_TYPE_SELECT } from 'constants/categories';
 
-class EditCategoryPage extends React.Component {
+class EditCategoryPage extends PureComponent {
+  static propTypes = {
+    categories: Proptypes.object,
+    categoryDetail: Proptypes.object,
+    solutionTree: Proptypes.object
+  }
+
   constructor(props) {
     super(props);
 
@@ -27,7 +34,8 @@ class EditCategoryPage extends React.Component {
     this.state = {
       category_type: null,
       parent_id: null,
-      solutionTree: {}
+      solutionTree: {},
+      pdfSolution: []
     };
 
     // As 'categoryDetail' can be retrieved locally or asking for it,
@@ -58,14 +66,21 @@ class EditCategoryPage extends React.Component {
 
     // if category details are equal, there's no need to do anything
     if (!isEqual(currentCategoryDetails, nextCategoryDetails)) {
+      const pdfMetadata = (((nextCategoryDetails.relationships || {}).documents || {}).data || [])[0];
+      const { type, id } = pdfMetadata || {};
+      const pdfSolution = ((nextProps.categories.detail.included || []).find(included =>
+        included.type === type && included.id === id) || {});
+
       this.categoryDetail = nextCategoryDetails;
       this.setCategory(nextCategoryDetails);
-    }
-
-    if (solutionTreeChanged) {
       this.setState({
-        solutionTree: nextProps.solutionTree
+        pdfSolution: [{
+          id: pdfSolution.id,
+          ...pdfSolution.attributes
+        }]
       });
+
+      if (solutionTreeChanged) this.setState({ solutionTree: nextProps.solutionTree });
     }
   }
 
@@ -98,8 +113,8 @@ class EditCategoryPage extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
 
-    const { solution, category_type, parent_id } = this.state;
-    const isSolution = category_type === 'solution';
+    const { solution, category_type: categoryType, parent_id, pdfSolution } = this.state;
+    const isSolution = categoryType === 'solution';
     const { parent, children } = solution || {};
     let parentId = null;
 
@@ -118,7 +133,8 @@ class EditCategoryPage extends React.Component {
     const data = {
       ...this.form,
       parent_id: parentId,
-      category_type: CATEGORY_TYPE_CONVERSOR.find(cat => cat.key === this.state.category_type).value
+      category_type: CATEGORY_TYPE_CONVERSOR.find(cat => cat.key === this.state.category_type).value,
+      ...isSolution && { documents_attributes: pdfSolution }
     };
 
     // update category
@@ -252,14 +268,20 @@ class EditCategoryPage extends React.Component {
               />
             </div>}
             {isSolution &&
-              <SolutionSelector
-                index={0}
-                state={solutionTree}
-                hideSubCategory
-                solutionCategories={filteredSolutions}
-                onChangeSelect={this.onChangeSolution}
-                deletable={false}
-              />
+              <div>
+                <SolutionSelector
+                  index={0}
+                  state={solutionTree}
+                  showPDF
+                  files={DropZone.defaultFileTransform(this, 'pdfSolution')}
+                  onAddNewPDF={DropZone.defaultDropOnEdit(this, 'pdfSolution', 1)}
+                  onRemovePDF={DropZone.defaultDeleteOnEdit(this, 'pdfSolution')}
+                  hideSubCategory
+                  solutionCategories={filteredSolutions}
+                  onChangeSelect={this.onChangeSolution}
+                  deletable={false}
+                />
+              </div>
             }
           </div>
           {/* BME question */}
@@ -285,13 +307,6 @@ class EditCategoryPage extends React.Component {
     );
   }
 }
-
-EditCategoryPage.propTypes = {
-  categories: Proptypes.object,
-  solutionCategories: Proptypes.array,
-  categoryDetail: Proptypes.object,
-  solutionTree: Proptypes.object
-};
 
 const mapStateToProps = state => ({
   categories: state.categories,

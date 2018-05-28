@@ -35,7 +35,13 @@ function categoriesReducer(state = initialState, action) {
     case SET_CATEGORIES:
       return {
         ...state,
-        [action.payload.type]: action.payload.data,
+        ...action.payload.type !== 'detail' && { [action.payload.type]: action.payload.data },
+        ...action.payload.type === 'detail' && {
+          detail: {
+            ...action.payload.data,
+            included: action.payload.included
+          }
+        },
         itemCount: action.payload.itemCount
       };
     case SET_CATEGORIES_FILTER: {
@@ -74,7 +80,8 @@ function setCategories(categories, type) {
     payload: {
       data: categories.list,
       itemCount: categories.itemCount,
-      type
+      type,
+      included: categories.included
     }
   };
 }
@@ -153,7 +160,7 @@ function getCategories({ type, id, tree, pageSize, pageNumber, sort, search }) {
     dispatch(setCategoriesLoading(true));
     get({
       url: `${config.API_URL}/${endPoint}${queryS}`,
-      onSuccess({ data, meta }) {
+      onSuccess({ data, meta, included }) {
         let parsedData = data;
 
         // Parse data to json api format
@@ -163,7 +170,8 @@ function getCategories({ type, id, tree, pageSize, pageNumber, sort, search }) {
 
         const categoryData = {
           list: deserialize(parsedData),
-          itemCount: meta.total_items
+          itemCount: meta.total_items,
+          included
         };
 
         dispatch(setCategoriesLoading(false));

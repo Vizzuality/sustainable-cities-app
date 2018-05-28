@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import Proptypes from 'prop-types';
 import { validation } from 'utils/validation'; // eslint-disable-line no-unused-vars
 import { connect } from 'react-redux';
@@ -7,6 +7,7 @@ import { push } from 'react-router-redux';
 import { toastr } from 'react-redux-toastr';
 import { Autobind } from 'es-decorators';
 import { dispatch } from 'main';
+import DropZone from 'components/dropzone/DropZone';
 
 import { createCategory, getCategories } from 'modules/categories';
 
@@ -16,7 +17,10 @@ import SolutionSelector from 'components/solution/SolutionSelector';
 
 import { CATEGORY_TYPE_CONVERSOR, CATEGORY_TYPE_SELECT } from 'constants/categories';
 
-class NewCategoryPage extends React.Component {
+class NewCategoryPage extends PureComponent {
+  static propTypes = { categories: Proptypes.object }
+
+  static defaultProps = { categories: {} }
 
   constructor(props) {
     super(props);
@@ -25,7 +29,8 @@ class NewCategoryPage extends React.Component {
     this.state = {
       category_type: null,
       parent_id: null,
-      solution: {}
+      solution: {},
+      pdfSolution: []
     };
   }
 
@@ -58,8 +63,8 @@ class NewCategoryPage extends React.Component {
   onSubmit(evt) {
     evt.preventDefault();
 
-    const { solution, category_type, parent_id } = this.state;
-    const isSolution = category_type === 'solution';
+    const { solution, category_type: categoryType, parent_id, pdfSolution } = this.state;
+    const isSolution = categoryType === 'solution';
     const { parent, children } = solution || {};
     let parentId = null;
 
@@ -78,7 +83,8 @@ class NewCategoryPage extends React.Component {
     const data = {
       ...this.form,
       category_type: CATEGORY_TYPE_CONVERSOR.find(cat => cat.key === this.state.category_type).value,
-      parent_id: parentId
+      parent_id: parentId,
+      ...isSolution && { documents_attributes: pdfSolution }
     };
 
     // Create category
@@ -102,17 +108,21 @@ class NewCategoryPage extends React.Component {
   }
 
   renderForm() {
-    const { category_type } = this.state;
+    const { category_type: categoryType } = this.state;
 
-    if (!category_type) return null;
+    if (!categoryType) return null;
 
-    if (category_type === 'solution') {
+    if (categoryType === 'solution') {
       return (
         <SolutionSelector
           index={0}
           state={this.state.solution}
+          showPDF
+          files={DropZone.defaultFileTransform(this, 'pdfSolution')}
           solutionCategories={this.props.categories.solution}
           onChangeSelect={this.onChangeSolution}
+          onAddNewPDF={DropZone.defaultDropOnNew(this, 'pdfSolution', 1)}
+          onRemovePDF={DropZone.defaultDeleteOnNew(this, 'pdfSolution')}
           hideSubCategory
           deletable={false}
         />
@@ -191,13 +201,6 @@ class NewCategoryPage extends React.Component {
   }
 }
 
-NewCategoryPage.propTypes = {
-  categories: Proptypes.object
-};
-
-
-const mapStateToProps = ({ categories }) => ({
-  categories
-});
+const mapStateToProps = ({ categories }) => ({ categories });
 
 export default connect(mapStateToProps, null)(NewCategoryPage);
