@@ -1,24 +1,46 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Autobind } from 'es-decorators';
+import DropZone from 'components/dropzone/DropZone';
 
 import { Select } from 'components/form/Form';
 
-export default class SolutionSelector extends React.Component {
+const MAX_SIZE_PDF = 1048576 * 10; // 10MB
+
+class SolutionSelector extends PureComponent {
+  static propTypes = {
+    deletable: PropTypes.bool,
+    index: PropTypes.number,
+    solutionCategories: PropTypes.array,
+    state: PropTypes.object,
+    onChangeSelect: PropTypes.func,
+    onDeleteSelect: PropTypes.func,
+    mandatoryLevels: PropTypes.array,
+    hideSubCategory: PropTypes.bool,
+    files: PropTypes.array,
+    showPDF: PropTypes.bool,
+    onAddNewPDF: PropTypes.func,
+    onRemovePDF: PropTypes.func
+  }
+
+  static defaultProps = {
+    deletable: true,
+    mandatoryLevels: [],
+    hideSubCategory: false,
+    showPDF: false,
+    files: [],
+    onAddNewPDF: null,
+    onRemovePDF: null
+  }
 
   constructor(props) {
     super(props);
 
-    this.state = {
-      categories: props.state
-    };
+    this.state = { categories: props.state };
   }
 
-  /* lifecycle */
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      categories: nextProps.state
-    });
+    this.setState({ categories: nextProps.state });
   }
 
   onCategoryChange(level, initialVal) {
@@ -138,7 +160,14 @@ export default class SolutionSelector extends React.Component {
   render() {
     const selectOptions = this.loadMultiSelectOptions();
     const { parent, children, nephew } = this.state.categories || {};
-    const { mandatoryLevels, hideSubCategory } = this.props;
+    const {
+      mandatoryLevels,
+      hideSubCategory,
+      onAddNewPDF,
+      onRemovePDF,
+      files,
+      showPDF
+    } = this.props;
 
     return (
       <div className="c-solution-selector">
@@ -178,24 +207,23 @@ export default class SolutionSelector extends React.Component {
             <button type="button" className="button alert" onClick={this.onDeleteSelect}>Delete solution</button>
           </div>}
         </div>
+        {showPDF &&
+          <div className="row expanded -flex">
+            <div className="small-12 medium-4 columns">
+              <DropZone
+                title="Attach a PDF file (optional)"
+                accept={'application/pdf'}
+                files={files}
+                onDrop={onAddNewPDF}
+                onDelete={onRemovePDF}
+                multiple={false}
+                maxSize={MAX_SIZE_PDF}
+              />
+            </div>
+          </div>}
       </div>
     );
   }
 }
 
-SolutionSelector.propTypes = {
-  deletable: PropTypes.bool,
-  index: PropTypes.number,
-  solutionCategories: PropTypes.array,
-  state: PropTypes.object,
-  onChangeSelect: PropTypes.func,
-  onDeleteSelect: PropTypes.func,
-  mandatoryLevels: PropTypes.array,
-  hideSubCategory: PropTypes.bool
-};
-
-SolutionSelector.defaultProps = {
-  deletable: true,
-  mandatoryLevels: [],
-  hideSubCategory: false
-};
+export default SolutionSelector;
