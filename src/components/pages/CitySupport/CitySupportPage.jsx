@@ -90,14 +90,14 @@ class CitySupportPage extends React.Component {
 
     return (
       <div className="c-page">
-        <Link className="button" to="/city-supports/new">New City Support</Link>
+        <Link className="button" to="/backoffice/city-supports/new">New City Support</Link>
         <Search onChange={this.search} />
         <Table
           items={citiesSupport}
           itemCount={itemCount}
           fields={CITY_SUPPORT_TABLE_FIELDS}
           defaultSortField={DEFAULT_SORT_FIELD}
-          editUrl="/city-supports/edit"
+          editUrl="/backoffice/city-supports/edit"
           pagination={pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
           onDelete={(item) => {

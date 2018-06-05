@@ -4,39 +4,39 @@ import Nav from 'components/ui/Nav';
 const links = [
   {
     text: 'Study case',
-    href: '/study-cases'
+    href: '/backoffice/study-cases'
   },
   {
     text: 'Business model element',
-    href: '/business-model-element'
+    href: '/backoffice/business-model-element'
   },
   {
     text: 'Categories',
-    href: '/category'
+    href: '/backoffice/category'
   },
   {
     text: 'Impact',
-    href: '/impact'
+    href: '/backoffice/impact'
   },
   {
     text: 'Enabling condition',
-    href: '/enabling-condition'
+    href: '/backoffice/enabling-condition'
   },
   {
     text: 'Cities',
-    href: '/cities'
+    href: '/backoffice/cities'
   },
   {
     text: 'Blogs',
-    href: '/blogs'
+    href: '/backoffice/blogs'
   },
   {
     text: 'Events',
-    href: '/events'
+    href: '/backoffice/events'
   },
   {
     text: 'City Supports',
-    href: '/city-supports'
+    href: '/backoffice/city-supports'
   }
 ];
 

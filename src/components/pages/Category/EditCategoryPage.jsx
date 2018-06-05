@@ -230,7 +230,7 @@ class EditCategoryPage extends PureComponent {
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
           <BtnGroup>
-            <Link to="/category" className="button alert">Cancel</Link>
+            <Link to="/backoffice/category" className="button alert">Cancel</Link>
             <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
           <div className="row expanded">

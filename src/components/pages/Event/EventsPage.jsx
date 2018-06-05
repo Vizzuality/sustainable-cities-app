@@ -90,14 +90,14 @@ class EventsPage extends React.Component {
 
     return (
       <div className="c-page">
-        <Link className="button" to="/events/new">New Event</Link>
+        <Link className="button" to="/backoffice/events/new">New Event</Link>
         <Search onChange={this.search} />
         <Table
           items={events}
           itemCount={itemCount}
           fields={EVENT_TABLE_FIELDS}
           defaultSortField={DEFAULT_SORT_FIELD}
-          editUrl="/events/edit"
+          editUrl="/backoffice/events/edit"
           pagination={pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
           onDelete={(item) => {

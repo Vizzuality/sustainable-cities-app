@@ -14,8 +14,6 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
-// Serving assets from public folder
-app.use(express.static(path.join(rootPath, 'public')));
 
 // Load environment config
 require(envPath)(app);

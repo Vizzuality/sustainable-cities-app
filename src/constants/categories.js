@@ -7,8 +7,8 @@ const CATEGORY_TABLE_FIELDS = [
 const DEFAULT_SORT_FIELD = 'name';
 
 /* table – URL's */
-const NEW_CATEGORY_URL = '/category/new';
-const EDIT_CATEGORY_URL = '/category/edit';
+const NEW_CATEGORY_URL = '/backoffice/category/new';
+const EDIT_CATEGORY_URL = '/backoffice/category/edit';
 
 /* type selector */
 const CATEGORY_TYPE_SELECT = [

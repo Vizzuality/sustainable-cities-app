@@ -90,14 +90,14 @@ class BlogsPage extends React.Component {
 
     return (
       <div className="c-page">
-        <Link className="button" to="/blogs/new">New Blog</Link>
+        <Link className="button" to="/backoffice/blogs/new">New Blog</Link>
         <Search onChange={this.search} />
         <Table
           items={blogs}
           itemCount={itemCount}
           fields={BLOGS_TABLE_FIELDS}
           defaultSortField={DEFAULT_SORT_FIELD}
-          editUrl="/blogs/edit"
+          editUrl="/backoffice/blogs/edit"
           pagination={pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
           onDelete={(item) => {

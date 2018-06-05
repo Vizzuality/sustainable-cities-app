@@ -77,14 +77,14 @@ class CityPage extends React.Component {
     const { cities, loading, pagination, itemCount } = this.props;
     return (
       <div className="c-page">
-        <Link className="button" to="/cities/new">New City</Link>
+        <Link className="button" to="/backoffice/cities/new">New City</Link>
         <Search onChange={this.search} />
         <Table
           items={cities}
           itemCount={itemCount}
           fields={CITY_TABLE_FIELDS}
           defaultSortField={DEFAULT_SORT_FIELD}
-          editUrl="/cities/edit"
+          editUrl="/backoffice/cities/edit"
           pagination={pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
           onDelete={(item) => {

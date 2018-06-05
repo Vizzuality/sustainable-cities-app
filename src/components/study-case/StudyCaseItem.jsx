@@ -8,7 +8,7 @@ export default function StudyCaseItem({ data }) {
     backgroundImage: photo_urls[0] ? `url(${config.API_URL}${data.photo_urls[0]})` : ''
   };
   return (
-    <Link className="c-sc" to={`/study-cases/edit/${id}`}>
+    <Link className="c-sc" to={`/backoffice/study-cases/edit/${id}`}>
       <div className="sc-img" style={imageStyles} />
       <div className="sc-name">{name}</div>
     </Link>

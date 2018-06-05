@@ -71,7 +71,7 @@ class NewEnablingPage extends React.Component {
         ...this.state
       },
       onSuccess: () => {
-        dispatch(push('/enabling-condition'));
+        dispatch(push('/backoffice/enabling-condition'));
         toastr.success('Enabling condition created!');
       }
     }));
@@ -82,7 +82,7 @@ class NewEnablingPage extends React.Component {
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
           <BtnGroup>
-            <Link to="/enabling-condition" className="button alert">Cancel</Link>
+            <Link to="/backoffice/enabling-condition" className="button alert">Cancel</Link>
             <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
           <Input

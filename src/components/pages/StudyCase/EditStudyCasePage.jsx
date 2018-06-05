@@ -405,7 +405,7 @@ class EditStudyCasePage extends React.Component {
           <BtnGroup>
             <Button type="submit" className="button success">Edit</Button>
             <button type="button" className="button alert" onClick={this.showDeleteModal}>Delete</button>
-            <Link to="/study-cases" className="button">Cancel</Link>
+            <Link to="/backoffice/study-cases" className="button">Cancel</Link>
           </BtnGroup>
           {/* Name */}
           <Input

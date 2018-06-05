@@ -81,14 +81,14 @@ class EnablingPage extends React.Component {
 
     return (
       <div className="c-page">
-        <Link className="button" to="/enabling-condition/new">New Enabling Condition</Link>
+        <Link className="button" to="/backoffice/enabling-condition/new">New Enabling Condition</Link>
         <Search onChange={this.search} />
         <Table
           items={enablings}
           itemCount={this.props.enablings.itemCount}
           fields={ENABLINGS_TABLE_FIELDS}
           defaultSortField={DEFAULT_SORT_FIELD}
-          editUrl="/enabling-condition/edit"
+          editUrl="/backoffice/enabling-condition/edit"
           pagination={this.props.enablings.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
           onDelete={(item) => {

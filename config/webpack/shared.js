@@ -14,9 +14,9 @@ const config = {
   },
 
   output: {
-    path: path.join(rootPath, 'dist/'),
+    path: path.join(rootPath, 'dist/backoffice'),
     filename: '[name].js',
-    publicPath: '/'
+    publicPath: '/backoffice'
   },
 
   module: {

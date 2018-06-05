@@ -100,7 +100,7 @@ class EditBlogsPage extends React.Component {
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
           <BtnGroup>
-            <Link to="/blogs" className="button alert">Cancel</Link>
+            <Link to="/backoffice/blogs" className="button alert">Cancel</Link>
             <Button type="submit" className="button success">Edit</Button>
           </BtnGroup>
           <div className="row expanded">
