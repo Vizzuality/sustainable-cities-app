@@ -66,7 +66,7 @@ import {
 
 const Routes = ({ history }) => (
   <Router history={history}>
-    <Route path="/" component={AppContainer}>
+    <Route path="/backoffice" component={AppContainer}>
       <IndexRoute components={{ main: HomePage, nav: Sidebar }} />
       <Route path="login">
         <IndexRoute components={{ main: LoginPage }} />
