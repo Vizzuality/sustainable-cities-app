@@ -100,7 +100,7 @@ function login(userData) {
         localStorage.token = token;
         dispatch(setLogged(true));
         dispatch(setLoading(false));
-        dispatch(replace('/'));
+        dispatch(replace('/backoffice'));
         dispatch(getUserData());
       },
       onError(error) {
@@ -116,7 +116,7 @@ function logout() {
     delete localStorage.token;
     dispatch(setLogged(false));
     dispatch(setUserData(null));
-    dispatch(replace('/login'));
+    dispatch(replace('/backoffice/login'));
   };
 }
 
