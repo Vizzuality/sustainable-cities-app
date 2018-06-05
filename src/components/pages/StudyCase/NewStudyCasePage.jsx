@@ -99,7 +99,7 @@ class NewStudyCasePage extends React.Component {
         operational_year: operationalDate
       },
       onSuccess() {
-        dispatch(push('/study-cases'));
+        dispatch(push('/backoffice/study-cases'));
         toastr.success('Study case created!');
       }
     }));
@@ -245,7 +245,7 @@ class NewStudyCasePage extends React.Component {
           {/* Submit buttons */}
           <BtnGroup>
             <Button className="button success" type="submit">Save</Button>
-            <Link className="button alert" to="/study-cases">Cancel</Link>
+            <Link className="button alert" to="/backoffice/study-cases">Cancel</Link>
           </BtnGroup>
           {/* Name */}
           <Input

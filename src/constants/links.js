@@ -1,10 +1,10 @@
 const links = [
   {
-    href: '/login',
+    href: '/backoffice/login',
     text: 'login'
   },
   {
-    href: '/register',
+    href: '/backoffice/register',
     text: 'register'
   }
 ];

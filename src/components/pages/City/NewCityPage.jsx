@@ -59,7 +59,7 @@ class NewCityPage extends React.Component {
     dispatch(createCity({
       data: this.state,
       onSuccess: () => {
-        dispatch(push('/cities'));
+        dispatch(push('/backoffice/cities'));
         toastr.success('City created successfully');
       },
       onError: ({ title }) => {
@@ -75,7 +75,7 @@ class NewCityPage extends React.Component {
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
           <BtnGroup>
-            <Link to="/cities" className="button alert">Cancel</Link>
+            <Link to="/backoffice/cities" className="button alert">Cancel</Link>
             <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
           <div className="row expanded">

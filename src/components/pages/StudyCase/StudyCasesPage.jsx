@@ -84,7 +84,7 @@ class StudyCasesPage extends React.Component {
   render() {
     return (
       <div>
-        <Link className="button" to="/study-cases/new">New study case</Link>
+        <Link className="button" to="/backoffice/study-cases/new">New study case</Link>
         <Search onChange={this.search} />
         <StudyCaseList data={this.props.studyCases.list} />
         <div style={{ position: 'relative', height: '50px' }}>

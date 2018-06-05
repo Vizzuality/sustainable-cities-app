@@ -111,7 +111,7 @@ class NewBmePage extends React.Component {
       data,
       onSuccess: () => {
         // Redirect to bme list
-        dispatch(push('/business-model-element'));
+        dispatch(push('/backoffice/business-model-element'));
         toastr.success('Business model element created!');
       },
       onError: xhrErrorToast
@@ -319,7 +319,7 @@ class NewBmePage extends React.Component {
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
           <BtnGroup>
-            <Link to="/business-model-element" className="button alert">Cancel</Link>
+            <Link to="/backoffice/business-model-element" className="button alert">Cancel</Link>
             <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
           {/* Name */}

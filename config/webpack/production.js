@@ -12,7 +12,7 @@ module.exports = merge(sharedConfig, {
   output: {
     path: path.join(rootPath, 'dist/backoffice/'),
     filename: '[name]-[hash].js',
-    publicPath: '/'
+    publicPath: '/backoffice'
   },
 
   plugins: [

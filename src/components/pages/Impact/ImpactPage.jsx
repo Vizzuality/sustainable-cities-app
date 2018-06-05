@@ -81,14 +81,14 @@ class ImpactPage extends React.Component {
 
     return (
       <div className="c-page">
-        <Link className="button" to="/impact/new">New Impact</Link>
+        <Link className="button" to="/backoffice/impact/new">New Impact</Link>
         <Search onChange={this.search} />
         <Table
           items={impacts}
           itemCount={this.props.impacts.itemCount}
           fields={IMPACT_TABLE_FIELDS}
           defaultSortField={DEFAULT_SORT_FIELD}
-          editUrl="/impact/edit"
+          editUrl="/backoffice/impact/edit"
           pagination={this.props.impacts.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
           onDelete={(item) => {

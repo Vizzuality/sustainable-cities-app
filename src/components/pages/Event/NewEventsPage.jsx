@@ -50,7 +50,7 @@ class NewEventsPage extends React.Component {
     dispatch(createEvents({
       data: this.state,
       onSuccess: () => {
-        dispatch(push('/events'));
+        dispatch(push('/backoffice/events'));
         toastr.success('Event created successfully');
       },
       onError: ({ title }) => {
@@ -66,7 +66,7 @@ class NewEventsPage extends React.Component {
       <section className="c-form">
         <Form onSubmit={this.onSubmit}>
           <BtnGroup>
-            <Link to="/events" className="button alert">Cancel</Link>
+            <Link to="/backoffice/events" className="button alert">Cancel</Link>
             <Button type="submit" className="button success">Save</Button>
           </BtnGroup>
           <div className="row expanded">

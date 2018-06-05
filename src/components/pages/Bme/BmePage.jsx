@@ -89,14 +89,14 @@ class BmePage extends React.Component {
 
     return (
       <div className="c-page">
-        <Link className="button" to="/business-model-element/new">New Business Model Element</Link>
+        <Link className="button" to="/backoffice/business-model-element/new">New Business Model Element</Link>
         <Search onChange={this.search} />
         <Table
           items={bmes}
           itemCount={this.props.bmes.itemCount}
           fields={BME_TABLE_FIELDS}
           defaultSortField={DEFAULT_SORT_FIELD}
-          editUrl="/business-model-element/edit"
+          editUrl="/backoffice/business-model-element/edit"
           pagination={this.props.bmes.pagination}
           onUpdateFilters={(field, value) => { dispatch(setFilters(field, value)); }}
           onDelete={(item) => {

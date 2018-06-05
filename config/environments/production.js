@@ -1,7 +1,7 @@
 const path = require('path');
 const express = require('express');
 
-const indexPath = path.join(process.cwd(), 'dist/index.html');
+const indexPath = path.join(process.cwd(), 'dist/backoffice/index.html');
 
 module.exports = (app) => {
   app.use(express.static(path.join(process.cwd(), 'dist')));

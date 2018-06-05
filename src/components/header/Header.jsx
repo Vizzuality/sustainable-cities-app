@@ -9,7 +9,7 @@ import { logout } from 'modules/user';
 export default function Header(props) {
   return (
     <header className="c-header" role="banner">
-      <Link to="/" className="logo">Sustainable Cities</Link>
+      <Link to="/backoffice" className="logo">Sustainable Cities</Link>
       {props.user.logged ?
         <button className="button" type="button" onClick={() => { dispatch(logout()); }}>Logout</button> :
         <Nav links={links} />
